@@ -51,6 +51,18 @@ function resolveEffectiveBranch(ctx: LandContext): LandContext {
   return ctx;
 }
 
+function emptyResult(warnings: string[], excluded: { reason: string } | null): LeaseRankResult {
+  return {
+    possibleRanks: [],
+    strongestRank: null,
+    incompleteRanks: [],
+    incompleteSpecialRanks: [],
+    warnings,
+    requiredProofs: [],
+    excluded,
+  };
+}
+
 const SPECIAL_IDS: RankId[] = [
   "G10_animal_holder",
   "G10_organic",
@@ -68,27 +80,34 @@ export function evaluateLeaseRanks(input: {
   const p = input.partyStatus;
   const warnings: string[] = [];
 
+  if (ctx.branch === "out_of_scope") {
+    return emptyResult(
+      [
+        "Kivett terület esetén a haszonbérleti előhaszonbérleti ranghely kalkulátor nem alkalmazható.",
+      ],
+      { reason: "A kivett terület nem tartozik a Földforgalmi törvény szerinti föld fogalma alá." },
+    );
+  }
+
   // Adásvétel: ez a motor csak haszonbérletet kezel.
   if (ctx.transaction === "sale") {
-    return {
-      possibleRanks: [],
-      strongestRank: null,
-      incompleteRanks: [],
-      incompleteSpecialRanks: [],
-      warnings: ["Adásvételi elővásárlási ranghely külön modulban készül."],
-      requiredProofs: [],
-      excluded: { reason: "Az adásvételi elővásárlási ranghely más szabályrendszer." },
-    };
+    return emptyResult(["Adásvételi elővásárlási ranghely külön modulban készül."], {
+      reason: "Az adásvételi elővásárlási ranghely más szabályrendszer.",
+    });
   }
 
   if (p.bankruptcy) {
-    warnings.push("Szervezet csőd / felszámolás / végelszámolás esetén a jogcím érvényesítése kizárt lehet.");
+    warnings.push(
+      "Szervezet csőd / felszámolás / végelszámolás esetén a jogcím érvényesítése kizárt lehet.",
+    );
   }
   if (p.has_use_debt) {
     warnings.push("Földhasználati díjtartozás a jogcím érvényesítését akadályozhatja.");
   }
   if (input.landContext.mixedParcel && input.landContext.largerArea === "unknown") {
-    warnings.push("Vegyes alrészlet — nem ismert melyik nagyobb. Az erdő/nem erdő szabálykészlet közötti választás bizonytalan.");
+    warnings.push(
+      "Vegyes alrészlet — nem ismert melyik nagyobb. Az erdő/nem erdő szabálykészlet közötti választás bizonytalan.",
+    );
   }
 
   const ip = intraPriority(p);

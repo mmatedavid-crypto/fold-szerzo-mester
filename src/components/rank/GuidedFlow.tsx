@@ -103,10 +103,10 @@ export function GuidedFlow({
               },
               { value: "forest", label: "Erdő" },
               { value: "non_forest", label: "Gyep" },
-              { value: "unknown", label: "Kivett terület" },
+              { value: "out_of_scope", label: "Kivett terület" },
             ]}
             onPick={(v) => {
-              if (v !== "unknown") setLand({ ...land, branch: v as "forest" | "non_forest" });
+              setLand({ ...land, branch: v as "forest" | "non_forest" | "out_of_scope" });
               next();
             }}
           />

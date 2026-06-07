@@ -4,7 +4,7 @@
  */
 
 export type Transaction = "lease" | "sale";
-export type Branch = "forest" | "non_forest";
+export type Branch = "forest" | "non_forest" | "out_of_scope";
 
 export type Cultivation =
   | "szanto"

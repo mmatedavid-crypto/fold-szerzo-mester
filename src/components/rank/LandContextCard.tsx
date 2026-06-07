@@ -1,8 +1,19 @@
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Sprout, TreePine } from "lucide-react";
 import type { Cultivation, LandContext, Transaction, YesNoUnknown } from "@/lib/rank/leaseTypes";
 
@@ -63,10 +74,20 @@ export const DEFAULT_LAND: LandContextValue = {
 
 function YNU({ value, onChange }: { value: YesNoUnknown; onChange: (v: YesNoUnknown) => void }) {
   return (
-    <RadioGroup value={value} onValueChange={(v) => onChange(v as YesNoUnknown)} className="flex gap-3 flex-wrap">
-      <label className="flex items-center gap-1.5 text-sm cursor-pointer"><RadioGroupItem value="yes" /> igen</label>
-      <label className="flex items-center gap-1.5 text-sm cursor-pointer"><RadioGroupItem value="no" /> nem</label>
-      <label className="flex items-center gap-1.5 text-sm cursor-pointer"><RadioGroupItem value="unknown" /> nem tudom</label>
+    <RadioGroup
+      value={value}
+      onValueChange={(v) => onChange(v as YesNoUnknown)}
+      className="flex gap-3 flex-wrap"
+    >
+      <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+        <RadioGroupItem value="yes" /> igen
+      </label>
+      <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+        <RadioGroupItem value="no" /> nem
+      </label>
+      <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+        <RadioGroupItem value="unknown" /> nem tudom
+      </label>
     </RadioGroup>
   );
 }
@@ -124,6 +145,13 @@ export function LandContextCard({
             title="Erdő / fásított terület"
             desc="Erdőnek minősülő föld — külön erdős ranghelyszabályokkal."
           />
+          <BranchTile
+            active={value.branch === "out_of_scope"}
+            onClick={() => set("branch", "out_of_scope")}
+            icon={<Sprout className="h-5 w-5" />}
+            title="Kivett terület"
+            desc="Nem Földforgalmi tv. szerinti föld — ranghely kalkuláció nem fut."
+          />
         </div>
       </div>
 
@@ -133,10 +161,14 @@ export function LandContextCard({
           value={value.cultivationBranch}
           onValueChange={(v) => set("cultivationBranch", v as Cultivation)}
         >
-          <SelectTrigger><SelectValue placeholder="Válassz…" /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue placeholder="Válassz…" />
+          </SelectTrigger>
           <SelectContent>
             {CULTIVATIONS.map((c) => (
-              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+              <SelectItem key={c.value} value={c.value}>
+                {c.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -163,9 +195,15 @@ export function LandContextCard({
                   onValueChange={(v) => set("largerArea", v as "non_forest" | "forest" | "unknown")}
                   className="flex gap-3 flex-wrap"
                 >
-                  <label className="flex items-center gap-1.5 text-sm cursor-pointer"><RadioGroupItem value="non_forest" /> termőföld nagyobb</label>
-                  <label className="flex items-center gap-1.5 text-sm cursor-pointer"><RadioGroupItem value="forest" /> erdő nagyobb</label>
-                  <label className="flex items-center gap-1.5 text-sm cursor-pointer"><RadioGroupItem value="unknown" /> nem tudom</label>
+                  <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                    <RadioGroupItem value="non_forest" /> termőföld nagyobb
+                  </label>
+                  <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                    <RadioGroupItem value="forest" /> erdő nagyobb
+                  </label>
+                  <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                    <RadioGroupItem value="unknown" /> nem tudom
+                  </label>
                 </RadioGroup>
               </div>
             )}
@@ -188,14 +226,28 @@ export function LandContextCard({
   );
 }
 
-function BranchTile({ active, onClick, icon, title, desc }: { active: boolean; onClick: () => void; icon: React.ReactNode; title: string; desc: string }) {
+function BranchTile({
+  active,
+  onClick,
+  icon,
+  title,
+  desc,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`text-left rounded-lg border-2 p-3 transition-all ${active ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
     >
-      <div className="flex items-center gap-2 font-medium text-sm">{icon} {title}</div>
+      <div className="flex items-center gap-2 font-medium text-sm">
+        {icon} {title}
+      </div>
       <div className="text-xs text-muted-foreground mt-1">{desc}</div>
     </button>
   );

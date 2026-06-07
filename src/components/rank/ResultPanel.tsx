@@ -275,4 +275,8 @@ const META: Record<LeaseComparisonResult["comparison"], { badge: string; copy?: 
   no_prelease_right: {
     badge: "NINCS ELŐHASZONBÉRLETI JOG",
   },
+  out_of_scope: {
+    badge: "NEM FÖLDFORGALMI TV. HATÁLY",
+    copy: "Kivett terület esetén ez a ranghely kalkulátor nem alkalmazható. Ilyenkor nem a Földforgalmi törvény szerinti előhaszonbérleti ranghelyről beszélünk.",
+  },
 };
