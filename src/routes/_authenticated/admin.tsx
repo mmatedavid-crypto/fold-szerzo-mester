@@ -5,6 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { NoticesImport } from "@/components/admin/notices-import";
 
 const checkAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -85,6 +86,9 @@ function AdminPage() {
             </TableBody>
           </Table>
         </Card>
+
+        <h2 className="font-serif text-xl mt-8">Kifüggesztések importálása</h2>
+        <NoticesImport />
 
         <p className="text-xs text-muted-foreground mt-8">
           Admin-szerep beállítás: az első adminhoz a Lovable Cloud SQL editorral futtasd:
