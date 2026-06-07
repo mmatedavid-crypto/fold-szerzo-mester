@@ -12,7 +12,10 @@ function makeDocNumber(seqHint: string): string {
 
 async function sha256Hex(input: Uint8Array | string): Promise<string> {
   const bytes = typeof input === "string" ? new TextEncoder().encode(input) : input;
-  const buf = await crypto.subtle.digest("SHA-256", bytes);
+  // Copy into a fresh ArrayBuffer to satisfy the BufferSource type constraint
+  const ab = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(ab).set(bytes);
+  const buf = await crypto.subtle.digest("SHA-256", ab);
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
