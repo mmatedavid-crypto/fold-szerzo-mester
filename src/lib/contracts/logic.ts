@@ -26,6 +26,22 @@ export function computeRiskReport(draft: Pick<Draft, "lessor_data" | "lessee_dat
   // Mandatory parties
   if (!req(L.name)) items.push({ id: "lessor_name", category: "felek", level: "hianyzo_kotelezo", message: "Hiányzik a haszonbérbeadó neve." });
   if (!req(L.address)) items.push({ id: "lessor_address", category: "felek", level: "hianyzo_kotelezo", message: "Hiányzik a haszonbérbeadó címe." });
+  const coLessors = (L.co_lessors ?? []).filter((c) => c && (req(c.name) || req(c.address) || req(c.ownership_share)));
+  coLessors.forEach((c, i) => {
+    const tag = `${i + 2}. tulajdonos`;
+    if (!req(c.name)) items.push({ id: `co_lessor_${i}_name`, category: "felek", level: "hianyzo_kotelezo", message: `${tag}: hiányzik a név.` });
+    if (!req(c.address)) items.push({ id: `co_lessor_${i}_address`, category: "felek", level: "hianyzo_kotelezo", message: `${tag}: hiányzik a cím.` });
+    if (!req(c.ownership_share)) items.push({ id: `co_lessor_${i}_share`, category: "felek", level: "figyelmeztetes", message: `${tag}: hiányzik a tulajdoni hányad.` });
+  });
+  if (coLessors.length > 0) {
+    const totals = [L, ...coLessors].map((x) => parseShare(x.ownership_share)).filter((n): n is number => n != null);
+    if (totals.length === 1 + coLessors.length) {
+      const sum = totals.reduce((a, b) => a + b, 0);
+      if (Math.abs(sum - 1) > 0.001) {
+        items.push({ id: "ownership_sum", category: "felek", level: "jogi_ellenorzes", message: `A tulajdoni hányadok összege ${sum.toFixed(3)} — 1/1 helyett.` });
+      }
+    }
+  }
   if (!req(E.name)) items.push({ id: "lessee_name", category: "felek", level: "hianyzo_kotelezo", message: "Hiányzik a haszonbérlő neve / cégneve." });
   if (!req(E.address)) items.push({ id: "lessee_address", category: "felek", level: "hianyzo_kotelezo", message: "Hiányzik a haszonbérlő címe / székhelye." });
   if (E.type && !E.is_registered_farmer) {
