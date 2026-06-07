@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
+import { Route as KifuggesztesekRouteImport } from './routes/kifuggesztesek'
 import { Route as BelepesRouteImport } from './routes/belepes'
 import { Route as ArakRouteImport } from './routes/arak'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const RegisztracioRoute = RegisztracioRouteImport.update({
   id: '/regisztracio',
   path: '/regisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KifuggesztesekRoute = KifuggesztesekRouteImport.update({
+  id: '/kifuggesztesek',
+  path: '/kifuggesztesek',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BelepesRoute = BelepesRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
+  '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
+  '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
+  '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/arak' | '/belepes' | '/regisztracio'
+  fullPaths: '/' | '/arak' | '/belepes' | '/kifuggesztesek' | '/regisztracio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/arak' | '/belepes' | '/regisztracio'
-  id: '__root__' | '/' | '/arak' | '/belepes' | '/regisztracio'
+  to: '/' | '/arak' | '/belepes' | '/kifuggesztesek' | '/regisztracio'
+  id:
+    | '__root__'
+    | '/'
+    | '/arak'
+    | '/belepes'
+    | '/kifuggesztesek'
+    | '/regisztracio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArakRoute: typeof ArakRoute
   BelepesRoute: typeof BelepesRoute
+  KifuggesztesekRoute: typeof KifuggesztesekRoute
   RegisztracioRoute: typeof RegisztracioRoute
 }
 
@@ -76,6 +92,13 @@ declare module '@tanstack/react-router' {
       path: '/regisztracio'
       fullPath: '/regisztracio'
       preLoaderRoute: typeof RegisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kifuggesztesek': {
+      id: '/kifuggesztesek'
+      path: '/kifuggesztesek'
+      fullPath: '/kifuggesztesek'
+      preLoaderRoute: typeof KifuggesztesekRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/belepes': {
@@ -106,6 +129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArakRoute: ArakRoute,
   BelepesRoute: BelepesRoute,
+  KifuggesztesekRoute: KifuggesztesekRoute,
   RegisztracioRoute: RegisztracioRoute,
 }
 export const routeTree = rootRouteImport
