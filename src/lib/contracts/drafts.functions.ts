@@ -63,7 +63,8 @@ export const updateDraft = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("contract_drafts")
-      .update({ ...data.patch })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update({ ...(data.patch as any) })
       .eq("id", data.id)
       .eq("user_id", userId)
       .select("*")
