@@ -85,22 +85,22 @@ function RankCalculatorPage() {
 
   return (
     <PageShell>
-      <div className="df-paper min-h-[calc(100vh-5rem)] space-y-6 px-4 py-8 md:px-8">
-        <header className="space-y-2">
+      <div className="min-h-[calc(100vh-4rem)] space-y-6 bg-df-cream px-4 py-6 md:px-8 md:py-10">
+        <header className="mx-auto max-w-2xl space-y-2 text-center">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Badge variant="outline" className="border-primary/40 text-primary">
               Dr Föld
             </Badge>
             <span>Ranghely kalkulátor</span>
           </div>
-          <h1 className="font-brand text-3xl font-black tracking-tight text-df-green md:text-5xl">
-            Ha előrébb állsz, ne maradj hátul.
+          <h1 className="font-brand text-3xl font-bold tracking-[-0.02em] text-df-ink md:text-5xl">
+            Ranghely kalkulátor
           </h1>
-          <p className="text-muted-foreground max-w-2xl">
+          <p className="mx-auto max-w-xl text-df-gray">
             Válaszolj pár egyszerű kérdésre. Dr Föld megmutatja, kinek lehet erősebb
             előhaszonbérleti ranghelye.
           </p>
-          <p className="text-sm text-primary font-medium flex items-center gap-1.5">
+          <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-df-green">
             <Sparkles className="h-4 w-4" /> Ravasz a gazda: nézd meg, hol állsz a sorban.
           </p>
           {showNoticeChip && (

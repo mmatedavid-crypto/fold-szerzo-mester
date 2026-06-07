@@ -4,27 +4,20 @@ import { StampBadge } from "@/components/brand/brand-elements";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 border-t-2 border-df-border bg-df-cream">
-      <div className="container mx-auto grid gap-8 px-4 py-10 text-sm md:grid-cols-3">
+    <footer className="border-t border-df-border bg-df-card">
+      <div className="container mx-auto grid gap-10 px-4 py-10 text-sm md:grid-cols-[1.3fr_1fr_1fr_1fr]">
         <div>
-          <DrFoldLogo className="scale-90 origin-left" />
-          <p className="mt-4 font-brand text-lg font-black text-df-green">Ravasz a gazda.</p>
-          <p className="mt-2 text-df-gray">
-            Ha előrébb állsz, ne maradj hátul. Dr Föld segít ranghelyet nézni, kifüggesztést keresni
-            és dokumentumot előkészíteni.
-          </p>
+          <DrFoldLogo />
+          <p className="mt-4 font-semibold text-df-green">Dr Föld — Ravasz a gazda.</p>
+          <p className="mt-1 text-df-gray">drfold.hu</p>
+          <p className="mt-2 text-df-gray">Nem vagyok ügyvéd, de tudom, hol állok a sorban.</p>
         </div>
         <div>
-          <div className="mb-2 font-brand font-black text-df-green">Szolgáltatás</div>
+          <div className="mb-3 font-semibold text-df-ink">Szolgáltatás</div>
           <ul className="space-y-1 text-df-gray">
             <li>
-              <Link to="/arak" className="hover:text-primary">
-                Árak
-              </Link>
-            </li>
-            <li>
               <Link to="/kifuggesztesek" className="hover:text-primary">
-                Kifüggesztések keresése
+                Kifüggesztések
               </Link>
             </li>
             <li>
@@ -34,25 +27,19 @@ export function SiteFooter() {
             </li>
             <li>
               <Link to="/foldberleti-szerzodes" className="hover:text-primary">
-                Földbérleti szerződés
+                Bérleti szerződés
               </Link>
             </li>
             <li>
-              <Link to="/berleti-dij-iranytu" className="hover:text-primary">
-                Bérleti díj iránytű
-              </Link>
-            </li>
-            <li>
-              <Link to="/dokumentum-ellenorzes" className="hover:text-primary">
-                Dokumentum ellenőrzése
+              <Link to="/elfogado-nyilatkozat" className="hover:text-primary">
+                Elfogadó nyilatkozat
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <div className="mb-2 font-brand font-black text-df-green">Jogi tájékoztatás</div>
-          <StampBadge>Ravasz, de szabályos</StampBadge>
-          <p className="mt-3 text-df-gray">
+          <div className="mb-3 font-semibold text-df-ink">Jogi tájékoztatás</div>
+          <p className="text-df-gray">
             A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás, nem ügyvédi iroda. Egyedi,
             vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.
           </p>
@@ -64,7 +51,7 @@ export function SiteFooter() {
             </li>
             <li>
               <Link to="/adatkezeles" className="hover:text-primary">
-                Adatkezelési tájékoztató
+                Adatkezelés
               </Link>
             </li>
             <li>
@@ -73,6 +60,18 @@ export function SiteFooter() {
               </Link>
             </li>
           </ul>
+        </div>
+        <div>
+          <div className="mb-3 font-semibold text-df-ink">Kapcsolat</div>
+          <ul className="space-y-1 text-df-gray">
+            <li>
+              <Link to="/dokumentum-ellenorzes" className="hover:text-primary">
+                Dokumentum ellenőrzése
+              </Link>
+            </li>
+            <li>drfold.hu</li>
+          </ul>
+          <StampBadge className="mt-4">Jogszerű megoldások</StampBadge>
         </div>
       </div>
       <div className="border-t border-df-border py-4 text-center text-xs text-df-gray">

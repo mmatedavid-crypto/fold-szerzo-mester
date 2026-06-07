@@ -10,15 +10,14 @@ export function DrFoldLogo({ variant = "full", className }: DrFoldLogoProps) {
     return (
       <div
         className={cn(
-          "df-stamp-logo inline-flex aspect-square items-center justify-center rounded-full border-2 border-df-red px-3 text-center font-brand text-df-red",
+          "grid aspect-square place-items-center rounded-full border border-df-red/80 px-3 text-center text-df-red",
           className,
         )}
         aria-label="Dr Föld dokumentum pecsét"
       >
         <div className="-rotate-6">
-          <div className="text-lg font-black leading-none">DR</div>
-          <div className="text-xl font-black leading-none">FÖLD</div>
-          <div className="mt-1 border-t border-df-red pt-1 text-[9px] font-black uppercase tracking-wide">
+          <div className="font-brand text-lg font-bold leading-none">Dr Föld</div>
+          <div className="mt-1 border-t border-df-red pt-1 text-[9px] font-bold uppercase tracking-[0.18em]">
             Dokumentum
           </div>
         </div>
@@ -30,47 +29,52 @@ export function DrFoldLogo({ variant = "full", className }: DrFoldLogoProps) {
     return (
       <div
         className={cn(
-          "inline-flex aspect-square items-center justify-center rounded-xl border-2 border-df-green bg-df-green px-2 font-brand text-df-card shadow-[3px_3px_0_var(--df-border)]",
+          "inline-flex h-10 w-10 items-center justify-center rounded-md border border-df-green bg-df-card text-df-green",
           className,
         )}
         aria-label="Dr Föld"
       >
-        <div className="text-center text-[15px] font-black leading-[0.9] tracking-wide">
-          <div>DR</div>
-          <div>FÖLD</div>
-        </div>
+        <Monogram className="h-7 w-7" />
       </div>
     );
   }
 
   return (
-    <div
-      className={cn(
-        "inline-flex items-center gap-3 rounded-2xl border-2 border-df-green bg-df-card p-2 pr-4 shadow-[4px_4px_0_var(--df-border)]",
-        className,
-      )}
-      aria-label="Dr Föld - Ravasz a gazda."
-    >
-      <div className="relative grid h-14 w-14 place-items-center rounded-xl border-2 border-df-green bg-df-cream">
-        <div className="absolute top-1 h-2 w-10 rounded-sm bg-df-green" />
-        <div className="mt-2 h-9 w-8 rounded-sm border-2 border-df-green bg-df-card shadow-sm">
-          <div className="mx-auto mt-1 h-1.5 w-4 rounded-full bg-df-yellow" />
-          <div className="mx-auto mt-1 grid w-5 grid-cols-3 gap-0.5">
-            <span className="h-2 rounded-sm bg-df-yellow" />
-            <span className="h-4 rounded-sm bg-df-green" />
-            <span className="h-2.5 rounded-sm bg-df-gray" />
-          </div>
-        </div>
-        <span className="absolute -right-1 -bottom-1 grid h-5 w-5 place-items-center rounded-full border-2 border-df-card bg-df-red text-[11px] font-black text-df-card">
-          1
-        </span>
-      </div>
+    <div className={cn("inline-flex items-center gap-2.5", className)} aria-label="Dr Föld">
+      <Monogram className="h-10 w-10 text-df-green" />
       <div className="leading-none">
-        <div className="font-brand text-2xl font-black tracking-wide text-df-green">DR FÖLD</div>
-        <div className="-mt-0.5 inline-flex -rotate-1 rounded-sm bg-df-yellow px-2 py-1 font-brand text-[11px] font-black uppercase tracking-wide text-df-ink">
-          Ravasz a gazda.
+        <div className="font-brand text-2xl font-bold tracking-[-0.02em] text-df-green">
+          Dr Föld
+        </div>
+        <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.22em] text-df-green">
+          Ravasz a gazda
         </div>
       </div>
     </div>
+  );
+}
+
+function Monogram({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden>
+      <path
+        d="M8 40C18 37.5 25 31.2 27.5 20.8C29.2 13.8 25.4 8.2 18.4 6.5H8V40Z"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M17.5 39C29.2 38.4 38 30.3 39.4 18.3C31 18.8 24.1 22.4 19.9 28.6C17.9 31.7 16.8 35.2 17.5 39Z"
+        fill="currentColor"
+        opacity="0.12"
+      />
+      <path
+        d="M17.5 39C29.2 38.4 38 30.3 39.4 18.3C31 18.8 24.1 22.4 19.9 28.6C17.9 31.7 16.8 35.2 17.5 39Z"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M13.5 31.5C19.8 30.7 26.6 25.6 31 16" stroke="currentColor" strokeWidth="2" />
+    </svg>
   );
 }

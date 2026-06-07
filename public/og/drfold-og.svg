@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#FAF6EF"/>
+  <path d="M0 460C170 390 290 430 420 390C560 346 660 300 820 330C970 358 1080 300 1200 248V630H0Z" fill="#E5D8C3"/>
+  <path d="M0 510C210 430 360 486 540 430C710 377 850 397 1200 318V630H0Z" fill="#1F4D37" opacity=".16"/>
+  <g transform="translate(90 118)" fill="none" stroke="#1F4D37" stroke-width="12" stroke-linejoin="round">
+    <path d="M0 130C40 120 68 95 78 54C85 26 70 3 42-4H0V130Z"/>
+    <path d="M70 130C117 128 152 96 158 48C124 50 96 64 80 89C72 101 67 115 70 130Z" fill="#1F4D37" opacity=".12"/>
+    <path d="M70 130C117 128 152 96 158 48C124 50 96 64 80 89C72 101 67 115 70 130Z"/>
+    <path d="M24 96C49 93 76 73 94 34" stroke-width="8"/>
+  </g>
+  <text x="280" y="215" fill="#1F4D37" font-family="Georgia, serif" font-size="86" font-weight="700">Dr Föld</text>
+  <text x="286" y="260" fill="#1F4D37" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="5">RAVASZ A GAZDA</text>
+  <text x="90" y="410" fill="#1A1A1A" font-family="Georgia, serif" font-size="58" font-weight="700">Nézd meg, hol állsz a sorban.</text>
+  <rect x="90" y="468" width="224" height="54" rx="8" fill="#1F4D37"/>
+  <text x="122" y="503" fill="#FFFDF7" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">drfold.hu</text>
+</svg>

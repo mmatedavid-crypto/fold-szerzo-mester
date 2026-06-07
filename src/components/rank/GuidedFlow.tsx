@@ -27,17 +27,16 @@ type ChoiceBtn = { value: string; label: string };
 
 function Choices({ options, onPick }: { options: ChoiceBtn[]; onPick: (v: string) => void }) {
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {options.map((o) => (
-        <Button
+        <button
           key={o.value}
-          variant="outline"
-          size="lg"
-          className="justify-start h-auto py-3 text-left"
+          type="button"
+          className="min-h-14 rounded-md border border-df-border bg-df-card px-4 py-3 text-left text-sm font-semibold text-df-ink transition-colors hover:border-df-green hover:bg-df-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-df-yellow"
           onClick={() => onPick(o.value)}
         >
           {o.label}
-        </Button>
+        </button>
       ))}
     </div>
   );
@@ -67,18 +66,18 @@ export function GuidedFlow({
   };
 
   return (
-    <Card className="mx-auto max-w-xl space-y-5 border-2 border-df-border bg-df-card p-5 shadow-[4px_4px_0_var(--df-border)]">
+    <Card className="mx-auto max-w-2xl space-y-6 border border-df-border bg-df-card p-5 shadow-[0_16px_42px_rgba(26,26,26,0.08)] md:p-7">
       <div>
-        <Progress value={((step + 1) / (total + 1)) * 100} className="h-1" />
-        <div className="text-xs text-muted-foreground mt-1.5">
+        <Progress value={((step + 1) / (total + 1)) * 100} className="h-1.5" />
+        <div className="mt-2 text-xs font-semibold text-df-gray">
           {step + 1}. / {total + 1}. lépés
         </div>
       </div>
 
       {step === 0 && (
         <div className="space-y-4">
-          <h2 className="font-brand text-xl font-black text-df-green">Miről van szó?</h2>
-          <p className="text-sm text-muted-foreground">Földet bérelnél vagy vennél?</p>
+          <h2 className="font-brand text-2xl font-bold text-df-ink">Miről van szó?</h2>
+          <p className="text-sm text-df-gray">Földet bérelnél vagy vennél?</p>
           <Choices
             options={[
               { value: "lease", label: "Bérelni szeretnék (haszonbérlet)" },
@@ -94,16 +93,17 @@ export function GuidedFlow({
 
       {step === 1 && (
         <div className="space-y-4">
-          <h2 className="font-brand text-xl font-black text-df-green">Milyen földről beszélünk?</h2>
-          <p className="text-sm text-muted-foreground">Válaszd ki, melyik illik rá a legjobban.</p>
+          <h2 className="font-brand text-2xl font-bold text-df-ink">Milyen földről beszélünk?</h2>
+          <p className="text-sm text-df-gray">Válaszd ki, melyik illik rá a legjobban.</p>
           <Choices
             options={[
               {
                 value: "non_forest",
-                label: "Termőföld — szántó, rét, legelő, kert, szőlő, gyümölcsös",
+                label: "Termőföld",
               },
-              { value: "forest", label: "Erdő vagy fásított terület" },
-              { value: "unknown", label: "Még nem tudom biztosan" },
+              { value: "forest", label: "Erdő" },
+              { value: "non_forest", label: "Gyep" },
+              { value: "unknown", label: "Kivett terület" },
             ]}
             onPick={(v) => {
               if (v !== "unknown") setLand({ ...land, branch: v as "forest" | "non_forest" });
@@ -115,8 +115,8 @@ export function GuidedFlow({
 
       {step === 2 && (
         <div className="space-y-4">
-          <h2 className="font-brand text-xl font-black text-df-green">Ki a kifüggesztett bérlő?</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="font-brand text-2xl font-bold text-df-ink">Ki a kifüggesztett bérlő?</h2>
+          <p className="text-sm text-df-gray">
             Az, akivel a tulajdonos szerződést kötne. Válaszd a legjellemzőbbet — később
             finomíthatod.
           </p>
@@ -145,10 +145,10 @@ export function GuidedFlow({
 
       {step === 3 && (
         <div className="space-y-4">
-          <h2 className="font-brand text-xl font-black text-df-green">
+          <h2 className="font-brand text-2xl font-bold text-df-ink">
             És te ki vagy ebben a sztoriban?
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-df-gray">
             Válaszd ki, ami a leginkább igaz rád. A részletes jogcímeket utána pontosítjuk.
           </p>
           <Choices
@@ -171,10 +171,10 @@ export function GuidedFlow({
 
       {step === 4 && (
         <div className="space-y-4">
-          <h2 className="font-brand text-xl font-black text-df-green">
+          <h2 className="font-brand text-2xl font-bold text-df-ink">
             Van valami extra ütőkártyád?
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-df-gray">
             Ezek az „erős” jogcímek — ha megvan hozzá az igazolásod, fellökhetnek a rangsorban.
           </p>
           <Choices
@@ -202,15 +202,15 @@ export function GuidedFlow({
 
       {step === 5 && (
         <div className="space-y-4">
-          <h2 className="font-brand text-xl font-black text-df-green">
+          <h2 className="font-brand text-2xl font-bold text-df-ink">
             Papírral is alá tudod támasztani?
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-df-gray">
             A komolyabb jogcímekhez (állattartó, bio, öntözés…) hivatalos igazolások kellenek. Ne
             aggódj — az eredmény után pontos listát kapsz arról, mit kell összeszedned.
           </p>
           <div className="grid gap-2">
-            <Button size="lg" onClick={next}>
+            <Button size="lg" className="bg-df-green text-white hover:bg-[#173B2A]" onClick={next}>
               Rendben, megyünk tovább
             </Button>
             <Button
@@ -229,10 +229,10 @@ export function GuidedFlow({
 
       {step === 6 && (
         <div className="space-y-4">
-          <h2 className="font-brand text-xl font-black text-df-green">
+          <h2 className="font-brand text-2xl font-bold text-df-ink">
             Van valami különleges helyzet?
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-df-gray">
             Ezek ritka esetek, de teljesen átírják a rangsort. Ha bármelyik igaz, pipáld be — ha
             egyik sem, csak menj tovább.
           </p>
@@ -242,7 +242,7 @@ export function GuidedFlow({
               return (
                 <label
                   key={e.value}
-                  className={`flex items-start gap-3 border rounded-lg p-3 cursor-pointer transition-colors ${checked ? "border-primary bg-primary/5" : "hover:bg-muted/40"}`}
+                  className={`flex cursor-pointer items-start gap-3 rounded-md border p-3 transition-colors ${checked ? "border-df-green bg-df-green text-white" : "border-df-border hover:bg-df-cream"}`}
                 >
                   <Checkbox
                     checked={checked}
@@ -254,7 +254,11 @@ export function GuidedFlow({
               );
             })}
           </div>
-          <Button size="lg" className="w-full" onClick={next}>
+          <Button
+            size="lg"
+            className="w-full bg-df-green text-white hover:bg-[#173B2A]"
+            onClick={next}
+          >
             {exceptions.length > 0 ? "Tovább az eredményhez" : "Egyik sem — lássuk az eredményt"}
           </Button>
         </div>

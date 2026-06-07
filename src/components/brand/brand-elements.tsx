@@ -1,22 +1,26 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
-  AlertTriangle,
-  CalendarClock,
+  ArrowRight,
+  Calculator,
+  CalendarDays,
   Check,
   FileCheck2,
   FileSignature,
-  Handshake,
-  MapPinned,
-  PenLine,
+  Lock,
+  Scale,
+  Search,
+  ShieldCheck,
+  UserCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BrandButton } from "./brand-buttons";
 
 export function BrandBadge({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-sm border-2 border-df-green bg-df-yellow px-3 py-1 font-brand text-xs font-black uppercase tracking-wide text-df-ink shadow-[2px_2px_0_var(--df-border)]",
+        "inline-flex items-center rounded-full border border-df-border bg-df-card px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-df-green",
         className,
       )}
     >
@@ -29,7 +33,7 @@ export function StampBadge({ children, className }: { children: ReactNode; class
   return (
     <span
       className={cn(
-        "inline-flex -rotate-2 items-center rounded-sm border-2 border-df-red px-3 py-1 font-brand text-xs font-black uppercase tracking-wide text-df-red",
+        "inline-flex items-center rounded-full border border-df-red/70 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-df-red",
         className,
       )}
     >
@@ -38,99 +42,225 @@ export function StampBadge({ children, className }: { children: ReactNode; class
   );
 }
 
-export function RankBarsIcon({ className }: { className?: string }) {
-  return (
-    <div className={cn("flex h-16 items-end gap-1.5", className)} aria-hidden>
-      <div className="grid h-8 w-7 place-items-center rounded-sm border-2 border-df-green bg-df-gray font-brand text-sm font-black text-df-card">
-        2
-      </div>
-      <div className="relative grid h-14 w-9 place-items-center rounded-sm border-2 border-df-green bg-df-yellow font-brand text-2xl font-black text-df-green">
-        1
-        <span className="absolute -top-3 left-1/2 h-2 w-1 -translate-x-1/2 rounded-full bg-df-red" />
-        <span className="absolute -top-1 -left-2 h-1.5 w-1 rotate-[-35deg] rounded-full bg-df-red" />
-        <span className="absolute -top-1 -right-2 h-1.5 w-1 rotate-[35deg] rounded-full bg-df-red" />
-      </div>
-      <div className="grid h-7 w-7 place-items-center rounded-sm border-2 border-df-green bg-df-card font-brand text-sm font-black text-df-green">
-        3
-      </div>
-    </div>
-  );
-}
-
-export function NoticeBoardIcon({ className }: { className?: string }) {
-  return (
-    <div className={cn("relative h-16 w-16", className)} aria-hidden>
-      <div className="absolute left-1 top-0 h-3 w-14 rounded-sm bg-df-green" />
-      <div className="absolute left-3 top-3 h-11 w-10 rounded-sm border-2 border-df-green bg-df-card shadow-[2px_2px_0_var(--df-border)]">
-        <div className="mx-2 mt-2 h-1.5 rounded-full bg-df-red" />
-        <div className="mx-2 mt-2 h-1.5 rounded-full bg-df-green" />
-        <div className="mx-2 mt-2 h-1.5 rounded-full bg-df-border" />
-      </div>
-      <div className="absolute bottom-0 left-4 h-4 w-1.5 rounded-sm bg-df-green" />
-      <div className="absolute bottom-0 right-4 h-4 w-1.5 rounded-sm bg-df-green" />
-    </div>
-  );
-}
-
-export function DeadlineAlert({ className }: { className?: string }) {
+export function GoldSeal({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border-2 border-df-red bg-df-card px-3 py-2 text-sm font-bold text-df-red",
+        "grid aspect-square place-items-center rounded-full border border-[#B88F2D] bg-df-yellow text-df-green shadow-sm",
         className,
       )}
+      aria-hidden
     >
-      <AlertTriangle className="h-4 w-4" />A határidő jogvesztő.
+      <Scale className="h-5 w-5" />
     </div>
   );
 }
 
-export function FeatureCard({
+export function SelectableChip({
+  children,
+  selected,
+  className,
+}: {
+  children: ReactNode;
+  selected?: boolean;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "inline-flex min-h-10 items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-semibold transition-colors",
+        selected
+          ? "border-df-green bg-df-green text-df-card"
+          : "border-df-border bg-df-card text-df-ink hover:border-df-green",
+        className,
+      )}
+    >
+      {children}
+      {selected && <Check className="h-3.5 w-3.5" />}
+    </button>
+  );
+}
+
+export function HeroResultCard({ className }: { className?: string }) {
+  const rows = ["Helyben lakó szomszéd", "Földműves státusz", "Földhasználat", "Igazolható jogcím"];
+
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-lg border border-df-border bg-df-card shadow-[0_18px_45px_rgba(26,26,26,0.12)]",
+        className,
+      )}
+    >
+      <div className="df-dark-card relative p-7 text-df-card">
+        <GoldSeal className="absolute right-5 top-4 h-14 w-14" />
+        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-df-yellow">
+          Előzetes eredmény
+        </div>
+        <div className="mt-3 font-brand text-3xl font-bold leading-tight">TE ÁLLHATSZ ELŐRÉBB</div>
+      </div>
+      <div className="p-7">
+        <p className="text-sm font-semibold text-df-ink">
+          Az adatok alapján a rangsorban előrébb állhatsz.
+        </p>
+        <div className="mt-5 space-y-3">
+          {rows.map((row) => (
+            <div key={row} className="flex items-center gap-3 text-sm text-df-ink">
+              <span className="grid h-5 w-5 place-items-center rounded-full border border-df-green text-df-green">
+                <Check className="h-3 w-3" />
+              </span>
+              {row}
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 flex items-end justify-between border-t border-df-border pt-5">
+          <span className="text-sm text-df-gray">Becsült rangsor pozíció</span>
+          <span className="font-brand text-2xl font-bold text-df-green">2–3. hely</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ServiceCard({
   title,
-  kicker,
   text,
   to,
   cta,
   icon,
 }: {
   title: string;
-  kicker: string;
   text: string;
   to: string;
   cta: string;
-  icon: "notice" | "rank" | "acceptance" | "contract" | "deadline" | "lawyer";
+  icon: "rank" | "notice" | "acceptance" | "contract";
 }) {
-  const Icon = iconMap[icon];
+  const Icon = serviceIconMap[icon];
   return (
     <Link
       to={to}
-      className="group flex min-h-[220px] flex-col rounded-lg border-2 border-df-border bg-df-card p-5 shadow-[4px_4px_0_var(--df-border)] transition-transform hover:-translate-y-0.5 hover:border-df-green"
+      className="group flex min-h-[210px] flex-col border border-df-border bg-df-card p-7 transition-colors hover:border-df-green"
     >
-      <div className="flex items-start justify-between gap-3">
-        {icon === "notice" ? (
-          <NoticeBoardIcon />
-        ) : icon === "rank" ? (
-          <RankBarsIcon />
-        ) : (
-          <Icon className="h-10 w-10 text-df-green" />
-        )}
-        <span className="rounded-sm bg-df-cream px-2 py-1 font-brand text-[11px] font-black uppercase text-df-green">
-          {kicker}
-        </span>
-      </div>
-      <h3 className="mt-5 font-brand text-xl font-black text-df-green">{title}</h3>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-df-gray">{text}</p>
-      <span className="mt-4 inline-flex font-bold text-df-green group-hover:underline">{cta}</span>
+      <Icon className="h-10 w-10 text-df-green" strokeWidth={1.7} />
+      <h3 className="mt-6 font-brand text-2xl font-bold text-df-green">{title}</h3>
+      <p className="mt-3 flex-1 text-sm leading-relaxed text-df-ink">{text}</p>
+      <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-df-green">
+        {cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+      </span>
     </Link>
   );
 }
 
-const iconMap = {
-  notice: MapPinned,
-  rank: Check,
+export function FeatureCard(props: Parameters<typeof ServiceCard>[0] & { kicker?: string }) {
+  return <ServiceCard {...props} />;
+}
+
+export function RankPreview() {
+  const chips = [
+    ["Termőföld", true],
+    ["Erdő", false],
+    ["Gyep", false],
+    ["Kivett terület", false],
+    ["Helyben lakó szomszéd", true],
+    ["Helyi gazdálkodó", false],
+    ["Földműves végzettség", false],
+    ["Fiatal gazda", false],
+    ["Bio / öko", true],
+    ["Állattartó", false],
+    ["Integrátor", false],
+    ["Egyéb körülmény", false],
+  ] as const;
+
+  return (
+    <section className="container mx-auto px-4 py-10">
+      <div className="grid gap-8 rounded-lg border border-df-border bg-df-card p-6 md:grid-cols-[1fr_360px] md:p-8">
+        <div>
+          <h2 className="font-brand text-3xl font-bold text-df-ink">
+            Ranghely kalkulátor – előnézet
+          </h2>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {chips.map(([label, selected]) => (
+              <SelectableChip key={label} selected={selected}>
+                {label}
+              </SelectableChip>
+            ))}
+          </div>
+        </div>
+        <div className="df-dark-card rounded-lg p-7 text-df-card">
+          <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-df-yellow">
+            Előzetes eredmény
+          </div>
+          <div className="mt-4 font-brand text-2xl font-bold">Nagy eséllyel előrébb állsz.</div>
+          <div className="mt-5 text-sm text-df-cream">Becsült rangsor pozíció</div>
+          <div className="mt-1 font-brand text-4xl font-bold text-df-yellow">2–3. hely</div>
+          <BrandButton asChild variant="secondary" className="mt-7 w-full bg-df-card">
+            <Link to="/ranghely-kalkulator">
+              Teljes kalkulátor megnyitása <ArrowRight className="h-4 w-4" />
+            </Link>
+          </BrandButton>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function TrustStrip() {
+  const items = [
+    {
+      icon: ShieldCheck,
+      text: "Jogszabályok alapján és folyamatosan frissítve.",
+    },
+    {
+      icon: Lock,
+      text: "Az adataid biztonságban vannak. Nem adjuk tovább harmadik félnek.",
+    },
+    {
+      icon: UserCheck,
+      text: "Ügyvédi szakértelem a földügyek mögött.",
+    },
+  ];
+
+  return (
+    <section className="container mx-auto px-4 pb-12">
+      <div className="relative grid gap-5 rounded-lg border border-df-border bg-df-card p-6 md:grid-cols-3">
+        {items.map(({ icon: Icon, text }) => (
+          <div key={text} className="flex items-center gap-4 text-sm text-df-ink">
+            <Icon className="h-8 w-8 shrink-0 text-df-green" strokeWidth={1.6} />
+            {text}
+          </div>
+        ))}
+        <StampBadge className="md:absolute md:-right-4 md:-bottom-4 bg-df-card">
+          Jogszerű megoldások
+        </StampBadge>
+      </div>
+    </section>
+  );
+}
+
+export function NoticeBoardIcon({ className }: { className?: string }) {
+  return <Search className={cn("h-10 w-10 text-df-green", className)} strokeWidth={1.7} />;
+}
+
+export function RankBarsIcon({ className }: { className?: string }) {
+  return <Calculator className={cn("h-10 w-10 text-df-green", className)} strokeWidth={1.7} />;
+}
+
+export function DeadlineAlert({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-2 rounded-md border border-df-red bg-df-card px-3 py-2 text-sm font-semibold text-df-red",
+        className,
+      )}
+    >
+      <CalendarDays className="h-4 w-4" />A határidő jogvesztő.
+    </div>
+  );
+}
+
+const serviceIconMap = {
+  rank: Calculator,
+  notice: Search,
   acceptance: FileCheck2,
   contract: FileSignature,
-  deadline: CalendarClock,
-  lawyer: Handshake,
-  sale: PenLine,
 };
