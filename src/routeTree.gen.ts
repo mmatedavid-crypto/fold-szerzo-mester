@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as BelepesRouteImport } from './routes/belepes'
 import { Route as ArakRouteImport } from './routes/arak'
 import { Route as IndexRouteImport } from './routes/index'
 
+const RegisztracioRoute = RegisztracioRouteImport.update({
+  id: '/regisztracio',
+  path: '/regisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BelepesRoute = BelepesRouteImport.update({
   id: '/belepes',
   path: '/belepes',
@@ -33,34 +39,45 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
+  '/regisztracio': typeof RegisztracioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
+  '/regisztracio': typeof RegisztracioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
+  '/regisztracio': typeof RegisztracioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/arak' | '/belepes'
+  fullPaths: '/' | '/arak' | '/belepes' | '/regisztracio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/arak' | '/belepes'
-  id: '__root__' | '/' | '/arak' | '/belepes'
+  to: '/' | '/arak' | '/belepes' | '/regisztracio'
+  id: '__root__' | '/' | '/arak' | '/belepes' | '/regisztracio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArakRoute: typeof ArakRoute
   BelepesRoute: typeof BelepesRoute
+  RegisztracioRoute: typeof RegisztracioRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/regisztracio': {
+      id: '/regisztracio'
+      path: '/regisztracio'
+      fullPath: '/regisztracio'
+      preLoaderRoute: typeof RegisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/belepes': {
       id: '/belepes'
       path: '/belepes'
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArakRoute: ArakRoute,
   BelepesRoute: BelepesRoute,
+  RegisztracioRoute: RegisztracioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
