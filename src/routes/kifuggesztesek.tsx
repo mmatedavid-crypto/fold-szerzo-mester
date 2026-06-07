@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Search } from "lucide-react";
+import { ExternalLink, Search, Calculator } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 
@@ -123,14 +123,19 @@ function NoticesPage() {
                   <TableCell>{n.settlement ?? "—"}</TableCell>
                   <TableCell className="text-xs">{(n.parcel_numbers ?? []).join(", ") || "—"}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{n.municipality ?? "—"}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right whitespace-nowrap">
+                    <Button asChild size="sm" variant="ghost">
+                      <Link to="/kifuggesztesek/$noticeId" params={{ noticeId: n.id }}>
+                        <Calculator className="h-4 w-4 mr-1" /> Ranghely
+                      </Link>
+                    </Button>
                     {n.original_detail_url ? (
                       <Button asChild size="sm" variant="ghost">
-                        <a href={n.original_detail_url} target="_blank" rel="noopener noreferrer">
-                          Megnyitás <ExternalLink className="h-4 w-4 ml-1" />
+                        <a href={n.original_detail_url} target="_blank" rel="noopener noreferrer" aria-label="Hivatalos oldal megnyitása">
+                          <ExternalLink className="h-4 w-4" />
                         </a>
                       </Button>
-                    ) : "—"}
+                    ) : null}
                   </TableCell>
                 </TableRow>
               ))}
