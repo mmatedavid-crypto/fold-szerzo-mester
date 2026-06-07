@@ -93,6 +93,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Dr Föld | Ha előrébb állsz, ne maradj hátul." },
+      { name: "description", content: "Dr Föld segít gazdáknak és földtulajdonosoknak kifüggesztéseket figyelni, előhaszonbérleti ranghelyet ellenőrizni, elfogadó nyilatkozatot és földbérleti szerződ" },
+      { property: "og:description", content: "Dr Föld segít gazdáknak és földtulajdonosoknak kifüggesztéseket figyelni, előhaszonbérleti ranghelyet ellenőrizni, elfogadó nyilatkozatot és földbérleti szerződ" },
+      { name: "twitter:description", content: "Dr Föld segít gazdáknak és földtulajdonosoknak kifüggesztéseket figyelni, előhaszonbérleti ranghelyet ellenőrizni, elfogadó nyilatkozatot és földbérleti szerződ" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/hi1om8j0elZ5DuxO0fCooVpBb7O2/social-images/social-1780872566645-Image_3.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/hi1om8j0elZ5DuxO0fCooVpBb7O2/social-images/social-1780872566645-Image_3.webp" },
     ],
     links: [
       {
