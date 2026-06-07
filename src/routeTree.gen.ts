@@ -18,6 +18,7 @@ import { Route as ArakRouteImport } from './routes/arak'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSzerzodesUjRouteImport } from './routes/_authenticated/szerzodes.uj'
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 
 const RegisztracioRoute = RegisztracioRouteImport.update({
@@ -64,6 +65,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSzerzodesUjRoute =
+  AuthenticatedSzerzodesUjRouteImport.update({
+    id: '/szerzodes/uj',
+    path: '/szerzodes/uj',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicPaymentsMockConfirmRoute =
   ApiPublicPaymentsMockConfirmRouteImport.update({
     id: '/api/public/payments/mock-confirm',
@@ -80,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRoutesByTo {
@@ -91,6 +99,7 @@ export interface FileRoutesByTo {
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRoutesById {
@@ -104,6 +113,7 @@ export interface FileRoutesById {
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRouteTypes {
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/kifuggesztesek'
     | '/regisztracio'
     | '/dashboard'
+    | '/szerzodes/uj'
     | '/api/public/payments/mock-confirm'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/kifuggesztesek'
     | '/regisztracio'
     | '/dashboard'
+    | '/szerzodes/uj'
     | '/api/public/payments/mock-confirm'
   id:
     | '__root__'
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
     | '/kifuggesztesek'
     | '/regisztracio'
     | '/_authenticated/dashboard'
+    | '/_authenticated/szerzodes/uj'
     | '/api/public/payments/mock-confirm'
   fileRoutesById: FileRoutesById
 }
@@ -220,6 +233,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/szerzodes/uj': {
+      id: '/_authenticated/szerzodes/uj'
+      path: '/szerzodes/uj'
+      fullPath: '/szerzodes/uj'
+      preLoaderRoute: typeof AuthenticatedSzerzodesUjRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/payments/mock-confirm': {
       id: '/api/public/payments/mock-confirm'
       path: '/api/public/payments/mock-confirm'
@@ -232,10 +252,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSzerzodesUjRoute: typeof AuthenticatedSzerzodesUjRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSzerzodesUjRoute: AuthenticatedSzerzodesUjRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -255,3 +277,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
