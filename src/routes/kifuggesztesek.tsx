@@ -107,17 +107,16 @@ function NoticesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Közzététel</TableHead>
                 <TableHead>Település</TableHead>
                 <TableHead>Hrsz.</TableHead>
                 <TableHead>Típus</TableHead>
                 <TableHead className="text-right">Részletek</TableHead>
+                <TableHead className="text-right">Közzététel</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((n) => (
                 <TableRow key={n.id}>
-                  <TableCell className="text-sm whitespace-nowrap">{n.publication_date ? formatDate(n.publication_date) : "—"}</TableCell>
                   <TableCell>{n.settlement ?? "—"}</TableCell>
                   <TableCell className="text-xs">{(n.parcel_numbers ?? []).join(", ") || "—"}</TableCell>
                   <TableCell className="text-sm"><Badge variant="outline">{n.notice_type ?? "—"}</Badge></TableCell>
@@ -135,6 +134,7 @@ function NoticesPage() {
                       </Button>
                     ) : null}
                   </TableCell>
+                  <TableCell className="text-right text-sm whitespace-nowrap">{n.publication_date ? formatDate(n.publication_date) : "—"}</TableCell>
                 </TableRow>
               ))}
               {!q.isLoading && filtered.length === 0 && (
