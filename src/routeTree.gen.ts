@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as BelepesRouteImport } from './routes/belepes'
 import { Route as ArakRouteImport } from './routes/arak'
 import { Route as IndexRouteImport } from './routes/index'
 
+const BelepesRoute = BelepesRouteImport.update({
+  id: '/belepes',
+  path: '/belepes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArakRoute = ArakRouteImport.update({
   id: '/arak',
   path: '/arak',
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
+  '/belepes': typeof BelepesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
+  '/belepes': typeof BelepesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/arak': typeof ArakRoute
+  '/belepes': typeof BelepesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/arak'
+  fullPaths: '/' | '/arak' | '/belepes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/arak'
-  id: '__root__' | '/' | '/arak'
+  to: '/' | '/arak' | '/belepes'
+  id: '__root__' | '/' | '/arak' | '/belepes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArakRoute: typeof ArakRoute
+  BelepesRoute: typeof BelepesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/belepes': {
+      id: '/belepes'
+      path: '/belepes'
+      fullPath: '/belepes'
+      preLoaderRoute: typeof BelepesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/arak': {
       id: '/arak'
       path: '/arak'
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArakRoute: ArakRoute,
+  BelepesRoute: BelepesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
