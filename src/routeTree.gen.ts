@@ -21,6 +21,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSzerzodesUjRouteImport } from './routes/_authenticated/szerzodes.uj'
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 import { Route as AuthenticatedSzerzodesIdSzerkesztesRouteImport } from './routes/_authenticated/szerzodes.$id.szerkesztes'
+import { Route as AuthenticatedSzerzodesIdEllenorzesRouteImport } from './routes/_authenticated/szerzodes.$id.ellenorzes'
 
 const RegisztracioRoute = RegisztracioRouteImport.update({
   id: '/regisztracio',
@@ -84,6 +85,12 @@ const AuthenticatedSzerzodesIdSzerkesztesRoute =
     path: '/szerzodes/$id/szerkesztes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSzerzodesIdEllenorzesRoute =
+  AuthenticatedSzerzodesIdEllenorzesRouteImport.update({
+    id: '/szerzodes/$id/ellenorzes',
+    path: '/szerzodes/$id/ellenorzes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/regisztracio': typeof RegisztracioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -108,6 +116,7 @@ export interface FileRoutesByTo {
   '/regisztracio': typeof RegisztracioRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -123,6 +132,7 @@ export interface FileRoutesById {
   '/regisztracio': typeof RegisztracioRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/_authenticated/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/_authenticated/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/regisztracio'
     | '/dashboard'
     | '/szerzodes/uj'
+    | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/szerkesztes'
     | '/api/public/payments/mock-confirm'
   fileRoutesByTo: FileRoutesByTo
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/regisztracio'
     | '/dashboard'
     | '/szerzodes/uj'
+    | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/szerkesztes'
     | '/api/public/payments/mock-confirm'
   id:
@@ -165,6 +177,7 @@ export interface FileRouteTypes {
     | '/regisztracio'
     | '/_authenticated/dashboard'
     | '/_authenticated/szerzodes/uj'
+    | '/_authenticated/szerzodes/$id/ellenorzes'
     | '/_authenticated/szerzodes/$id/szerkesztes'
     | '/api/public/payments/mock-confirm'
   fileRoutesById: FileRoutesById
@@ -267,18 +280,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSzerzodesIdSzerkesztesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/szerzodes/$id/ellenorzes': {
+      id: '/_authenticated/szerzodes/$id/ellenorzes'
+      path: '/szerzodes/$id/ellenorzes'
+      fullPath: '/szerzodes/$id/ellenorzes'
+      preLoaderRoute: typeof AuthenticatedSzerzodesIdEllenorzesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSzerzodesUjRoute: typeof AuthenticatedSzerzodesUjRoute
+  AuthenticatedSzerzodesIdEllenorzesRoute: typeof AuthenticatedSzerzodesIdEllenorzesRoute
   AuthenticatedSzerzodesIdSzerkesztesRoute: typeof AuthenticatedSzerzodesIdSzerkesztesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSzerzodesUjRoute: AuthenticatedSzerzodesUjRoute,
+  AuthenticatedSzerzodesIdEllenorzesRoute:
+    AuthenticatedSzerzodesIdEllenorzesRoute,
   AuthenticatedSzerzodesIdSzerkesztesRoute:
     AuthenticatedSzerzodesIdSzerkesztesRoute,
 }
