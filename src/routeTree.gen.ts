@@ -15,6 +15,7 @@ import { Route as BerletiDijIranytuRouteImport } from './routes/berleti-dij-iran
 import { Route as BelepesRouteImport } from './routes/belepes'
 import { Route as ArakRouteImport } from './routes/arak'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 
 const RegisztracioRoute = RegisztracioRouteImport.update({
   id: '/regisztracio',
@@ -46,6 +47,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaymentsMockConfirmRoute =
+  ApiPublicPaymentsMockConfirmRouteImport.update({
+    id: '/api/public/payments/mock-confirm',
+    path: '/api/public/payments/mock-confirm',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +70,7 @@ export interface FileRoutesByTo {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +80,7 @@ export interface FileRoutesById {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +91,7 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/kifuggesztesek'
     | '/regisztracio'
+    | '/api/public/payments/mock-confirm'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +100,7 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/kifuggesztesek'
     | '/regisztracio'
+    | '/api/public/payments/mock-confirm'
   id:
     | '__root__'
     | '/'
@@ -97,6 +109,7 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/kifuggesztesek'
     | '/regisztracio'
+    | '/api/public/payments/mock-confirm'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +119,7 @@ export interface RootRouteChildren {
   BerletiDijIranytuRoute: typeof BerletiDijIranytuRoute
   KifuggesztesekRoute: typeof KifuggesztesekRoute
   RegisztracioRoute: typeof RegisztracioRoute
+  ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payments/mock-confirm': {
+      id: '/api/public/payments/mock-confirm'
+      path: '/api/public/payments/mock-confirm'
+      fullPath: '/api/public/payments/mock-confirm'
+      preLoaderRoute: typeof ApiPublicPaymentsMockConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,7 +183,18 @@ const rootRouteChildren: RootRouteChildren = {
   BerletiDijIranytuRoute: BerletiDijIranytuRoute,
   KifuggesztesekRoute: KifuggesztesekRoute,
   RegisztracioRoute: RegisztracioRoute,
+  ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
