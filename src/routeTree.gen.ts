@@ -93,9 +93,9 @@ const KifuggesztesekIndexRoute = KifuggesztesekIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const KifuggesztesekNoticeIdRoute = KifuggesztesekNoticeIdRouteImport.update({
-  id: '/$noticeId',
-  path: '/$noticeId',
-  getParentRoute: () => KifuggesztesekRoute,
+  id: '/kifuggesztesek/$noticeId',
+  path: '/kifuggesztesek/$noticeId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -318,6 +318,7 @@ export interface RootRouteChildren {
   DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
   LeiratkozasRoute: typeof LeiratkozasRoute
   RegisztracioRoute: typeof RegisztracioRoute
+  KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
   KifuggesztesekIndexRoute: typeof KifuggesztesekIndexRoute
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
@@ -412,10 +413,10 @@ declare module '@tanstack/react-router' {
     }
     '/kifuggesztesek/$noticeId': {
       id: '/kifuggesztesek/$noticeId'
-      path: '/$noticeId'
+      path: '/kifuggesztesek/$noticeId'
       fullPath: '/kifuggesztesek/$noticeId'
       preLoaderRoute: typeof KifuggesztesekNoticeIdRouteImport
-      parentRoute: typeof KifuggesztesekRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -527,6 +528,7 @@ const rootRouteChildren: RootRouteChildren = {
   DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
   LeiratkozasRoute: LeiratkozasRoute,
   RegisztracioRoute: RegisztracioRoute,
+  KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
   KifuggesztesekIndexRoute: KifuggesztesekIndexRoute,
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
@@ -535,13 +537,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
