@@ -60,7 +60,7 @@ export function PricingCards({ plans }: { plans: Plan[] }) {
               ))}
             </ul>
             <Button asChild className="mt-6" variant={isPopular ? "default" : "outline"}>
-              <Link to="/szerzodes/uj" search={{ plan: p.slug }}>{ctaBySlug[p.slug] ?? "Választom"}</Link>
+              <Link to="/szerzodes/uj">{ctaBySlug[p.slug] ?? "Választom"}</Link>
             </Button>
           </Card>
         );
