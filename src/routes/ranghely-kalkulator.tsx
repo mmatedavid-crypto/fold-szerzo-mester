@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -32,7 +33,6 @@ export const Route = createFileRoute("/ranghely-kalkulator")({
 
 function RankCalculatorPage() {
   const search = useSearch({ from: "/ranghely-kalkulator" });
-  const navigate = useNavigate();
   const [showNoticeChip, setShowNoticeChip] = useState(!!search.from);
 
   const [land, setLand] = useState<LandContextValue>(() => ({
@@ -67,7 +67,7 @@ function RankCalculatorPage() {
     try {
       sessionStorage.setItem("rank_calculation_snapshot", JSON.stringify(snapshot));
     } catch {}
-    navigate({ to: "/szerzodes/uj", search: { fromRankCalculation: "1" } as never });
+    toast.success("Számítás mentve. Az elfogadó nyilatkozat előkészítéséhez folytatjuk a folyamatot.");
   };
 
   return (
