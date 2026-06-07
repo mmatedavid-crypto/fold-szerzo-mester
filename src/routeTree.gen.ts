@@ -12,9 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as KifuggesztesekRouteImport } from './routes/kifuggesztesek'
 import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
+import { Route as CookieSzabalyzatRouteImport } from './routes/cookie-szabalyzat'
 import { Route as BerletiDijIranytuRouteImport } from './routes/berleti-dij-iranytu'
 import { Route as BelepesRouteImport } from './routes/belepes'
+import { Route as AszfRouteImport } from './routes/aszf'
 import { Route as ArakRouteImport } from './routes/arak'
+import { Route as AdatkezelesRouteImport } from './routes/adatkezeles'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -41,6 +44,11 @@ const DokumentumEllenorzesRoute = DokumentumEllenorzesRouteImport.update({
   path: '/dokumentum-ellenorzes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CookieSzabalyzatRoute = CookieSzabalyzatRouteImport.update({
+  id: '/cookie-szabalyzat',
+  path: '/cookie-szabalyzat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BerletiDijIranytuRoute = BerletiDijIranytuRouteImport.update({
   id: '/berleti-dij-iranytu',
   path: '/berleti-dij-iranytu',
@@ -51,9 +59,19 @@ const BelepesRoute = BelepesRouteImport.update({
   path: '/belepes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AszfRoute = AszfRouteImport.update({
+  id: '/aszf',
+  path: '/aszf',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArakRoute = ArakRouteImport.update({
   id: '/arak',
   path: '/arak',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdatkezelesRoute = AdatkezelesRouteImport.update({
+  id: '/adatkezeles',
+  path: '/adatkezeles',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -114,9 +132,12 @@ const AuthenticatedSzerzodesIdEllenorzesRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/adatkezeles': typeof AdatkezelesRoute
   '/arak': typeof ArakRoute
+  '/aszf': typeof AszfRoute
   '/belepes': typeof BelepesRoute
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -131,9 +152,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/adatkezeles': typeof AdatkezelesRoute
   '/arak': typeof ArakRoute
+  '/aszf': typeof AszfRoute
   '/belepes': typeof BelepesRoute
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -150,9 +174,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/adatkezeles': typeof AdatkezelesRoute
   '/arak': typeof ArakRoute
+  '/aszf': typeof AszfRoute
   '/belepes': typeof BelepesRoute
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -169,9 +196,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/adatkezeles'
     | '/arak'
+    | '/aszf'
     | '/belepes'
     | '/berleti-dij-iranytu'
+    | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
     | '/regisztracio'
@@ -186,9 +216,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/adatkezeles'
     | '/arak'
+    | '/aszf'
     | '/belepes'
     | '/berleti-dij-iranytu'
+    | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
     | '/regisztracio'
@@ -204,9 +237,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/adatkezeles'
     | '/arak'
+    | '/aszf'
     | '/belepes'
     | '/berleti-dij-iranytu'
+    | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
     | '/regisztracio'
@@ -223,9 +259,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AdatkezelesRoute: typeof AdatkezelesRoute
   ArakRoute: typeof ArakRoute
+  AszfRoute: typeof AszfRoute
   BelepesRoute: typeof BelepesRoute
   BerletiDijIranytuRoute: typeof BerletiDijIranytuRoute
+  CookieSzabalyzatRoute: typeof CookieSzabalyzatRoute
   DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
   KifuggesztesekRoute: typeof KifuggesztesekRoute
   RegisztracioRoute: typeof RegisztracioRoute
@@ -255,6 +294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DokumentumEllenorzesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cookie-szabalyzat': {
+      id: '/cookie-szabalyzat'
+      path: '/cookie-szabalyzat'
+      fullPath: '/cookie-szabalyzat'
+      preLoaderRoute: typeof CookieSzabalyzatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/berleti-dij-iranytu': {
       id: '/berleti-dij-iranytu'
       path: '/berleti-dij-iranytu'
@@ -269,11 +315,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BelepesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aszf': {
+      id: '/aszf'
+      path: '/aszf'
+      fullPath: '/aszf'
+      preLoaderRoute: typeof AszfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/arak': {
       id: '/arak'
       path: '/arak'
       fullPath: '/arak'
       preLoaderRoute: typeof ArakRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/adatkezeles': {
+      id: '/adatkezeles'
+      path: '/adatkezeles'
+      fullPath: '/adatkezeles'
+      preLoaderRoute: typeof AdatkezelesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -377,9 +437,12 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AdatkezelesRoute: AdatkezelesRoute,
   ArakRoute: ArakRoute,
+  AszfRoute: AszfRoute,
   BelepesRoute: BelepesRoute,
   BerletiDijIranytuRoute: BerletiDijIranytuRoute,
+  CookieSzabalyzatRoute: CookieSzabalyzatRoute,
   DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
   KifuggesztesekRoute: KifuggesztesekRoute,
   RegisztracioRoute: RegisztracioRoute,
@@ -388,13 +451,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

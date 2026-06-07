@@ -22,10 +22,14 @@ export function SiteFooter() {
         <div>
           <div className="font-medium mb-2">Jogi tájékoztatás</div>
           <p className="text-muted-foreground">
-            A szerződésminták jogi szakértő által karbantartott, verziózott klauzulatár alapján készülnek.
             A generált dokumentum szerződés-előkészítő irat. Egyedi, vitás vagy nagy értékű ügyben
             ügyvédi ellenőrzés javasolt.
           </p>
+          <ul className="space-y-1 text-muted-foreground mt-3">
+            <li><Link to="/aszf" className="hover:text-primary">ÁSZF</Link></li>
+            <li><Link to="/adatkezeles" className="hover:text-primary">Adatkezelési tájékoztató</Link></li>
+            <li><Link to="/cookie-szabalyzat" className="hover:text-primary">Süti tájékoztató</Link></li>
+          </ul>
         </div>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
