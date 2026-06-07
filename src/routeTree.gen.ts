@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as RanghelyKalkulatorRouteImport } from './routes/ranghely-kalkulator'
 import { Route as LeiratkozasRouteImport } from './routes/leiratkozas'
-import { Route as FoldAdasVetelRouteImport } from './routes/fold-adas-vetel'
 import { Route as FoldberletiSzerzodesRouteImport } from './routes/foldberleti-szerzodes'
+import { Route as FoldAdasVetelRouteImport } from './routes/fold-adas-vetel'
 import { Route as ElfogadoNyilatkozatRouteImport } from './routes/elfogado-nyilatkozat'
 import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
 import { Route as CookieSzabalyzatRouteImport } from './routes/cookie-szabalyzat'
@@ -29,6 +29,7 @@ import { Route as KifuggesztesekNoticeIdRouteImport } from './routes/kifuggeszte
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedSzerzodesUjRouteImport } from './routes/_authenticated/szerzodes.uj'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 import { Route as ApiPublicHooksSyncNoticesRouteImport } from './routes/api/public/hooks/sync-notices'
 import { Route as ApiPublicHooksSendWeeklyDigestRouteImport } from './routes/api/public/hooks/send-weekly-digest'
@@ -52,14 +53,14 @@ const LeiratkozasRoute = LeiratkozasRouteImport.update({
   path: '/leiratkozas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FoldAdasVetelRoute = FoldAdasVetelRouteImport.update({
-  id: '/fold-adas-vetel',
-  path: '/fold-adas-vetel',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FoldberletiSzerzodesRoute = FoldberletiSzerzodesRouteImport.update({
   id: '/foldberleti-szerzodes',
   path: '/foldberleti-szerzodes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoldAdasVetelRoute = FoldAdasVetelRouteImport.update({
+  id: '/fold-adas-vetel',
+  path: '/fold-adas-vetel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ElfogadoNyilatkozatRoute = ElfogadoNyilatkozatRouteImport.update({
@@ -137,6 +138,12 @@ const AuthenticatedSzerzodesUjRoute =
     path: '/szerzodes/uj',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsMockConfirmRoute =
   ApiPublicPaymentsMockConfirmRouteImport.update({
     id: '/api/public/payments/mock-confirm',
@@ -207,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -235,6 +243,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -265,6 +274,7 @@ export interface FileRoutesById {
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -352,6 +364,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -375,6 +388,7 @@ export interface RootRouteChildren {
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
   ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -400,18 +414,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeiratkozasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/fold-adas-vetel': {
-      id: '/fold-adas-vetel'
-      path: '/fold-adas-vetel'
-      fullPath: '/fold-adas-vetel'
-      preLoaderRoute: typeof FoldAdasVetelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/foldberleti-szerzodes': {
       id: '/foldberleti-szerzodes'
       path: '/foldberleti-szerzodes'
       fullPath: '/foldberleti-szerzodes'
       preLoaderRoute: typeof FoldberletiSzerzodesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fold-adas-vetel': {
+      id: '/fold-adas-vetel'
+      path: '/fold-adas-vetel'
+      fullPath: '/fold-adas-vetel'
+      preLoaderRoute: typeof FoldAdasVetelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/elfogado-nyilatkozat': {
@@ -519,6 +533,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSzerzodesUjRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/mock-confirm': {
       id: '/api/public/payments/mock-confirm'
       path: '/api/public/payments/mock-confirm'
@@ -617,17 +638,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
   ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
