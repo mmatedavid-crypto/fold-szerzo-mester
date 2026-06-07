@@ -21,6 +21,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSzerzodesUjRouteImport } from './routes/_authenticated/szerzodes.uj'
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 import { Route as AuthenticatedSzerzodesIdSzerkesztesRouteImport } from './routes/_authenticated/szerzodes.$id.szerkesztes'
+import { Route as AuthenticatedSzerzodesIdKeszRouteImport } from './routes/_authenticated/szerzodes.$id.kesz'
 import { Route as AuthenticatedSzerzodesIdFizetesRouteImport } from './routes/_authenticated/szerzodes.$id.fizetes'
 import { Route as AuthenticatedSzerzodesIdEllenorzesRouteImport } from './routes/_authenticated/szerzodes.$id.ellenorzes'
 
@@ -86,6 +87,12 @@ const AuthenticatedSzerzodesIdSzerkesztesRoute =
     path: '/szerzodes/$id/szerkesztes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSzerzodesIdKeszRoute =
+  AuthenticatedSzerzodesIdKeszRouteImport.update({
+    id: '/szerzodes/$id/kesz',
+    path: '/szerzodes/$id/kesz',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSzerzodesIdFizetesRoute =
   AuthenticatedSzerzodesIdFizetesRouteImport.update({
     id: '/szerzodes/$id/fizetes',
@@ -111,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
+  '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -126,6 +134,7 @@ export interface FileRoutesByTo {
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
+  '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -143,6 +152,7 @@ export interface FileRoutesById {
   '/_authenticated/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/_authenticated/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
+  '/_authenticated/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/_authenticated/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/szerzodes/uj'
     | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/fizetes'
+    | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
     | '/api/public/payments/mock-confirm'
   fileRoutesByTo: FileRoutesByTo
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/szerzodes/uj'
     | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/fizetes'
+    | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
     | '/api/public/payments/mock-confirm'
   id:
@@ -191,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated/szerzodes/uj'
     | '/_authenticated/szerzodes/$id/ellenorzes'
     | '/_authenticated/szerzodes/$id/fizetes'
+    | '/_authenticated/szerzodes/$id/kesz'
     | '/_authenticated/szerzodes/$id/szerkesztes'
     | '/api/public/payments/mock-confirm'
   fileRoutesById: FileRoutesById
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSzerzodesIdSzerkesztesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/szerzodes/$id/kesz': {
+      id: '/_authenticated/szerzodes/$id/kesz'
+      path: '/szerzodes/$id/kesz'
+      fullPath: '/szerzodes/$id/kesz'
+      preLoaderRoute: typeof AuthenticatedSzerzodesIdKeszRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/szerzodes/$id/fizetes': {
       id: '/_authenticated/szerzodes/$id/fizetes'
       path: '/szerzodes/$id/fizetes'
@@ -315,6 +335,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSzerzodesUjRoute: typeof AuthenticatedSzerzodesUjRoute
   AuthenticatedSzerzodesIdEllenorzesRoute: typeof AuthenticatedSzerzodesIdEllenorzesRoute
   AuthenticatedSzerzodesIdFizetesRoute: typeof AuthenticatedSzerzodesIdFizetesRoute
+  AuthenticatedSzerzodesIdKeszRoute: typeof AuthenticatedSzerzodesIdKeszRoute
   AuthenticatedSzerzodesIdSzerkesztesRoute: typeof AuthenticatedSzerzodesIdSzerkesztesRoute
 }
 
@@ -324,6 +345,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSzerzodesIdEllenorzesRoute:
     AuthenticatedSzerzodesIdEllenorzesRoute,
   AuthenticatedSzerzodesIdFizetesRoute: AuthenticatedSzerzodesIdFizetesRoute,
+  AuthenticatedSzerzodesIdKeszRoute: AuthenticatedSzerzodesIdKeszRoute,
   AuthenticatedSzerzodesIdSzerkesztesRoute:
     AuthenticatedSzerzodesIdSzerkesztesRoute,
 }
