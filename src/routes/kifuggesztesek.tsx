@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,9 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Search, Calculator } from "lucide-react";
+import { ExternalLink, Search, Calculator, Mail, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
+import { cleanSettlement } from "@/lib/notices/clean";
+import { subscribeToSettlement } from "@/lib/subscriptions/subscribe.functions";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/kifuggesztesek")({
   head: () => ({
@@ -57,12 +64,21 @@ function NoticesPage() {
     return Array.from(set).sort();
   }, [q.data]);
 
+  const settlements = useMemo(() => {
+    const set = new Set<string>();
+    (q.data ?? []).forEach((n) => {
+      const c = cleanSettlement(n.settlement);
+      if (c) set.add(c);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "hu"));
+  }, [q.data]);
+
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
     return (q.data ?? []).filter((n) => {
       if (type !== "all" && n.notice_type !== type) return false;
       if (!s) return true;
-      const hay = [n.settlement, n.municipality, n.subject, (n.parcel_numbers ?? []).join(" "), n.source_notice_id]
+      const hay = [cleanSettlement(n.settlement), n.municipality, n.subject, (n.parcel_numbers ?? []).join(" "), n.source_notice_id]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
@@ -77,6 +93,8 @@ function NoticesPage() {
         <p className="mt-2 text-muted-foreground text-sm max-w-2xl">
           Aktuális termőföld kifüggesztések. A részletekért (terület, díj, határidő, csatolmány) nyisd meg a hivatalos oldalt.
         </p>
+
+        <SubscribeBanner settlements={settlements} />
 
         <Card className="p-4 mt-6">
           <div className="grid gap-3 md:grid-cols-[1fr,220px] items-center">
@@ -117,7 +135,7 @@ function NoticesPage() {
             <TableBody>
               {filtered.map((n) => (
                 <TableRow key={n.id}>
-                  <TableCell>{n.settlement ?? "—"}</TableCell>
+                  <TableCell>{cleanSettlement(n.settlement) ?? n.settlement ?? "—"}</TableCell>
                   <TableCell className="text-xs">{(n.parcel_numbers ?? []).join(", ") || "—"}</TableCell>
                   <TableCell className="text-sm"><Badge variant="outline">{n.notice_type ?? "—"}</Badge></TableCell>
                   <TableCell className="text-right whitespace-nowrap">
@@ -148,5 +166,99 @@ function NoticesPage() {
 
       </section>
     </PageShell>
+  );
+}
+
+function SubscribeBanner({ settlements }: { settlements: string[] }) {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [settlement, setSettlement] = useState<string>("");
+  const [filter, setFilter] = useState("");
+  const [loading, setLoading] = useState(false);
+  const sub = useServerFn(subscribeToSettlement);
+
+  const options = useMemo(() => {
+    const f = filter.trim().toLowerCase();
+    const base = f ? settlements.filter((s) => s.toLowerCase().includes(f)) : settlements;
+    return base.slice(0, 50);
+  }, [settlements, filter]);
+
+  async function submit() {
+    if (!email || !settlement) {
+      toast.error("Add meg az email címet és válassz települést.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await sub({ data: { email, settlement } });
+      if (res.ok) {
+        toast.success(res.reactivated ? "Előfizetésed megújítva 52 hétre." : `Sikeres feliratkozás: ${res.settlement_clean}`);
+        setOpen(false);
+        setEmail("");
+        setSettlement("");
+      } else {
+        toast.error(res.error ?? "Hiba történt.");
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Hiba történt.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Card className="mt-5 p-4 md:p-5 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+      <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5">
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-primary" />
+            <h2 className="font-serif text-lg">Heti értesítő emailben</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Válassz települést és minden héten elküldjük az aktuális kifüggesztéseket. 52 hét. <strong>9.990 Ft / év.</strong>
+          </p>
+        </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button>Feliratkozás</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Heti kifüggesztés értesítő</DialogTitle>
+              <DialogDescription>
+                52 héten át minden héten emailben megkapod az adott település aktuális termőföld kifüggesztéseit.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-muted-foreground">Email cím</label>
+                <Input type="email" placeholder="te@email.hu" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Település</label>
+                <Input placeholder="Keresés..." value={filter} onChange={(e) => setFilter(e.target.value)} className="mb-2" />
+                <Select value={settlement} onValueChange={setSettlement}>
+                  <SelectTrigger><SelectValue placeholder="Válassz települést" /></SelectTrigger>
+                  <SelectContent>
+                    {options.length === 0 && <div className="p-2 text-xs text-muted-foreground">Nincs találat</div>}
+                    {options.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                A feliratkozással elfogadod a heti értesítő küldését. Bármikor leiratkozhatsz az emailben található linkkel.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setOpen(false)}>Mégse</Button>
+              <Button onClick={submit} disabled={loading}>
+                {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Feliratkozom
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </Card>
   );
 }

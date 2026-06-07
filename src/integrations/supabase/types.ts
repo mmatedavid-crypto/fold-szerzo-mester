@@ -443,6 +443,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notice_subscriptions: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          last_sent_at: string | null
+          settlement_clean: string
+          status: string
+          unsubscribe_token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          last_sent_at?: string | null
+          settlement_clean: string
+          status?: string
+          unsubscribe_token?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          last_sent_at?: string | null
+          settlement_clean?: string
+          status?: string
+          unsubscribe_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notices: {
         Row: {
           area_ha: number | null
@@ -813,6 +849,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clean_settlement: { Args: { _raw: string }; Returns: string }
       finalize_document: {
         Args: {
           _clause_version: string
