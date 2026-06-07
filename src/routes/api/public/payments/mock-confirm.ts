@@ -27,6 +27,7 @@ export const Route = createFileRoute("/api/public/payments/mock-confirm")({
           });
         } else {
           const planId = payment.plan_id;
+          if (!planId) return new Response("Plan missing", { status: 400 });
           const { data: plan } = await supabaseAdmin.from("plans").select("*").eq("id", planId).single();
           if (plan) {
             const start = new Date();
