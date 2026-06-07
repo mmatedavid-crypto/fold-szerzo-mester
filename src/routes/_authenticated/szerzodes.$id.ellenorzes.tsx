@@ -60,7 +60,7 @@ function RiskPage() {
             <Card className="p-6 mt-6">
               <h2 className="font-serif text-xl">Adatok összesítése</h2>
               <dl className="grid md:grid-cols-2 gap-x-6 gap-y-2 mt-3 text-sm">
-                <Row k="Haszonbérbeadó" v={draft.lessor_data?.name} />
+                <Row k="Haszonbérbeadó" v={[draft.lessor_data?.name, ...((draft.lessor_data?.co_lessors ?? []).map((c) => c.name))].filter(Boolean).join("; ")} />
                 <Row k="Haszonbérlő" v={draft.lessee_data?.name} />
                 <Row k="Parcellák száma" v={String(draft.parcels?.length ?? 0)} />
                 <Row k="Települések" v={(draft.parcels ?? []).map((p) => p.settlement).filter(Boolean).join(", ")} />
