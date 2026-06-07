@@ -393,7 +393,3 @@ function CheckRow({ label, checked, onChange }: { label: string; checked: boolea
     </label>
   );
 }
-
-// Unused import shake
-export const _Textarea = Textarea;
-export const _useMemo = useMemo;
