@@ -11,6 +11,12 @@ export type Lessor = {
   representative?: string;
   company_reg_number?: string;
   company_tax_number?: string;
+  /**
+   * Társtulajdonosok (co-owners). When the parcel has multiple lessors, the
+   * primary lessor is the parent record; additional co-owners go here with
+   * their own ownership_share. The compose step renders all of them.
+   */
+  co_lessors?: Lessor[];
 };
 
 export type Lessee = {
