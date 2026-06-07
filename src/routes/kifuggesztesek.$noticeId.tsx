@@ -313,6 +313,113 @@ function CheckRow({ checked, onChange, title, desc }: { checked: boolean; onChan
   );
 }
 
+function formatRank(r: number | null): string {
+  if (r === null) return "Nincs ranghely";
+  return `${r}. ranghely`;
+}
+
+function ProfileFields({
+  profile,
+  setProfile,
+  settlement,
+  branch,
+  role,
+}: {
+  profile: ClaimantProfile;
+  setProfile: (p: ClaimantProfile) => void;
+  settlement: string | null;
+  branch: LandBranch;
+  role: "self" | "party";
+}) {
+  const meLabel = role === "self" ? "vagyok" : "ő";
+  const setForest = (patch: Partial<NonNullable<ClaimantProfile["forest"]>>) =>
+    setProfile({ ...profile, forest: { ...profile.forest, ...patch } });
+
+  return (
+    <div className="space-y-3">
+      <CheckRow
+        checked={profile.isFoldmuves}
+        onChange={(v) => setProfile({ ...profile, isFoldmuves: v })}
+        title={`Földműves ${meLabel}`}
+        desc="A földműves nyilvántartásban szereplő természetes személy (Földforgalmi tv. 5. § 7. pont)."
+      />
+      <CheckRow
+        checked={profile.isHelybenLako}
+        onChange={(v) => setProfile({ ...profile, isHelybenLako: v })}
+        title={`Helyben lakó ${meLabel}`}
+        desc={`Életvitelszerűen a föld fekvése szerinti településen (${settlement ?? "—"}) lakik legalább 3 éve.`}
+      />
+      <CheckRow
+        checked={profile.isCsaladiGazdasagTag}
+        onChange={(v) => setProfile({ ...profile, isCsaladiGazdasagTag: v })}
+        title="Családi mezőgazdasági társaság / őstermelők családi gazdaságának tagja"
+        desc="46. § (1) a) — a legerősebb 1. ranghelyi alcsoport."
+      />
+      <CheckRow
+        checked={profile.isAllattarto}
+        onChange={(v) => setProfile({ ...profile, isAllattarto: v })}
+        title="Állattartó telepet üzemeltet"
+        desc="46. § (1) c) — rét/legelő esetén külön preferencia."
+      />
+      <CheckRow
+        checked={profile.isJelenlegiFoldhasznalo}
+        onChange={(v) => setProfile({ ...profile, isJelenlegiFoldhasznalo: v })}
+        title="Jelenlegi földhasználó ezen a parcellán"
+        desc="A kifüggesztett földön jelenleg haszonbérlő / földhasználó."
+      />
+      <CheckRow
+        checked={profile.isSzomszedosFoldhasznalo}
+        onChange={(v) => setProfile({ ...profile, isSzomszedosFoldhasznalo: v })}
+        title="Szomszédos földhasználó"
+        desc="A kifüggesztett földdel közvetlenül határos parcellát használ."
+      />
+      <CheckRow
+        checked={profile.isTelepulesiFoldhasznalo}
+        onChange={(v) => setProfile({ ...profile, isTelepulesiFoldhasznalo: v })}
+        title="A településen másik földön földhasználó"
+        desc={`A föld fekvése szerinti településen (${settlement ?? "—"}) más parcellán használ földet.`}
+      />
+      <Separator />
+      <CheckRow
+        checked={profile.isCloseRelativeOfSeller}
+        onChange={(v) => setProfile({ ...profile, isCloseRelativeOfSeller: v })}
+        title={role === "self" ? "Közeli hozzátartozó vagyok az eladóval/bérbeadóval" : "Az eladó/bérbeadó közeli hozzátartozója"}
+        desc="Ptk. 8:1. § — kizárja az elővásárlási jog gyakorlását (46. § (5))."
+      />
+      <CheckRow
+        checked={profile.isExemptEntity}
+        onChange={(v) => setProfile({ ...profile, isExemptEntity: v })}
+        title="Állam, önkormányzat vagy egyházi jogi személy"
+        desc="Az általános 46. § szerinti ranghely nem alkalmazható."
+      />
+      {branch === "forest" && (
+        <>
+          <Separator />
+          <p className="text-xs text-muted-foreground">Erdő esetén kiegészítő jogcímek (Evt., 2009. évi XXXVII. tv.):</p>
+          <CheckRow
+            checked={!!profile.forest?.isAdjacentForestOwner}
+            onChange={(v) => setForest({ isAdjacentForestOwner: v })}
+            title="Szomszédos erdő tulajdonosa"
+            desc="Evt. szerinti tulajdonosi szomszédság."
+          />
+          <CheckRow
+            checked={!!profile.forest?.isCommonForestOwner}
+            onChange={(v) => setForest({ isCommonForestOwner: v })}
+            title="Közös tulajdonú erdőben tulajdonostárs"
+            desc="Evt. szerinti tulajdonostársi jogcím."
+          />
+          <CheckRow
+            checked={!!profile.forest?.isForestryProfessional}
+            onChange={(v) => setForest({ isForestryProfessional: v })}
+            title="Erdőgazdálkodói minősítéssel rendelkezik"
+            desc="Bejegyzett erdőgazdálkodó / szakmai minősítéssel."
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
 function ResultPanel({
   result,
   noticeId,
