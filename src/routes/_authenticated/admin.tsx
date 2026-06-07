@@ -5,6 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { NoticesImport } from "@/components/admin/notices-import";
 
 const checkAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
