@@ -196,7 +196,3 @@ function RankCalculatorPage() {
     </PageShell>
   );
 }
-
-// re-export for typing if needed
-export type { LandContextValue };
-export { Card };

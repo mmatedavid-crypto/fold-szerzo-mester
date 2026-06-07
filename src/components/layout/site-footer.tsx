@@ -5,9 +5,9 @@ export function SiteFooter() {
     <footer className="border-t border-border bg-secondary/50 mt-16">
       <div className="container mx-auto px-4 py-10 grid gap-8 md:grid-cols-3 text-sm">
         <div>
-          <div className="font-serif text-base font-semibold text-primary">foldberletiszerzodes.hu</div>
+          <div className="font-serif text-base font-semibold text-primary">drfold.hu</div>
           <p className="mt-2 text-muted-foreground">
-            Termőföld haszonbérleti szerződés-előkészítő szolgáltatás gazdáknak és földtulajdonosoknak.
+            Dr Föld — termőföld haszonbérleti szerződés-előkészítés, ranghely kalkulátor és elfogadó nyilatkozat gazdáknak és földtulajdonosoknak.
           </p>
         </div>
         <div>
@@ -33,7 +33,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} foldberletiszerzodes.hu — Nem ügyvédi képviselet.
+        © {new Date().getFullYear()} drfold.hu — Nem ügyvédi képviselet.
       </div>
     </footer>
   );
