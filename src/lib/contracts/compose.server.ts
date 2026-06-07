@@ -1,5 +1,5 @@
 import type { Draft } from "./types";
-import { preLeaseRank, rentDescription } from "./logic";
+import { preLeaseRank, rentDescription, allLessors } from "./logic";
 
 type Clause = { clause_key: string; title: string; text: string; sort_order: number };
 
@@ -9,6 +9,7 @@ function substitute(text: string, vars: Record<string, string>): string {
 
 export function composeContract(draft: Draft, clauses: Clause[]): { title: string; sections: { title: string; text: string }[] } {
   const L = draft.lessor_data ?? {};
+  const lessors = allLessors(L);
   const E = draft.lessee_data ?? {};
   const parcels = draft.parcels ?? [];
   const r = draft.rent ?? {};
@@ -20,9 +21,17 @@ export function composeContract(draft: Draft, clauses: Clause[]): { title: strin
     .join("\n");
 
   const vars: Record<string, string> = {
-    lessor_name: L.name ?? "",
-    lessor_address: L.address ?? "",
+    lessor_name: lessors.map((x) => x.name).filter(Boolean).join("; "),
+    lessor_address: lessors.map((x) => x.address).filter(Boolean).join("; "),
     lessor_tax: L.tax_id ?? L.company_tax_number ?? "",
+    lessor_block: lessors
+      .map((x, i) => {
+        const idx = lessors.length > 1 ? `${i + 1}. ` : "";
+        const share = x.ownership_share ? ` (tulajdoni hányad: ${x.ownership_share})` : "";
+        const tax = x.tax_id ? `, adóazonosító: ${x.tax_id}` : "";
+        return `${idx}${x.name ?? ""} (lakcím/székhely: ${x.address ?? ""}${tax})${share}`;
+      })
+      .join("\n"),
     lessee_name: E.name ?? "",
     lessee_address: E.address ?? "",
     lessee_tax: E.tax_id ?? "",

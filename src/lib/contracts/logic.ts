@@ -14,6 +14,38 @@ function diffYears(a: string, b: string): number {
   return (db - da) / (1000 * 60 * 60 * 24 * 365.25);
 }
 
+/** Parse "1/2", "0.5", "50%" etc. as a fraction in [0, 1]. Returns null when unparseable. */
+export function parseShare(s: string | undefined | null): number | null {
+  if (!s) return null;
+  const t = s.trim().replace(/\s/g, "");
+  if (!t) return null;
+  const pct = t.match(/^([\d.,]+)\s*%$/);
+  if (pct) {
+    const n = parseFloat(pct[1].replace(",", "."));
+    return Number.isFinite(n) ? n / 100 : null;
+  }
+  const frac = t.match(/^(\d+(?:[.,]\d+)?)\s*\/\s*(\d+(?:[.,]\d+)?)$/);
+  if (frac) {
+    const a = parseFloat(frac[1].replace(",", "."));
+    const b = parseFloat(frac[2].replace(",", "."));
+    return b > 0 ? a / b : null;
+  }
+  const n = parseFloat(t.replace(",", "."));
+  return Number.isFinite(n) ? n : null;
+}
+
+/** Return primary lessor + all non-empty co-lessors as a flat list. */
+export function allLessors(L: Lessor | undefined | null): Lessor[] {
+  if (!L) return [];
+  const co = (L.co_lessors ?? []).filter((c) => c && (c.name || c.address || c.ownership_share));
+  return [L, ...co];
+}
+
+/** Human-readable joined lessor names: "Kiss János; Nagy Béla". */
+export function joinLessorNames(L: Lessor | undefined | null): string {
+  return allLessors(L).map((x) => x.name).filter(Boolean).join("; ");
+}
+
 export function computeRiskReport(draft: Pick<Draft, "lessor_data" | "lessee_data" | "parcels" | "rent" | "term" | "prelease">): RiskReport {
   const items: RiskItem[] = [];
   const L: Lessor = draft.lessor_data ?? {};
@@ -26,6 +58,22 @@ export function computeRiskReport(draft: Pick<Draft, "lessor_data" | "lessee_dat
   // Mandatory parties
   if (!req(L.name)) items.push({ id: "lessor_name", category: "felek", level: "hianyzo_kotelezo", message: "Hiányzik a haszonbérbeadó neve." });
   if (!req(L.address)) items.push({ id: "lessor_address", category: "felek", level: "hianyzo_kotelezo", message: "Hiányzik a haszonbérbeadó címe." });
+  const coLessors = (L.co_lessors ?? []).filter((c) => c && (req(c.name) || req(c.address) || req(c.ownership_share)));
+  coLessors.forEach((c, i) => {
+    const tag = `${i + 2}. tulajdonos`;
+    if (!req(c.name)) items.push({ id: `co_lessor_${i}_name`, category: "felek", level: "hianyzo_kotelezo", message: `${tag}: hiányzik a név.` });
+    if (!req(c.address)) items.push({ id: `co_lessor_${i}_address`, category: "felek", level: "hianyzo_kotelezo", message: `${tag}: hiányzik a cím.` });
+    if (!req(c.ownership_share)) items.push({ id: `co_lessor_${i}_share`, category: "felek", level: "figyelmeztetes", message: `${tag}: hiányzik a tulajdoni hányad.` });
+  });
+  if (coLessors.length > 0) {
+    const totals = [L, ...coLessors].map((x) => parseShare(x.ownership_share)).filter((n): n is number => n != null);
+    if (totals.length === 1 + coLessors.length) {
+      const sum = totals.reduce((a, b) => a + b, 0);
+      if (Math.abs(sum - 1) > 0.001) {
+        items.push({ id: "ownership_sum", category: "felek", level: "jogi_ellenorzes", message: `A tulajdoni hányadok összege ${sum.toFixed(3)} — 1/1 helyett.` });
+      }
+    }
+  }
   if (!req(E.name)) items.push({ id: "lessee_name", category: "felek", level: "hianyzo_kotelezo", message: "Hiányzik a haszonbérlő neve / cégneve." });
   if (!req(E.address)) items.push({ id: "lessee_address", category: "felek", level: "hianyzo_kotelezo", message: "Hiányzik a haszonbérlő címe / székhelye." });
   if (E.type && !E.is_registered_farmer) {

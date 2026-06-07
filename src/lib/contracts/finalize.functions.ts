@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { computeRiskReport, coreFieldsFingerprint } from "./logic";
+import { computeRiskReport, coreFieldsFingerprint, joinLessorNames } from "./logic";
 import type { Draft } from "./types";
 
 function makeDocNumber(seqHint: string): string {
@@ -83,7 +83,7 @@ export const finalizeContract = createServerFn({ method: "POST" })
       _core_hash: core_hash,
       _template_version: tpl.version,
       _clause_version: tpl.version,
-      _lessor_name: draft.lessor_data?.name ?? null,
+      _lessor_name: joinLessorNames(draft.lessor_data) || (draft.lessor_data?.name ?? null),
       _lessee_name: draft.lessee_data?.name ?? null,
       _settlement: draft.parcels?.[0]?.settlement ?? null,
       _parcel_numbers: (draft.parcels ?? []).map((p) => p.parcel_number ?? "").filter(Boolean),

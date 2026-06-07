@@ -150,6 +150,111 @@ export function ContractEditor({ draft }: { draft: Draft }) {
                 <div><Label>Képviselő</Label><Input value={state.lessor.representative ?? ""} onChange={(e) => set("lessor", { ...state.lessor, representative: e.target.value })} /></div>
               </>
             )}
+
+            <div className="pt-3 border-t border-border space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium">Társtulajdonosok</h4>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    set("lessor", {
+                      ...state.lessor,
+                      co_lessors: [...(state.lessor.co_lessors ?? []), {}],
+                    })
+                  }
+                >
+                  <Plus className="h-4 w-4 mr-1" />Társtulajdonos
+                </Button>
+              </div>
+              {(state.lessor.co_lessors ?? []).length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Ha a földet többen birtokolják, add hozzá a többi tulajdonost a saját
+                  tulajdoni hányadukkal. A szerződés mindegyiküket bérbeadóként szerepelteti.
+                </p>
+              )}
+              {(state.lessor.co_lessors ?? []).map((co, ci) => (
+                <div key={ci} className="border border-border rounded-md p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium">{ci + 2}. tulajdonos</div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
+                        set("lessor", {
+                          ...state.lessor,
+                          co_lessors: (state.lessor.co_lessors ?? []).filter((_, idx) => idx !== ci),
+                        })
+                      }
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    <div>
+                      <Label>Név</Label>
+                      <Input
+                        value={co.name ?? ""}
+                        onChange={(e) =>
+                          set("lessor", {
+                            ...state.lessor,
+                            co_lessors: (state.lessor.co_lessors ?? []).map((row, idx) =>
+                              idx === ci ? { ...row, name: e.target.value } : row,
+                            ),
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label>Cím</Label>
+                      <Input
+                        value={co.address ?? ""}
+                        onChange={(e) =>
+                          set("lessor", {
+                            ...state.lessor,
+                            co_lessors: (state.lessor.co_lessors ?? []).map((row, idx) =>
+                              idx === ci ? { ...row, address: e.target.value } : row,
+                            ),
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label>Adóazonosító</Label>
+                        <Input
+                          value={co.tax_id ?? ""}
+                          onChange={(e) =>
+                            set("lessor", {
+                              ...state.lessor,
+                              co_lessors: (state.lessor.co_lessors ?? []).map((row, idx) =>
+                                idx === ci ? { ...row, tax_id: e.target.value } : row,
+                              ),
+                            })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>Tulajdoni hányad</Label>
+                        <Input
+                          value={co.ownership_share ?? ""}
+                          placeholder="pl. 1/2"
+                          onChange={(e) =>
+                            set("lessor", {
+                              ...state.lessor,
+                              co_lessors: (state.lessor.co_lessors ?? []).map((row, idx) =>
+                                idx === ci ? { ...row, ownership_share: e.target.value } : row,
+                              ),
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-3">
