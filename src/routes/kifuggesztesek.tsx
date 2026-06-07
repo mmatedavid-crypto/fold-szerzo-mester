@@ -108,10 +108,9 @@ function NoticesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Közzététel</TableHead>
-                <TableHead>Típus</TableHead>
                 <TableHead>Település</TableHead>
                 <TableHead>Hrsz.</TableHead>
-                <TableHead>Forrásintézmény</TableHead>
+                <TableHead>Típus</TableHead>
                 <TableHead className="text-right">Részletek</TableHead>
               </TableRow>
             </TableHeader>
@@ -119,10 +118,9 @@ function NoticesPage() {
               {filtered.map((n) => (
                 <TableRow key={n.id}>
                   <TableCell className="text-sm whitespace-nowrap">{n.publication_date ? formatDate(n.publication_date) : "—"}</TableCell>
-                  <TableCell className="text-sm"><Badge variant="outline">{n.notice_type ?? "—"}</Badge></TableCell>
                   <TableCell>{n.settlement ?? "—"}</TableCell>
                   <TableCell className="text-xs">{(n.parcel_numbers ?? []).join(", ") || "—"}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{n.municipality ?? "—"}</TableCell>
+                  <TableCell className="text-sm"><Badge variant="outline">{n.notice_type ?? "—"}</Badge></TableCell>
                   <TableCell className="text-right whitespace-nowrap">
                     <Button asChild size="sm" variant="ghost">
                       <Link to="/kifuggesztesek/$noticeId" params={{ noticeId: n.id }}>
@@ -131,8 +129,8 @@ function NoticesPage() {
                     </Button>
                     {n.original_detail_url ? (
                       <Button asChild size="sm" variant="ghost">
-                        <a href={n.original_detail_url} target="_blank" rel="noopener noreferrer" aria-label="Hivatalos oldal megnyitása">
-                          <ExternalLink className="h-4 w-4" />
+                        <a href={n.original_detail_url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4 mr-1" /> Szerződés megtekintése
                         </a>
                       </Button>
                     ) : null}
@@ -140,7 +138,7 @@ function NoticesPage() {
                 </TableRow>
               ))}
               {!q.isLoading && filtered.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-10">
+                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-10">
                   Nincs találat.
                 </TableCell></TableRow>
               )}
