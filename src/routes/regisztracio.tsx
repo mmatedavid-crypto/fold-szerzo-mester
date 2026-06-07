@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { AppleButton } from "@/components/auth/apple-button";
 
 export const Route = createFileRoute("/regisztracio")({
   head: () => ({
@@ -65,6 +66,14 @@ function RegPage() {
               {loading ? "Regisztráció..." : "Regisztrálok"}
             </Button>
           </form>
+          <div className="mt-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">vagy</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+          <div className="mt-4">
+            <AppleButton />
+          </div>
           <p className="mt-4 text-sm text-center text-muted-foreground">
             Van már fiókod? <Link to="/belepes" className="text-primary underline">Belépés</Link>
           </p>
