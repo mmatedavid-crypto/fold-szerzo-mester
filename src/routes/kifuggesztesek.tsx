@@ -45,7 +45,7 @@ function NoticesPage() {
         .from("notices")
         .select("id, source_notice_id, subject, settlement, municipality, parcel_numbers, notice_type, publication_date, original_detail_url")
         .order("publication_date", { ascending: false, nullsFirst: false })
-        .limit(500);
+        .limit(5000);
       if (error) throw error;
       return (data ?? []) as Notice[];
     },
