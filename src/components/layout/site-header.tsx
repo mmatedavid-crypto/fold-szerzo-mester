@@ -24,10 +24,11 @@ export function SiteHeader() {
           <span className="sm:hidden">Földbérleti</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link to="/arak" className="text-foreground hover:text-primary">Árak</Link>
+          <Link to="/szerzodes/uj" className="text-foreground hover:text-primary">Szerződés</Link>
           <Link to="/kifuggesztesek" className="text-foreground hover:text-primary">Kifüggesztések</Link>
-          <Link to="/berleti-dij-iranytu" className="text-foreground hover:text-primary">Bérleti díj iránytű</Link>
-          <Link to="/dokumentum-ellenorzes" className="text-foreground hover:text-primary">Dokumentum ellenőrzés</Link>
+          <Link to="/ranghely-kalkulator" className="text-foreground hover:text-primary">Ranghely kalkulátor</Link>
+          <Link to="/elfogado-nyilatkozat" className="text-foreground hover:text-primary">Elfogadó nyilatkozat</Link>
+          <Link to="/fold-adas-vetel" className="text-foreground hover:text-primary">Föld adás-vétel</Link>
         </nav>
         <div className="flex items-center gap-2">
           {authed ? (

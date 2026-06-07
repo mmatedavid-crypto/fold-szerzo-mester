@@ -1,14 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageShell } from "@/components/layout/page-shell";
-import { PricingCards } from "@/components/pricing/pricing-cards";
-import { listPlans } from "@/lib/plans.functions";
-import { ShieldCheck, MapPinned, FileCheck2, TrendingUp, FileBadge2, Sprout } from "lucide-react";
-
-const plansQuery = queryOptions({ queryKey: ["plans"], queryFn: () => listPlans() });
+import { FileText, MapPinned, Scale, FileSignature, Landmark, Sprout, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,22 +14,46 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "Termőföld-haszonbérleti szerződés gazdáknak, gyorsan és átláthatóan." },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(plansQuery),
-  errorComponent: ({ error }) => (
-    <div className="p-8 text-center text-destructive">Hiba: {error.message}</div>
-  ),
   component: Index,
 });
 
 function Index() {
-  const { data: plans } = useSuspenseQuery(plansQuery);
-
-  const benefits = [
-    { icon: FileCheck2, title: "Nem üres sablon", text: "Kérdések alapján összeállított szerződés, nem letölthető Word-doksi." },
-    { icon: ShieldCheck, title: "Előhaszonbérleti logika", text: "Vezetett kérdőív és kockázati figyelmeztetések." },
-    { icon: MapPinned, title: "Jegyzői közzétételi lista", text: "Beadási ellenőrzőlista és kötelező mellékletek." },
-    { icon: TrendingUp, title: "Hirdetményi árfigyelő", text: "Piaci bérleti díj-iránytű települési szinten." },
-    { icon: FileBadge2, title: "Verziózott klauzulák", text: "Dokumentumazonosító, sablonverzió, ellenőrizhető hash." },
+  const tools = [
+    {
+      icon: FileText,
+      title: "Bérleti szerződés generáló",
+      text: "Készíts termőföld-haszonbérleti szerződést vezetett kérdőív alapján.",
+      to: "/szerzodes/uj",
+      cta: "Szerződés készítése",
+    },
+    {
+      icon: MapPinned,
+      title: "Kifüggesztések",
+      text: "Keresd a települési jegyzői közzétételeket és előhaszonbérleti hirdetményeket.",
+      to: "/kifuggesztesek",
+      cta: "Kifüggesztések böngészése",
+    },
+    {
+      icon: Scale,
+      title: "Ranghely kalkulátor",
+      text: "Hasonlítsd össze az előhaszonbérleti ranghelyedet a szerződő féléivel.",
+      to: "/ranghely-kalkulator",
+      cta: "Ranghely számítása",
+    },
+    {
+      icon: FileSignature,
+      title: "Elfogadó nyilatkozat generátor",
+      text: "Készítsd el az előhaszonbérleti elfogadó nyilatkozatot bizonyítékokkal együtt.",
+      to: "/elfogado-nyilatkozat",
+      cta: "Nyilatkozat készítése",
+    },
+    {
+      icon: Landmark,
+      title: "Föld adás-vétel",
+      text: "Termőföld adásvételi folyamat — hamarosan elérhető.",
+      to: "/fold-adas-vetel",
+      cta: "Megnyitás",
+    },
   ];
 
   return (
@@ -64,30 +83,23 @@ function Index() {
         </div>
       </section>
 
-      {/* Benefits */}
+      {/* Tools */}
       <section className="container mx-auto px-4 py-12 border-t border-border">
-        <h2 className="font-serif text-2xl md:text-3xl">Miért minket válassz?</h2>
-        <div className="mt-8 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
-          {benefits.map((b) => (
-            <Card key={b.title} className="p-5">
-              <b.icon className="h-6 w-6 text-primary" />
-              <div className="font-medium mt-3">{b.title}</div>
-              <p className="text-sm text-muted-foreground mt-1">{b.text}</p>
+        <h2 className="font-serif text-2xl md:text-3xl">Eszközök</h2>
+        <p className="mt-2 text-muted-foreground">Válaszd ki, melyik modullal szeretnél dolgozni.</p>
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {tools.map((t) => (
+            <Card key={t.title} className="p-6 flex flex-col">
+              <t.icon className="h-7 w-7 text-primary" />
+              <div className="font-serif text-lg mt-3">{t.title}</div>
+              <p className="text-sm text-muted-foreground mt-2 flex-1">{t.text}</p>
+              <Button asChild variant="outline" size="sm" className="mt-4 self-start">
+                <Link to={t.to}>
+                  {t.cta} <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
             </Card>
           ))}
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="arak" className="container mx-auto px-4 py-16">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="font-serif text-3xl">Egyszerű, átlátható árazás</h2>
-          <p className="mt-3 text-muted-foreground">
-            Válassz egyszeri szerződést vagy előfizetést. Az árak bruttó értékek.
-          </p>
-        </div>
-        <div className="mt-10">
-          <PricingCards plans={plans} />
         </div>
       </section>
     </PageShell>
