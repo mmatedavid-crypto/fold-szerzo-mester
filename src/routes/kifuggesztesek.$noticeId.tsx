@@ -76,7 +76,7 @@ function NoticeDetailPage() {
   const [step, setStep] = useState(0);
   const [branch, setBranch] = useState<LandBranch>("non_forest");
   const [transaction, setTransaction] = useState<TransactionKind>("lease");
-  const [contractingPartyRank, setContractingPartyRank] = useState<number | null>(4);
+  const [contractingParty, setContractingParty] = useState<ClaimantProfile>(DEFAULT_CLAIMANT);
   const [claimant, setClaimant] = useState<ClaimantProfile>(DEFAULT_CLAIMANT);
 
   const cultivationTags = useMemo<string[]>(() => {
@@ -87,15 +87,31 @@ function NoticeDetailPage() {
     return tags;
   }, [q.data]);
 
+  // A szerződő fél ranghelyét UGYANAZZAL a motorral számoljuk —
+  // így biztosítjuk, hogy a saját rangsorral konzisztens módon vethető össze.
+  const partyRank = useMemo(() => {
+    const baseFacts: NoticeFacts = {
+      branch,
+      transaction,
+      settlement: q.data?.settlement ?? "",
+      contractingPartyRank: null,
+      cultivationBranchTags: cultivationTags,
+    };
+    return computeRank(baseFacts, contractingParty).rank;
+  }, [branch, transaction, q.data?.settlement, cultivationTags, contractingParty]);
+
   const facts: NoticeFacts = {
     branch,
     transaction,
     settlement: q.data?.settlement ?? "",
-    contractingPartyRank,
+    contractingPartyRank: partyRank,
     cultivationBranchTags: cultivationTags,
   };
 
-  const result = useMemo(() => (step === 4 ? computeRank(facts, claimant) : null), [step, facts, claimant]);
+  const result = useMemo(
+    () => (step === 4 ? computeRank(facts, claimant) : null),
+    [step, facts, claimant]
+  );
 
   const deadline = useMemo(() => {
     if (!q.data?.publication_date) return null;
