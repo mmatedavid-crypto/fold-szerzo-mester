@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as LeiratkozasRouteImport } from './routes/leiratkozas'
-import { Route as KifuggesztesekRouteImport } from './routes/kifuggesztesek'
 import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
 import { Route as CookieSzabalyzatRouteImport } from './routes/cookie-szabalyzat'
 import { Route as BerletiDijIranytuRouteImport } from './routes/berleti-dij-iranytu'
@@ -21,6 +20,7 @@ import { Route as ArakRouteImport } from './routes/arak'
 import { Route as AdatkezelesRouteImport } from './routes/adatkezeles'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KifuggesztesekIndexRouteImport } from './routes/kifuggesztesek.index'
 import { Route as KifuggesztesekNoticeIdRouteImport } from './routes/kifuggesztesek.$noticeId'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -41,11 +41,6 @@ const RegisztracioRoute = RegisztracioRouteImport.update({
 const LeiratkozasRoute = LeiratkozasRouteImport.update({
   id: '/leiratkozas',
   path: '/leiratkozas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KifuggesztesekRoute = KifuggesztesekRouteImport.update({
-  id: '/kifuggesztesek',
-  path: '/kifuggesztesek',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DokumentumEllenorzesRoute = DokumentumEllenorzesRouteImport.update({
@@ -92,10 +87,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KifuggesztesekIndexRoute = KifuggesztesekIndexRouteImport.update({
+  id: '/kifuggesztesek/',
+  path: '/kifuggesztesek/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KifuggesztesekNoticeIdRoute = KifuggesztesekNoticeIdRouteImport.update({
-  id: '/$noticeId',
-  path: '/$noticeId',
-  getParentRoute: () => KifuggesztesekRoute,
+  id: '/kifuggesztesek/$noticeId',
+  path: '/kifuggesztesek/$noticeId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -165,12 +165,12 @@ export interface FileRoutesByFullPath {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
-  '/kifuggesztesek': typeof KifuggesztesekRouteWithChildren
   '/leiratkozas': typeof LeiratkozasRoute
   '/regisztracio': typeof RegisztracioRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
+  '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
@@ -189,12 +189,12 @@ export interface FileRoutesByTo {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
-  '/kifuggesztesek': typeof KifuggesztesekRouteWithChildren
   '/leiratkozas': typeof LeiratkozasRoute
   '/regisztracio': typeof RegisztracioRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
+  '/kifuggesztesek': typeof KifuggesztesekIndexRoute
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
@@ -215,12 +215,12 @@ export interface FileRoutesById {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
-  '/kifuggesztesek': typeof KifuggesztesekRouteWithChildren
   '/leiratkozas': typeof LeiratkozasRoute
   '/regisztracio': typeof RegisztracioRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
+  '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
   '/_authenticated/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/_authenticated/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
@@ -241,12 +241,12 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
-    | '/kifuggesztesek'
     | '/leiratkozas'
     | '/regisztracio'
     | '/admin'
     | '/dashboard'
     | '/kifuggesztesek/$noticeId'
+    | '/kifuggesztesek/'
     | '/szerzodes/uj'
     | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/fizetes'
@@ -265,12 +265,12 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
-    | '/kifuggesztesek'
     | '/leiratkozas'
     | '/regisztracio'
     | '/admin'
     | '/dashboard'
     | '/kifuggesztesek/$noticeId'
+    | '/kifuggesztesek'
     | '/szerzodes/uj'
     | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/fizetes'
@@ -290,12 +290,12 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
-    | '/kifuggesztesek'
     | '/leiratkozas'
     | '/regisztracio'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/kifuggesztesek/$noticeId'
+    | '/kifuggesztesek/'
     | '/_authenticated/szerzodes/uj'
     | '/_authenticated/szerzodes/$id/ellenorzes'
     | '/_authenticated/szerzodes/$id/fizetes'
@@ -316,9 +316,10 @@ export interface RootRouteChildren {
   BerletiDijIranytuRoute: typeof BerletiDijIranytuRoute
   CookieSzabalyzatRoute: typeof CookieSzabalyzatRoute
   DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
-  KifuggesztesekRoute: typeof KifuggesztesekRouteWithChildren
   LeiratkozasRoute: typeof LeiratkozasRoute
   RegisztracioRoute: typeof RegisztracioRoute
+  KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
+  KifuggesztesekIndexRoute: typeof KifuggesztesekIndexRoute
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
   ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
@@ -338,13 +339,6 @@ declare module '@tanstack/react-router' {
       path: '/leiratkozas'
       fullPath: '/leiratkozas'
       preLoaderRoute: typeof LeiratkozasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kifuggesztesek': {
-      id: '/kifuggesztesek'
-      path: '/kifuggesztesek'
-      fullPath: '/kifuggesztesek'
-      preLoaderRoute: typeof KifuggesztesekRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dokumentum-ellenorzes': {
@@ -410,12 +404,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kifuggesztesek/': {
+      id: '/kifuggesztesek/'
+      path: '/kifuggesztesek'
+      fullPath: '/kifuggesztesek/'
+      preLoaderRoute: typeof KifuggesztesekIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kifuggesztesek/$noticeId': {
       id: '/kifuggesztesek/$noticeId'
-      path: '/$noticeId'
+      path: '/kifuggesztesek/$noticeId'
       fullPath: '/kifuggesztesek/$noticeId'
       preLoaderRoute: typeof KifuggesztesekNoticeIdRouteImport
-      parentRoute: typeof KifuggesztesekRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -515,18 +516,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface KifuggesztesekRouteChildren {
-  KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
-}
-
-const KifuggesztesekRouteChildren: KifuggesztesekRouteChildren = {
-  KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
-}
-
-const KifuggesztesekRouteWithChildren = KifuggesztesekRoute._addFileChildren(
-  KifuggesztesekRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -537,9 +526,10 @@ const rootRouteChildren: RootRouteChildren = {
   BerletiDijIranytuRoute: BerletiDijIranytuRoute,
   CookieSzabalyzatRoute: CookieSzabalyzatRoute,
   DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
-  KifuggesztesekRoute: KifuggesztesekRouteWithChildren,
   LeiratkozasRoute: LeiratkozasRoute,
   RegisztracioRoute: RegisztracioRoute,
+  KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
+  KifuggesztesekIndexRoute: KifuggesztesekIndexRoute,
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
   ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
@@ -547,3 +537,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
