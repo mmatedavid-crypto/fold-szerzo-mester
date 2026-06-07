@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 import { computeRank, computeAcceptanceDeadline } from "@/lib/rank/engine";
 import type { ClaimantProfile, NoticeFacts, LandBranch, TransactionKind } from "@/lib/rank/types";
-import { ArrowLeft, ArrowRight, ExternalLink, FileCheck2, Loader2, ShieldAlert, ShieldCheck, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, FileCheck2, Loader2, ShieldAlert, ShieldCheck, Trophy, Scale } from "lucide-react";
 
 export const Route = createFileRoute("/kifuggesztesek/$noticeId")({
   head: ({ params }) => ({
@@ -42,7 +42,7 @@ type Notice = {
   original_detail_url: string | null;
 };
 
-const STEPS = ["Hirdetmény", "Föld", "Profil", "Földhasználat", "Eredmény"];
+const STEPS = ["Hirdetmény", "Föld", "Szerződő fél", "Te", "Eredmény"];
 
 const DEFAULT_CLAIMANT: ClaimantProfile = {
   isFoldmuves: false,
@@ -76,7 +76,7 @@ function NoticeDetailPage() {
   const [step, setStep] = useState(0);
   const [branch, setBranch] = useState<LandBranch>("non_forest");
   const [transaction, setTransaction] = useState<TransactionKind>("lease");
-  const [contractingPartyRank, setContractingPartyRank] = useState<number | null>(4);
+  const [contractingParty, setContractingParty] = useState<ClaimantProfile>(DEFAULT_CLAIMANT);
   const [claimant, setClaimant] = useState<ClaimantProfile>(DEFAULT_CLAIMANT);
 
   const cultivationTags = useMemo<string[]>(() => {
@@ -87,15 +87,31 @@ function NoticeDetailPage() {
     return tags;
   }, [q.data]);
 
+  // A szerződő fél ranghelyét UGYANAZZAL a motorral számoljuk —
+  // így biztosítjuk, hogy a saját rangsorral konzisztens módon vethető össze.
+  const partyRank = useMemo(() => {
+    const baseFacts: NoticeFacts = {
+      branch,
+      transaction,
+      settlement: q.data?.settlement ?? "",
+      contractingPartyRank: null,
+      cultivationBranchTags: cultivationTags,
+    };
+    return computeRank(baseFacts, contractingParty).rank;
+  }, [branch, transaction, q.data?.settlement, cultivationTags, contractingParty]);
+
   const facts: NoticeFacts = {
     branch,
     transaction,
     settlement: q.data?.settlement ?? "",
-    contractingPartyRank,
+    contractingPartyRank: partyRank,
     cultivationBranchTags: cultivationTags,
   };
 
-  const result = useMemo(() => (step === 4 ? computeRank(facts, claimant) : null), [step, facts, claimant]);
+  const result = useMemo(
+    () => (step === 4 ? computeRank(facts, claimant) : null),
+    [step, facts, claimant]
+  );
 
   const deadline = useMemo(() => {
     if (!q.data?.publication_date) return null;
@@ -207,111 +223,43 @@ function NoticeDetailPage() {
                   </label>
                 </RadioGroup>
               </div>
-              <div className="space-y-2">
-                <Label>A kifüggesztésen szereplő szerződő fél ranghelye (ha ismert)</Label>
-                <RadioGroup
-                  value={contractingPartyRank?.toString() ?? "unknown"}
-                  onValueChange={(v) => setContractingPartyRank(v === "unknown" ? null : Number(v))}
-                  className="grid gap-2 md:grid-cols-5"
-                >
-                  {["1", "2", "3", "4", "unknown"].map((v) => (
-                    <label key={v} className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
-                      <RadioGroupItem value={v} /> {v === "unknown" ? "Nem tudom" : `${v}.`}
-                    </label>
-                  ))}
-                </RadioGroup>
-              </div>
             </div>
           )}
 
           {step === 2 && (
             <div className="space-y-4 text-sm">
-              <h2 className="font-serif text-lg">A te profilod</h2>
-              <CheckRow
-                checked={claimant.isFoldmuves}
-                onChange={(v) => setClaimant({ ...claimant, isFoldmuves: v })}
-                title="Földműves vagyok"
-                desc="A földműves nyilvántartásban szereplő természetes személy (Földforgalmi tv. 5. § 7. pont)."
-              />
-              <CheckRow
-                checked={claimant.isHelybenLako}
-                onChange={(v) => setClaimant({ ...claimant, isHelybenLako: v })}
-                title="Helyben lakó vagyok"
-                desc={`Életvitelszerűen a föld fekvése szerinti településen (${n.settlement ?? "—"}) lakom legalább 3 éve.`}
-              />
-              <CheckRow
-                checked={claimant.isCsaladiGazdasagTag}
-                onChange={(v) => setClaimant({ ...claimant, isCsaladiGazdasagTag: v })}
-                title="Családi mezőgazdasági társaság / őstermelők családi gazdaságának tagja vagyok"
-                desc="46. § (1) a) — a legerősebb 1. ranghelyi alcsoport."
-              />
-              <CheckRow
-                checked={claimant.isAllattarto}
-                onChange={(v) => setClaimant({ ...claimant, isAllattarto: v })}
-                title="Állattartó telepet üzemeltetek"
-                desc="46. § (1) c) — rét/legelő esetén külön preferencia."
+              <h2 className="font-serif text-lg">A szerződő fél státusza</h2>
+              <p className="text-xs text-muted-foreground">
+                Jelöld be a kifüggesztett szerződésben szereplő vevő/bérlő jogcímeit. Ezek alapján a rendszer kiszámolja a ranghelyét.
+                Több jogcím is jelölhető — a motor a legerősebb szerint sorolja be.
+              </p>
+              <ProfileFields
+                profile={contractingParty}
+                setProfile={setContractingParty}
+                settlement={n.settlement}
+                branch={branch}
+                role="party"
               />
               <Separator />
-              <CheckRow
-                checked={claimant.isCloseRelativeOfSeller}
-                onChange={(v) => setClaimant({ ...claimant, isCloseRelativeOfSeller: v })}
-                title="Közeli hozzátartozó vagyok az eladóval/bérbeadóval"
-                desc="Ptk. 8:1. § — ez kizárja az elővásárlási jog gyakorlását."
-              />
-              <CheckRow
-                checked={claimant.isExemptEntity}
-                onChange={(v) => setClaimant({ ...claimant, isExemptEntity: v })}
-                title="Állam, önkormányzat vagy egyházi jogi személy vagyok"
-                desc="Az általános 46. § szerinti ranghely nem alkalmazható."
-              />
+              <p className="text-xs text-muted-foreground">
+                Számított ranghely: <strong className="text-foreground">{formatRank(partyRank)}</strong>
+              </p>
             </div>
           )}
 
           {step === 3 && (
             <div className="space-y-4 text-sm">
-              <h2 className="font-serif text-lg">Földhasználat</h2>
-              <CheckRow
-                checked={claimant.isJelenlegiFoldhasznalo}
-                onChange={(v) => setClaimant({ ...claimant, isJelenlegiFoldhasznalo: v })}
-                title="Jelenleg én használom ezt a földet"
-                desc="A kifüggesztett parcellán jelenlegi haszonbérlő / földhasználó vagyok."
+              <h2 className="font-serif text-lg">A te státuszod</h2>
+              <p className="text-xs text-muted-foreground">
+                Jelöld be a saját jogcímeidet. Egyszerre több is bejelölhető (pl. helyben lakó + állattartó).
+              </p>
+              <ProfileFields
+                profile={claimant}
+                setProfile={setClaimant}
+                settlement={n.settlement}
+                branch={branch}
+                role="self"
               />
-              <CheckRow
-                checked={claimant.isSzomszedosFoldhasznalo}
-                onChange={(v) => setClaimant({ ...claimant, isSzomszedosFoldhasznalo: v })}
-                title="Szomszédos földhasználó vagyok"
-                desc="A kifüggesztett földdel közvetlenül határos parcellát használok."
-              />
-              <CheckRow
-                checked={claimant.isTelepulesiFoldhasznalo}
-                onChange={(v) => setClaimant({ ...claimant, isTelepulesiFoldhasznalo: v })}
-                title="A településen másik földön földhasználó vagyok"
-                desc={`A föld fekvése szerinti településen (${n.settlement ?? "—"}) más parcellán használok földet.`}
-              />
-              {branch === "forest" && (
-                <>
-                  <Separator />
-                  <p className="text-xs text-muted-foreground">Erdő esetén kiegészítő jogcímek (Evt., 2009. évi XXXVII. tv.):</p>
-                  <CheckRow
-                    checked={!!claimant.forest?.isAdjacentForestOwner}
-                    onChange={(v) => setClaimant({ ...claimant, forest: { ...claimant.forest, isAdjacentForestOwner: v } })}
-                    title="Szomszédos erdő tulajdonosa vagyok"
-                    desc="Evt. szerinti tulajdonosi szomszédság."
-                  />
-                  <CheckRow
-                    checked={!!claimant.forest?.isCommonForestOwner}
-                    onChange={(v) => setClaimant({ ...claimant, forest: { ...claimant.forest, isCommonForestOwner: v } })}
-                    title="Közös tulajdonú erdőben tulajdonostárs vagyok"
-                    desc="Evt. szerinti tulajdonostársi jogcím."
-                  />
-                  <CheckRow
-                    checked={!!claimant.forest?.isForestryProfessional}
-                    onChange={(v) => setClaimant({ ...claimant, forest: { ...claimant.forest, isForestryProfessional: v } })}
-                    title="Erdőgazdálkodói minősítéssel rendelkezem"
-                    desc="Bejegyzett erdőgazdálkodó / szakmai minősítéssel."
-                  />
-                </>
-              )}
             </div>
           )}
 
@@ -320,7 +268,12 @@ function NoticeDetailPage() {
               result={result}
               noticeId={n.id}
               deadline={deadline}
-              onRestart={() => { setStep(0); setClaimant(DEFAULT_CLAIMANT); }}
+              partyRank={partyRank}
+              onRestart={() => {
+                setStep(0);
+                setClaimant(DEFAULT_CLAIMANT);
+                setContractingParty(DEFAULT_CLAIMANT);
+              }}
             />
           )}
 
@@ -360,19 +313,129 @@ function CheckRow({ checked, onChange, title, desc }: { checked: boolean; onChan
   );
 }
 
+function formatRank(r: number | null): string {
+  if (r === null) return "Nincs ranghely";
+  return `${r}. ranghely`;
+}
+
+function ProfileFields({
+  profile,
+  setProfile,
+  settlement,
+  branch,
+  role,
+}: {
+  profile: ClaimantProfile;
+  setProfile: (p: ClaimantProfile) => void;
+  settlement: string | null;
+  branch: LandBranch;
+  role: "self" | "party";
+}) {
+  const meLabel = role === "self" ? "vagyok" : "ő";
+  const setForest = (patch: Partial<NonNullable<ClaimantProfile["forest"]>>) =>
+    setProfile({ ...profile, forest: { ...profile.forest, ...patch } });
+
+  return (
+    <div className="space-y-3">
+      <CheckRow
+        checked={profile.isFoldmuves}
+        onChange={(v) => setProfile({ ...profile, isFoldmuves: v })}
+        title={`Földműves ${meLabel}`}
+        desc="A földműves nyilvántartásban szereplő természetes személy (Földforgalmi tv. 5. § 7. pont)."
+      />
+      <CheckRow
+        checked={profile.isHelybenLako}
+        onChange={(v) => setProfile({ ...profile, isHelybenLako: v })}
+        title={`Helyben lakó ${meLabel}`}
+        desc={`Életvitelszerűen a föld fekvése szerinti településen (${settlement ?? "—"}) lakik legalább 3 éve.`}
+      />
+      <CheckRow
+        checked={profile.isCsaladiGazdasagTag}
+        onChange={(v) => setProfile({ ...profile, isCsaladiGazdasagTag: v })}
+        title="Családi mezőgazdasági társaság / őstermelők családi gazdaságának tagja"
+        desc="46. § (1) a) — a legerősebb 1. ranghelyi alcsoport."
+      />
+      <CheckRow
+        checked={profile.isAllattarto}
+        onChange={(v) => setProfile({ ...profile, isAllattarto: v })}
+        title="Állattartó telepet üzemeltet"
+        desc="46. § (1) c) — rét/legelő esetén külön preferencia."
+      />
+      <CheckRow
+        checked={profile.isJelenlegiFoldhasznalo}
+        onChange={(v) => setProfile({ ...profile, isJelenlegiFoldhasznalo: v })}
+        title="Jelenlegi földhasználó ezen a parcellán"
+        desc="A kifüggesztett földön jelenleg haszonbérlő / földhasználó."
+      />
+      <CheckRow
+        checked={profile.isSzomszedosFoldhasznalo}
+        onChange={(v) => setProfile({ ...profile, isSzomszedosFoldhasznalo: v })}
+        title="Szomszédos földhasználó"
+        desc="A kifüggesztett földdel közvetlenül határos parcellát használ."
+      />
+      <CheckRow
+        checked={profile.isTelepulesiFoldhasznalo}
+        onChange={(v) => setProfile({ ...profile, isTelepulesiFoldhasznalo: v })}
+        title="A településen másik földön földhasználó"
+        desc={`A föld fekvése szerinti településen (${settlement ?? "—"}) más parcellán használ földet.`}
+      />
+      <Separator />
+      <CheckRow
+        checked={profile.isCloseRelativeOfSeller}
+        onChange={(v) => setProfile({ ...profile, isCloseRelativeOfSeller: v })}
+        title={role === "self" ? "Közeli hozzátartozó vagyok az eladóval/bérbeadóval" : "Az eladó/bérbeadó közeli hozzátartozója"}
+        desc="Ptk. 8:1. § — kizárja az elővásárlási jog gyakorlását (46. § (5))."
+      />
+      <CheckRow
+        checked={profile.isExemptEntity}
+        onChange={(v) => setProfile({ ...profile, isExemptEntity: v })}
+        title="Állam, önkormányzat vagy egyházi jogi személy"
+        desc="Az általános 46. § szerinti ranghely nem alkalmazható."
+      />
+      {branch === "forest" && (
+        <>
+          <Separator />
+          <p className="text-xs text-muted-foreground">Erdő esetén kiegészítő jogcímek (Evt., 2009. évi XXXVII. tv.):</p>
+          <CheckRow
+            checked={!!profile.forest?.isAdjacentForestOwner}
+            onChange={(v) => setForest({ isAdjacentForestOwner: v })}
+            title="Szomszédos erdő tulajdonosa"
+            desc="Evt. szerinti tulajdonosi szomszédság."
+          />
+          <CheckRow
+            checked={!!profile.forest?.isCommonForestOwner}
+            onChange={(v) => setForest({ isCommonForestOwner: v })}
+            title="Közös tulajdonú erdőben tulajdonostárs"
+            desc="Evt. szerinti tulajdonostársi jogcím."
+          />
+          <CheckRow
+            checked={!!profile.forest?.isForestryProfessional}
+            onChange={(v) => setForest({ isForestryProfessional: v })}
+            title="Erdőgazdálkodói minősítéssel rendelkezik"
+            desc="Bejegyzett erdőgazdálkodó / szakmai minősítéssel."
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
 function ResultPanel({
   result,
   noticeId,
   deadline,
+  partyRank,
   onRestart,
 }: {
   result: ReturnType<typeof computeRank>;
   noticeId: string;
   deadline: Date | null;
+  partyRank: number | null;
   onRestart: () => void;
 }) {
   const stronger = result.strongerThanContractingParty;
   const hasRank = result.rank !== null;
+  const sameRank = hasRank && partyRank !== null && result.rank === partyRank;
 
   return (
     <div className="space-y-4 text-sm">
@@ -391,23 +454,43 @@ function ResultPanel({
         </div>
       </div>
 
-      {stronger === true && (
-        <Alert>
-          <AlertTitle>Erősebb vagy a szerződő félnél</AlertTitle>
-          <AlertDescription>
-            Elfogadó nyilatkozattal beléphetsz a szerződésbe a 15 napos jogvesztő határidőn belül
-            {deadline ? <> ({formatDate(deadline.toISOString())}-ig)</> : null}.
-          </AlertDescription>
-        </Alert>
-      )}
-      {stronger === false && hasRank && (
-        <Alert>
-          <AlertTitle>Nem vagy erősebb a szerződő félnél</AlertTitle>
-          <AlertDescription>
-            A megadott profillal a szerződő fél ranghelye azonos vagy erősebb, így elfogadó nyilatkozattal nem léphetsz be.
-          </AlertDescription>
-        </Alert>
-      )}
+      <div className="grid gap-2 md:grid-cols-2 pt-2">
+        <div className="rounded-md border p-3">
+          <div className="text-xs text-muted-foreground">Te</div>
+          <div className="font-serif text-base">{formatRank(result.rank)}</div>
+        </div>
+        <div className="rounded-md border p-3">
+          <div className="text-xs text-muted-foreground">Szerződő fél</div>
+          <div className="font-serif text-base">{formatRank(partyRank)}</div>
+        </div>
+      </div>
+
+      <Alert>
+        <Scale className="h-4 w-4" />
+        <AlertTitle>
+          {stronger === true
+            ? "Erősebb vagy a szerződő félnél"
+            : sameRank
+              ? "Azonos ranghelyen álltok"
+              : hasRank && partyRank !== null
+                ? "A szerződő fél erősebb"
+                : "Összevetés nem értelmezhető"}
+        </AlertTitle>
+        <AlertDescription>
+          {stronger === true && (
+            <>Elfogadó nyilatkozattal beléphetsz a szerződésbe a 15 napos jogvesztő határidőn belül{deadline ? <> ({formatDate(deadline.toISOString())}-ig)</> : null}.</>
+          )}
+          {sameRank && (
+            <>Azonos ranghely esetén az elfogadó nyilatkozat csak akkor előzi meg a szerződő felet, ha azon belül erősebb alcsoportba tartozol — ezt a jegyző / mg-i igazgatási szerv bírálja el.</>
+          )}
+          {!stronger && !sameRank && hasRank && partyRank !== null && (
+            <>A szerződő fél ranghelye erősebb, így elfogadó nyilatkozattal nem léphetsz be.</>
+          )}
+          {!hasRank && (
+            <>A megadott profillal nincs elővásárlási / előhaszonbérleti jogod.</>
+          )}
+        </AlertDescription>
+      </Alert>
 
       {result.warnings.length > 0 && (
         <Alert>
