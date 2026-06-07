@@ -423,7 +423,7 @@ function ResultPanel({
       <div className="flex flex-wrap gap-2 pt-2">
         {stronger === true && (
           <Button asChild>
-            <Link to="/belepes" search={{ next: `/kifuggesztesek/${noticeId}` }}>
+            <Link to="/belepes">
               <FileCheck2 className="h-4 w-4 mr-1" /> Elfogadó nyilatkozat (hamarosan)
             </Link>
           </Button>
