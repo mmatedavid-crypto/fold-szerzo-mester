@@ -32,6 +32,7 @@ export interface LeaseRankResult {
   possibleRanks: EvaluatedRank[];
   strongestRank: EvaluatedRank | null;
   incompleteRanks: EvaluatedRank[];
+  incompleteSpecialRanks: EvaluatedRank[];
   warnings: string[];
   requiredProofs: ProofItem[];
   excluded: { reason: string } | null;
@@ -43,11 +44,28 @@ function intraPriority(p: PartyStatus): number {
   return 3;
 }
 
+function resolveEffectiveBranch(ctx: LandContext): LandContext {
+  if (!ctx.mixedParcel) return ctx;
+  if (ctx.largerArea === "forest") return { ...ctx, branch: "forest" };
+  if (ctx.largerArea === "non_forest") return { ...ctx, branch: "non_forest" };
+  return ctx;
+}
+
+const SPECIAL_IDS: RankId[] = [
+  "G10_animal_holder",
+  "G10_organic",
+  "G10_horticulture",
+  "G10_seed",
+  "G10_irrigation",
+  "G10_rice",
+];
+
 export function evaluateLeaseRanks(input: {
   landContext: LandContext;
   partyStatus: PartyStatus;
 }): LeaseRankResult {
-  const { landContext: ctx, partyStatus: p } = input;
+  const ctx = resolveEffectiveBranch(input.landContext);
+  const p = input.partyStatus;
   const warnings: string[] = [];
 
   // Adásvétel: ez a motor csak haszonbérletet kezel.
@@ -56,26 +74,10 @@ export function evaluateLeaseRanks(input: {
       possibleRanks: [],
       strongestRank: null,
       incompleteRanks: [],
+      incompleteSpecialRanks: [],
       warnings: ["Adásvételi elővásárlási ranghely külön modulban készül."],
       requiredProofs: [],
       excluded: { reason: "Az adásvételi elővásárlási ranghely más szabályrendszer." },
-    };
-  }
-
-  // Kizárás: közeli hozzátartozó.
-  if (p.close_relative) {
-    return {
-      possibleRanks: [],
-      strongestRank: null,
-      incompleteRanks: [],
-      warnings: [
-        "A szerződő féllel közeli hozzátartozói viszony esetén előhaszonbérleti jog főszabály szerint kizárt.",
-      ],
-      requiredProofs: [],
-      excluded: {
-        reason:
-          "A szerződő féllel közeli hozzátartozói viszony a Földforgalmi tv. szerint kizárja az előhaszonbérleti jogot.",
-      },
     };
   }
 
@@ -84,6 +86,9 @@ export function evaluateLeaseRanks(input: {
   }
   if (p.has_use_debt) {
     warnings.push("Földhasználati díjtartozás a jogcím érvényesítését akadályozhatja.");
+  }
+  if (input.landContext.mixedParcel && input.landContext.largerArea === "unknown") {
+    warnings.push("Vegyes alrészlet — nem ismert melyik nagyobb. Az erdő/nem erdő szabálykészlet közötti választás bizonytalan.");
   }
 
   const ip = intraPriority(p);
@@ -111,12 +116,15 @@ export function evaluateLeaseRanks(input: {
   matched.sort((a, b) => a.group - b.group || a.intraPriority - b.intraPriority);
   const strongest = matched[0] ?? null;
 
+  const incompleteSpecial = incomplete.filter((r) => SPECIAL_IDS.includes(r.id));
+
   const proofs: ProofItem[] = strongest ? getProofsFor(strongest.id, p) : [];
 
   return {
     possibleRanks: [...matched, ...incomplete],
     strongestRank: strongest,
     incompleteRanks: incomplete,
+    incompleteSpecialRanks: incompleteSpecial,
     warnings,
     requiredProofs: proofs,
     excluded: null,
