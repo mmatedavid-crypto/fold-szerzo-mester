@@ -14,6 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
+      acceptance_documents: {
+        Row: {
+          claimant_snapshot: Json
+          computed_rank: number
+          created_at: string
+          document_hash: string
+          document_number: string
+          draft_id: string | null
+          id: string
+          issued_at: string
+          notice_snapshot: Json
+          pdf_file_path: string
+          rank_rules_version: string
+          updated_at: string
+          user_id: string
+          verification_token: string
+        }
+        Insert: {
+          claimant_snapshot: Json
+          computed_rank: number
+          created_at?: string
+          document_hash: string
+          document_number: string
+          draft_id?: string | null
+          id?: string
+          issued_at?: string
+          notice_snapshot: Json
+          pdf_file_path: string
+          rank_rules_version: string
+          updated_at?: string
+          user_id: string
+          verification_token: string
+        }
+        Update: {
+          claimant_snapshot?: Json
+          computed_rank?: number
+          created_at?: string
+          document_hash?: string
+          document_number?: string
+          draft_id?: string | null
+          id?: string
+          issued_at?: string
+          notice_snapshot?: Json
+          pdf_file_path?: string
+          rank_rules_version?: string
+          updated_at?: string
+          user_id?: string
+          verification_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acceptance_documents_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "acceptance_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      acceptance_drafts: {
+        Row: {
+          claimant_data: Json
+          computed_branch: string | null
+          computed_rank: number | null
+          computed_reason: string | null
+          computed_warnings: Json
+          created_at: string
+          deadline_date: string | null
+          id: string
+          notice_id: string | null
+          notice_snapshot: Json
+          rank_rules_version: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          claimant_data: Json
+          computed_branch?: string | null
+          computed_rank?: number | null
+          computed_reason?: string | null
+          computed_warnings?: Json
+          created_at?: string
+          deadline_date?: string | null
+          id?: string
+          notice_id?: string | null
+          notice_snapshot: Json
+          rank_rules_version?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          claimant_data?: Json
+          computed_branch?: string | null
+          computed_rank?: number | null
+          computed_reason?: string | null
+          computed_warnings?: Json
+          created_at?: string
+          deadline_date?: string | null
+          id?: string
+          notice_id?: string | null
+          notice_snapshot?: Json
+          rank_rules_version?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acceptance_drafts_notice_id_fkey"
+            columns: ["notice_id"]
+            isOneToOne: false
+            referencedRelation: "notices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      acceptance_verifications: {
+        Row: {
+          created_at: string
+          document_hash: string
+          document_id: string
+          id: string
+          issued_at: string
+          parcel_numbers: string[] | null
+          settlement: string | null
+          token: string
+          view_count: number
+        }
+        Insert: {
+          created_at?: string
+          document_hash: string
+          document_id: string
+          id?: string
+          issued_at: string
+          parcel_numbers?: string[] | null
+          settlement?: string | null
+          token: string
+          view_count?: number
+        }
+        Update: {
+          created_at?: string
+          document_hash?: string
+          document_id?: string
+          id?: string
+          issued_at?: string
+          parcel_numbers?: string[] | null
+          settlement?: string | null
+          token?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acceptance_verifications_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "acceptance_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clauses: {
         Row: {
           active: boolean
@@ -455,6 +617,39 @@ export type Database = {
           price_label?: string
           slug?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      rank_rules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          rules: Json
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          rules: Json
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          rules?: Json
+          updated_at?: string
+          version?: string
         }
         Relationships: []
       }
