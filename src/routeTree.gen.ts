@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as KifuggesztesekRouteImport } from './routes/kifuggesztesek'
+import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
 import { Route as BerletiDijIranytuRouteImport } from './routes/berleti-dij-iranytu'
 import { Route as BelepesRouteImport } from './routes/belepes'
 import { Route as ArakRouteImport } from './routes/arak'
@@ -25,6 +26,11 @@ const RegisztracioRoute = RegisztracioRouteImport.update({
 const KifuggesztesekRoute = KifuggesztesekRouteImport.update({
   id: '/kifuggesztesek',
   path: '/kifuggesztesek',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DokumentumEllenorzesRoute = DokumentumEllenorzesRouteImport.update({
+  id: '/dokumentum-ellenorzes',
+  path: '/dokumentum-ellenorzes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BerletiDijIranytuRoute = BerletiDijIranytuRouteImport.update({
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/arak': typeof ArakRoute
   '/belepes': typeof BelepesRoute
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRoute
   '/regisztracio': typeof RegisztracioRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/arak'
     | '/belepes'
     | '/berleti-dij-iranytu'
+    | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
     | '/regisztracio'
     | '/api/public/payments/mock-confirm'
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/arak'
     | '/belepes'
     | '/berleti-dij-iranytu'
+    | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
     | '/regisztracio'
     | '/api/public/payments/mock-confirm'
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/arak'
     | '/belepes'
     | '/berleti-dij-iranytu'
+    | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
     | '/regisztracio'
     | '/api/public/payments/mock-confirm'
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   ArakRoute: typeof ArakRoute
   BelepesRoute: typeof BelepesRoute
   BerletiDijIranytuRoute: typeof BerletiDijIranytuRoute
+  DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
   KifuggesztesekRoute: typeof KifuggesztesekRoute
   RegisztracioRoute: typeof RegisztracioRoute
   ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
@@ -136,6 +149,13 @@ declare module '@tanstack/react-router' {
       path: '/kifuggesztesek'
       fullPath: '/kifuggesztesek'
       preLoaderRoute: typeof KifuggesztesekRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dokumentum-ellenorzes': {
+      id: '/dokumentum-ellenorzes'
+      path: '/dokumentum-ellenorzes'
+      fullPath: '/dokumentum-ellenorzes'
+      preLoaderRoute: typeof DokumentumEllenorzesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/berleti-dij-iranytu': {
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArakRoute: ArakRoute,
   BelepesRoute: BelepesRoute,
   BerletiDijIranytuRoute: BerletiDijIranytuRoute,
+  DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
   KifuggesztesekRoute: KifuggesztesekRoute,
   RegisztracioRoute: RegisztracioRoute,
   ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
@@ -188,3 +209,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
