@@ -75,7 +75,7 @@ function NoticesPage() {
       <section className="container mx-auto px-4 py-10 max-w-6xl">
         <h1 className="font-serif text-3xl">Kifüggesztések</h1>
         <p className="mt-2 text-muted-foreground text-sm max-w-2xl">
-          Friss földhirdetmények a hirdetmenyek.gov.hu RSS feedjéből. A részletekért (terület, díj, határidő, csatolmány) kattints a hivatalos oldal linkjére.
+          Aktuális termőföld kifüggesztések. A részletekért (terület, díj, határidő, csatolmány) nyisd meg a hivatalos oldalt.
         </p>
 
         <Card className="p-4 mt-6">
@@ -141,16 +141,13 @@ function NoticesPage() {
               ))}
               {!q.isLoading && filtered.length === 0 && (
                 <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-10">
-                  Nincs találat. Az admin felületen futtasd le az RSS szinkront.
+                  Nincs találat.
                 </TableCell></TableRow>
               )}
             </TableBody>
           </Table>
         </Card>
 
-        <p className="text-xs text-muted-foreground mt-4">
-          Forrás: hirdetmenyek.gov.hu RSS — naponta frissül. A területet, díjat, határidőt és csatolmányt a hivatalos oldalon nézheted meg.
-        </p>
       </section>
     </PageShell>
   );
