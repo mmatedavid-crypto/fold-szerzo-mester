@@ -88,6 +88,12 @@ function AdminPage() {
         </Card>
 
         <p className="text-xs text-muted-foreground mt-8">
+        </p>
+
+        <h2 className="font-serif text-xl mt-8">Kifüggesztések importálása</h2>
+        <NoticesImport />
+
+        <p className="text-xs text-muted-foreground mt-8">
           Admin-szerep beállítás: az első adminhoz a Lovable Cloud SQL editorral futtasd:
           <code className="ml-1">INSERT INTO public.user_roles(user_id, role) VALUES ('&lt;user-uuid&gt;', 'admin');</code>
         </p>
