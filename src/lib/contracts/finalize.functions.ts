@@ -51,7 +51,7 @@ export const finalizeContract = createServerFn({ method: "POST" })
 
     // Pre-generate doc number from draft id; finalize_document RPC consumes credit atomically.
     const documentNumber = makeDocNumber(draft.id);
-    const verificationUrl = `https://foldberletiszerzodes.hu/dokumentum-ellenorzes?id=${documentNumber}`;
+    const verificationUrl = `https://drfold.hu/dokumentum-ellenorzes?id=${documentNumber}`;
     const core_hash = coreFieldsFingerprint(draft);
 
     // Render PDF
