@@ -9,38 +9,280 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisztracioRouteImport } from './routes/regisztracio'
+import { Route as KifuggesztesekRouteImport } from './routes/kifuggesztesek'
+import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
+import { Route as BerletiDijIranytuRouteImport } from './routes/berleti-dij-iranytu'
+import { Route as BelepesRouteImport } from './routes/belepes'
+import { Route as ArakRouteImport } from './routes/arak'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedSzerzodesUjRouteImport } from './routes/_authenticated/szerzodes.uj'
+import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
+import { Route as AuthenticatedSzerzodesIdSzerkesztesRouteImport } from './routes/_authenticated/szerzodes.$id.szerkesztes'
+import { Route as AuthenticatedSzerzodesIdKeszRouteImport } from './routes/_authenticated/szerzodes.$id.kesz'
+import { Route as AuthenticatedSzerzodesIdFizetesRouteImport } from './routes/_authenticated/szerzodes.$id.fizetes'
+import { Route as AuthenticatedSzerzodesIdEllenorzesRouteImport } from './routes/_authenticated/szerzodes.$id.ellenorzes'
 
+const RegisztracioRoute = RegisztracioRouteImport.update({
+  id: '/regisztracio',
+  path: '/regisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KifuggesztesekRoute = KifuggesztesekRouteImport.update({
+  id: '/kifuggesztesek',
+  path: '/kifuggesztesek',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DokumentumEllenorzesRoute = DokumentumEllenorzesRouteImport.update({
+  id: '/dokumentum-ellenorzes',
+  path: '/dokumentum-ellenorzes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BerletiDijIranytuRoute = BerletiDijIranytuRouteImport.update({
+  id: '/berleti-dij-iranytu',
+  path: '/berleti-dij-iranytu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BelepesRoute = BelepesRouteImport.update({
+  id: '/belepes',
+  path: '/belepes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArakRoute = ArakRouteImport.update({
+  id: '/arak',
+  path: '/arak',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSzerzodesUjRoute =
+  AuthenticatedSzerzodesUjRouteImport.update({
+    id: '/szerzodes/uj',
+    path: '/szerzodes/uj',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicPaymentsMockConfirmRoute =
+  ApiPublicPaymentsMockConfirmRouteImport.update({
+    id: '/api/public/payments/mock-confirm',
+    path: '/api/public/payments/mock-confirm',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedSzerzodesIdSzerkesztesRoute =
+  AuthenticatedSzerzodesIdSzerkesztesRouteImport.update({
+    id: '/szerzodes/$id/szerkesztes',
+    path: '/szerzodes/$id/szerkesztes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSzerzodesIdKeszRoute =
+  AuthenticatedSzerzodesIdKeszRouteImport.update({
+    id: '/szerzodes/$id/kesz',
+    path: '/szerzodes/$id/kesz',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSzerzodesIdFizetesRoute =
+  AuthenticatedSzerzodesIdFizetesRouteImport.update({
+    id: '/szerzodes/$id/fizetes',
+    path: '/szerzodes/$id/fizetes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSzerzodesIdEllenorzesRoute =
+  AuthenticatedSzerzodesIdEllenorzesRouteImport.update({
+    id: '/szerzodes/$id/ellenorzes',
+    path: '/szerzodes/$id/ellenorzes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/arak': typeof ArakRoute
+  '/belepes': typeof BelepesRoute
+  '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
+  '/kifuggesztesek': typeof KifuggesztesekRoute
+  '/regisztracio': typeof RegisztracioRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
+  '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
+  '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
+  '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/arak': typeof ArakRoute
+  '/belepes': typeof BelepesRoute
+  '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
+  '/kifuggesztesek': typeof KifuggesztesekRoute
+  '/regisztracio': typeof RegisztracioRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
+  '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
+  '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
+  '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/arak': typeof ArakRoute
+  '/belepes': typeof BelepesRoute
+  '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
+  '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
+  '/kifuggesztesek': typeof KifuggesztesekRoute
+  '/regisztracio': typeof RegisztracioRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/_authenticated/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
+  '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
+  '/_authenticated/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
+  '/_authenticated/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/arak'
+    | '/belepes'
+    | '/berleti-dij-iranytu'
+    | '/dokumentum-ellenorzes'
+    | '/kifuggesztesek'
+    | '/regisztracio'
+    | '/admin'
+    | '/dashboard'
+    | '/szerzodes/uj'
+    | '/szerzodes/$id/ellenorzes'
+    | '/szerzodes/$id/fizetes'
+    | '/szerzodes/$id/kesz'
+    | '/szerzodes/$id/szerkesztes'
+    | '/api/public/payments/mock-confirm'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/arak'
+    | '/belepes'
+    | '/berleti-dij-iranytu'
+    | '/dokumentum-ellenorzes'
+    | '/kifuggesztesek'
+    | '/regisztracio'
+    | '/admin'
+    | '/dashboard'
+    | '/szerzodes/uj'
+    | '/szerzodes/$id/ellenorzes'
+    | '/szerzodes/$id/fizetes'
+    | '/szerzodes/$id/kesz'
+    | '/szerzodes/$id/szerkesztes'
+    | '/api/public/payments/mock-confirm'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/arak'
+    | '/belepes'
+    | '/berleti-dij-iranytu'
+    | '/dokumentum-ellenorzes'
+    | '/kifuggesztesek'
+    | '/regisztracio'
+    | '/_authenticated/admin'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/szerzodes/uj'
+    | '/_authenticated/szerzodes/$id/ellenorzes'
+    | '/_authenticated/szerzodes/$id/fizetes'
+    | '/_authenticated/szerzodes/$id/kesz'
+    | '/_authenticated/szerzodes/$id/szerkesztes'
+    | '/api/public/payments/mock-confirm'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ArakRoute: typeof ArakRoute
+  BelepesRoute: typeof BelepesRoute
+  BerletiDijIranytuRoute: typeof BerletiDijIranytuRoute
+  DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
+  KifuggesztesekRoute: typeof KifuggesztesekRoute
+  RegisztracioRoute: typeof RegisztracioRoute
+  ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/regisztracio': {
+      id: '/regisztracio'
+      path: '/regisztracio'
+      fullPath: '/regisztracio'
+      preLoaderRoute: typeof RegisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kifuggesztesek': {
+      id: '/kifuggesztesek'
+      path: '/kifuggesztesek'
+      fullPath: '/kifuggesztesek'
+      preLoaderRoute: typeof KifuggesztesekRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dokumentum-ellenorzes': {
+      id: '/dokumentum-ellenorzes'
+      path: '/dokumentum-ellenorzes'
+      fullPath: '/dokumentum-ellenorzes'
+      preLoaderRoute: typeof DokumentumEllenorzesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/berleti-dij-iranytu': {
+      id: '/berleti-dij-iranytu'
+      path: '/berleti-dij-iranytu'
+      fullPath: '/berleti-dij-iranytu'
+      preLoaderRoute: typeof BerletiDijIranytuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/belepes': {
+      id: '/belepes'
+      path: '/belepes'
+      fullPath: '/belepes'
+      preLoaderRoute: typeof BelepesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arak': {
+      id: '/arak'
+      path: '/arak'
+      fullPath: '/arak'
+      preLoaderRoute: typeof ArakRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +290,100 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/szerzodes/uj': {
+      id: '/_authenticated/szerzodes/uj'
+      path: '/szerzodes/uj'
+      fullPath: '/szerzodes/uj'
+      preLoaderRoute: typeof AuthenticatedSzerzodesUjRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/payments/mock-confirm': {
+      id: '/api/public/payments/mock-confirm'
+      path: '/api/public/payments/mock-confirm'
+      fullPath: '/api/public/payments/mock-confirm'
+      preLoaderRoute: typeof ApiPublicPaymentsMockConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/szerzodes/$id/szerkesztes': {
+      id: '/_authenticated/szerzodes/$id/szerkesztes'
+      path: '/szerzodes/$id/szerkesztes'
+      fullPath: '/szerzodes/$id/szerkesztes'
+      preLoaderRoute: typeof AuthenticatedSzerzodesIdSzerkesztesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/szerzodes/$id/kesz': {
+      id: '/_authenticated/szerzodes/$id/kesz'
+      path: '/szerzodes/$id/kesz'
+      fullPath: '/szerzodes/$id/kesz'
+      preLoaderRoute: typeof AuthenticatedSzerzodesIdKeszRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/szerzodes/$id/fizetes': {
+      id: '/_authenticated/szerzodes/$id/fizetes'
+      path: '/szerzodes/$id/fizetes'
+      fullPath: '/szerzodes/$id/fizetes'
+      preLoaderRoute: typeof AuthenticatedSzerzodesIdFizetesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/szerzodes/$id/ellenorzes': {
+      id: '/_authenticated/szerzodes/$id/ellenorzes'
+      path: '/szerzodes/$id/ellenorzes'
+      fullPath: '/szerzodes/$id/ellenorzes'
+      preLoaderRoute: typeof AuthenticatedSzerzodesIdEllenorzesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSzerzodesUjRoute: typeof AuthenticatedSzerzodesUjRoute
+  AuthenticatedSzerzodesIdEllenorzesRoute: typeof AuthenticatedSzerzodesIdEllenorzesRoute
+  AuthenticatedSzerzodesIdFizetesRoute: typeof AuthenticatedSzerzodesIdFizetesRoute
+  AuthenticatedSzerzodesIdKeszRoute: typeof AuthenticatedSzerzodesIdKeszRoute
+  AuthenticatedSzerzodesIdSzerkesztesRoute: typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSzerzodesUjRoute: AuthenticatedSzerzodesUjRoute,
+  AuthenticatedSzerzodesIdEllenorzesRoute:
+    AuthenticatedSzerzodesIdEllenorzesRoute,
+  AuthenticatedSzerzodesIdFizetesRoute: AuthenticatedSzerzodesIdFizetesRoute,
+  AuthenticatedSzerzodesIdKeszRoute: AuthenticatedSzerzodesIdKeszRoute,
+  AuthenticatedSzerzodesIdSzerkesztesRoute:
+    AuthenticatedSzerzodesIdSzerkesztesRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ArakRoute: ArakRoute,
+  BelepesRoute: BelepesRoute,
+  BerletiDijIranytuRoute: BerletiDijIranytuRoute,
+  DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
+  KifuggesztesekRoute: KifuggesztesekRoute,
+  RegisztracioRoute: RegisztracioRoute,
+  ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
