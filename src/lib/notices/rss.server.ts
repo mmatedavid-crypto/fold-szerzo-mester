@@ -91,33 +91,99 @@ export function parseRss(xml: string): RssNotice[] {
 }
 
 export async function syncFromRss(): Promise<{ fetched: number; upserted: number }> {
-  const res = await fetch("https://hirdetmenyek.gov.hu/rss", {
-    headers: { "User-Agent": "Foldberleti-Szerzodes-Generator/1.0 (+kifuggesztesek)" },
+  return syncFromApi({ incremental: true });
+}
+
+const TYPE_LABEL: Record<string, string> = {
+  foldelovasarlasos: "Adás-vétel",
+  foldhivatali: "Haszonbérlet",
+};
+
+type ApiRow = {
+  id: number;
+  targy: string;
+  forrasIntezmenyNeve: string | null;
+  kifuggesztesNapja: string | null;
+  hirdetmenyTipusNev: string | null;
+};
+
+function parseSubjectParts(rawTitle: string): { settlement: string | null; parcels: string[] } {
+  const parts = rawTitle.split("|").map((p) => p.trim()).filter(Boolean);
+  let settlement: string | null = null;
+  const parcels: string[] = [];
+  for (const part of parts) {
+    const m = part.match(/^(.+?)\s*-\s*(.+?)\s*hrsz\.?:?\s*(.+)$/i);
+    if (m) {
+      if (!settlement) settlement = m[2].trim();
+      const tail = m[3].replace(/külterület|zártkert|hrsz\.?/gi, " ").trim();
+      for (const p of tail.split(/[,\s]+/)) {
+        const cleaned = p.replace(/[^0-9A-Za-z/]/g, "");
+        if (cleaned && /\d/.test(cleaned)) parcels.push(cleaned);
+      }
+    }
+  }
+  return { settlement, parcels: Array.from(new Set(parcels)).slice(0, 50) };
+}
+
+async function fetchPage(pageIndex: number, pageSize: number): Promise<{ rows: ApiRow[]; total: number }> {
+  const url = `https://hirdetmenyek.gov.hu/api/hirdetmenyek?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=kifuggesztesNapja&order=desc`;
+  const res = await fetch(url, {
+    headers: { "User-Agent": "Foldberleti-Szerzodes-Generator/1.0", Accept: "application/json" },
   });
-  if (!res.ok) throw new Error(`RSS HTTP ${res.status}`);
-  const xml = await res.text();
-  const rows = parseRss(xml);
-  if (rows.length === 0) return { fetched: 0, upserted: 0 };
+  if (!res.ok) throw new Error(`API HTTP ${res.status}`);
+  return (await res.json()) as { rows: ApiRow[]; total: number };
+}
 
-  const payload = rows.map((r) => ({
+function mapRow(r: ApiRow) {
+  const { settlement, parcels } = parseSubjectParts(r.targy ?? "");
+  const typeLabel = TYPE_LABEL[r.hirdetmenyTipusNev ?? ""] ?? r.hirdetmenyTipusNev ?? "Egyéb";
+  const pub = r.kifuggesztesNapja ? new Date(r.kifuggesztesNapja).toISOString().slice(0, 10) : null;
+  return {
     source: "hirdetmenyek.gov.hu",
-    source_notice_id: r.source_notice_id,
-    original_detail_url: r.original_detail_url,
-    subject: r.subject,
-    notice_type: r.notice_type,
-    settlement: r.settlement,
-    parcel_numbers: r.parcel_numbers,
-    municipality: r.municipality,
-    publication_date: r.publication_date,
+    source_notice_id: String(r.id),
+    original_detail_url: `https://hirdetmenyek.gov.hu/reszletezo/${r.id}`,
+    subject: (r.targy ?? "").slice(0, 1000),
+    notice_type: typeLabel.slice(0, 64),
+    settlement: settlement?.slice(0, 255) ?? null,
+    parcel_numbers: parcels,
+    municipality: r.forrasIntezmenyNeve?.slice(0, 255) ?? null,
+    publication_date: pub,
     last_fetched_at: new Date().toISOString(),
-  }));
+  };
+}
 
-  // Upsert without overwriting Excel-imported rich fields (area, rent, deadline, attachment).
-  // PostgREST upsert with onConflict + ignoreDuplicates would skip updates; instead we
-  // insert new and update only the RSS-sourced columns for existing rows.
-  const { error } = await supabaseAdmin
-    .from("notices")
-    .upsert(payload, { onConflict: "source,source_notice_id" });
-  if (error) throw new Error(error.message);
-  return { fetched: rows.length, upserted: payload.length };
+export async function syncFromApi(opts: { incremental?: boolean; maxPages?: number } = {}): Promise<{
+  fetched: number;
+  upserted: number;
+}> {
+  const pageSize = 100;
+  const first = await fetchPage(0, pageSize);
+  const total = first.total;
+  const totalPages = Math.ceil(total / pageSize);
+  const cap = opts.maxPages ?? (opts.incremental ? 2 : totalPages);
+  const pages = Math.min(totalPages, cap);
+
+  let fetched = 0;
+  let upserted = 0;
+
+  async function flush(rows: ApiRow[]) {
+    if (rows.length === 0) return;
+    const payload = rows.map(mapRow);
+    const { error } = await supabaseAdmin
+      .from("notices")
+      .upsert(payload, { onConflict: "source,source_notice_id" });
+    if (error) throw new Error(error.message);
+    fetched += rows.length;
+    upserted += payload.length;
+  }
+
+  await flush(first.rows);
+
+  for (let i = 1; i < pages; i++) {
+    const page = await fetchPage(i, pageSize);
+    await flush(page.rows);
+    if (page.rows.length === 0) break;
+  }
+
+  return { fetched, upserted };
 }
