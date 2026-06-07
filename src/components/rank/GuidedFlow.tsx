@@ -52,11 +52,12 @@ export function GuidedFlow({ land, setLand, lessee, setLessee, me, setMe, result
 
       {step === 0 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Haszonbérletről vagy adásvételről van szó?</h2>
+          <h2 className="text-lg font-semibold">Miről van szó?</h2>
+          <p className="text-sm text-muted-foreground">Földet bérelnél vagy vennél?</p>
           <Choices
             options={[
-              { value: "lease", label: "Haszonbérlet" },
-              { value: "sale", label: "Adásvétel (hamarosan)" },
+              { value: "lease", label: "Bérelni szeretnék (haszonbérlet)" },
+              { value: "sale", label: "Venni szeretnék (adásvétel) — hamarosan" },
             ]}
             onPick={(v) => { setLand({ ...land, transaction: v as "lease" | "sale" }); next(); }}
           />
@@ -65,12 +66,13 @@ export function GuidedFlow({ land, setLand, lessee, setLessee, me, setMe, result
 
       {step === 1 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Milyen föld?</h2>
+          <h2 className="text-lg font-semibold">Milyen földről beszélünk?</h2>
+          <p className="text-sm text-muted-foreground">Válaszd ki, melyik illik rá a legjobban.</p>
           <Choices
             options={[
-              { value: "non_forest", label: "Termőföld (szántó, rét, kert, szőlő…)" },
-              { value: "forest", label: "Erdő / fásított terület" },
-              { value: "unknown", label: "Nem tudom" },
+              { value: "non_forest", label: "Termőföld — szántó, rét, legelő, kert, szőlő, gyümölcsös" },
+              { value: "forest", label: "Erdő vagy fásított terület" },
+              { value: "unknown", label: "Még nem tudom biztosan" },
             ]}
             onPick={(v) => {
               if (v !== "unknown") setLand({ ...land, branch: v as "forest" | "non_forest" });
@@ -82,18 +84,19 @@ export function GuidedFlow({ land, setLand, lessee, setLessee, me, setMe, result
 
       {step === 2 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Mit tudsz a kifüggesztett bérlőről?</h2>
+          <h2 className="text-lg font-semibold">Ki a kifüggesztett bérlő?</h2>
+          <p className="text-sm text-muted-foreground">Az, akivel a tulajdonos szerződést kötne. Válaszd a legjellemzőbbet — később finomíthatod.</p>
           <Choices
             options={[
-              { value: "former_lessee", label: "Volt haszonbérlő" },
-              { value: "local_neighbor", label: "Helyben lakó szomszéd" },
-              { value: "local_resident", label: "Helyben lakó" },
-              { value: "within_20km", label: "20 km-en belüli" },
-              { value: "animal_holder", label: "Állattartó" },
-              { value: "organic", label: "Bio / öko" },
-              { value: "co_owner", label: "Tulajdonostárs" },
-              { value: "org_local", label: "Mezőgazdasági termelőszervezet" },
-              { value: "unknown", label: "Nem tudom" },
+              { value: "former_lessee", label: "Eddig is ő bérelte (korábbi haszonbérlő)" },
+              { value: "local_neighbor", label: "Helyben lakó, és szomszédos földje van" },
+              { value: "local_resident", label: "Helyben lakó a településen" },
+              { value: "within_20km", label: "20 km-en belül lakik / székhelye 20 km-en belül van" },
+              { value: "animal_holder", label: "Állattartó gazda" },
+              { value: "organic", label: "Bio- vagy ökogazdálkodó" },
+              { value: "co_owner", label: "Tulajdonostárs a földön" },
+              { value: "org_local", label: "Mezőgazdasági termelőszervezet (cég, szövetkezet)" },
+              { value: "unknown", label: "Őszintén szólva nem tudom" },
             ]}
             onPick={(v) => { setLessee(applyPresetByValue(v, lessee)); next(); }}
           />
@@ -102,16 +105,17 @@ export function GuidedFlow({ land, setLand, lessee, setLessee, me, setMe, result
 
       {step === 3 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Mi igaz rád?</h2>
+          <h2 className="text-lg font-semibold">És te ki vagy ebben a sztoriban?</h2>
+          <p className="text-sm text-muted-foreground">Válaszd ki, ami a leginkább igaz rád. A részletes jogcímeket utána pontosítjuk.</p>
           <Choices
             options={[
-              { value: "former_lessee", label: "Volt haszonbérlő vagyok" },
-              { value: "local_neighbor", label: "Helyben lakó szomszéd vagyok" },
-              { value: "local_resident", label: "Helyben lakó vagyok" },
-              { value: "within_20km", label: "20 km-en belüli vagyok" },
-              { value: "co_owner", label: "Földműves tulajdonostárs vagyok" },
-              { value: "org_local", label: "Helybeli szervezet vagyok" },
-              { value: "unknown", label: "Nem tudom" },
+              { value: "former_lessee", label: "Eddig én béreltem ezt a földet" },
+              { value: "local_neighbor", label: "Helyben lakok, és szomszédos földem van" },
+              { value: "local_resident", label: "Helyben lakok a településen" },
+              { value: "within_20km", label: "20 km-en belül lakok" },
+              { value: "co_owner", label: "Földműves vagyok, és tulajdonostárs ezen a földön" },
+              { value: "org_local", label: "Helyi termelőszervezet képviseletében jövök" },
+              { value: "unknown", label: "Még nem tudom, segítsetek" },
             ]}
             onPick={(v) => { setMe(applyPresetByValue(v, me)); next(); }}
           />
@@ -120,15 +124,16 @@ export function GuidedFlow({ land, setLand, lessee, setLessee, me, setMe, result
 
       {step === 4 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Van valami erős külön jogcímed?</h2>
+          <h2 className="text-lg font-semibold">Van valami extra ütőkártyád?</h2>
+          <p className="text-sm text-muted-foreground">Ezek az „erős” jogcímek — ha megvan hozzá az igazolásod, fellökhetnek a rangsorban.</p>
           <Choices
             options={[
-              { value: "animal_holder", label: "Állattartó vagyok" },
-              { value: "organic", label: "Bio / öko gazdálkodó vagyok" },
-              { value: "irrigation", label: "Öntözésfejlesztő vagyok" },
-              { value: "young_farmer", label: "Fiatal gazda vagyok" },
-              { value: "csmt", label: "CSMT / ŐCSG tag vagyok" },
-              { value: "none", label: "Nincs ilyen" },
+              { value: "animal_holder", label: "Állattartó vagyok (a földet takarmányozásra használnám)" },
+              { value: "organic", label: "Bio- vagy ökogazdálkodó vagyok" },
+              { value: "irrigation", label: "Öntözésfejlesztést végzek a területen" },
+              { value: "young_farmer", label: "Fiatal gazda vagyok (40 év alatti)" },
+              { value: "csmt", label: "Családi mezőgazdasági társaság / őstermelői család tagja vagyok" },
+              { value: "none", label: "Nincs ilyen — sima gazda vagyok" },
             ]}
             onPick={(v) => {
               if (v !== "none") setMe(applyPresetByValue(v, me));
@@ -140,14 +145,14 @@ export function GuidedFlow({ land, setLand, lessee, setLessee, me, setMe, result
 
       {step === 5 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Meg tudod igazolni?</h2>
+          <h2 className="text-lg font-semibold">Papírral is alá tudod támasztani?</h2>
           <p className="text-sm text-muted-foreground">
-            Az erős speciális jogcímekhez (állattartó, bio, öntözés…) több igazolás kell. Az igazolási listát az eredmény után megkapod.
+            A komolyabb jogcímekhez (állattartó, bio, öntözés…) hivatalos igazolások kellenek. Ne aggódj — az eredmény után pontos listát kapsz arról, mit kell összeszedned.
           </p>
           <div className="grid gap-2">
-            <Button size="lg" onClick={next}>Igen, lássuk az eredményt</Button>
+            <Button size="lg" onClick={next}>Rendben, mutasd az eredményt</Button>
             <Button size="lg" variant="outline" onClick={() => { setMe({ ...EMPTY_PARTY }); setStep(3); }}>
-              Vissza — újraválasztom magamat
+              Mégis újrakezdem magamnál
             </Button>
           </div>
         </div>
@@ -157,7 +162,7 @@ export function GuidedFlow({ land, setLand, lessee, setLessee, me, setMe, result
         <div className="space-y-4">
           <ResultPanel result={result} onAccept={onAccept} />
           <Button variant="outline" className="w-full" onClick={onFinish}>
-            Tovább a részletes kalkulátorhoz <Sparkles className="h-4 w-4" />
+            Átváltok a részletes kalkulátorra <Sparkles className="h-4 w-4" />
           </Button>
         </div>
       )}
@@ -165,7 +170,7 @@ export function GuidedFlow({ land, setLand, lessee, setLessee, me, setMe, result
       {step > 0 && step < 6 && (
         <div className="flex justify-between pt-2">
           <Button variant="ghost" size="sm" onClick={back}><ArrowLeft className="h-3 w-3" /> Vissza</Button>
-          <Button variant="ghost" size="sm" onClick={next}>Kihagyás <ArrowRight className="h-3 w-3" /></Button>
+          <Button variant="ghost" size="sm" onClick={next}>Most kihagyom <ArrowRight className="h-3 w-3" /></Button>
         </div>
       )}
     </Card>
