@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { AppleButton } from "@/components/auth/apple-button";
+import { OAuthButton } from "@/components/auth/apple-button";
 
 export const Route = createFileRoute("/belepes")({
   head: () => ({
@@ -61,8 +61,9 @@ function BelepesPage() {
             <span className="text-xs text-muted-foreground">vagy</span>
             <div className="h-px flex-1 bg-border" />
           </div>
-          <div className="mt-4">
-            <AppleButton label="Belépés Apple-lel" />
+          <div className="mt-4 space-y-2">
+            <OAuthButton provider="google" label="Belépés Google-lel" />
+            <OAuthButton provider="apple" label="Belépés Apple-lel" />
           </div>
           <p className="mt-4 text-sm text-center text-muted-foreground">
             Még nincs fiókod? <Link to="/regisztracio" className="text-primary underline">Regisztráció</Link>
