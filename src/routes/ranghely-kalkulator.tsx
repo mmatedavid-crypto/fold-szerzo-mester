@@ -4,7 +4,11 @@ import { toast } from "sonner";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, X } from "lucide-react";
-import { DEFAULT_LAND, toLandContext, type LandContextValue } from "@/components/rank/LandContextCard";
+import {
+  DEFAULT_LAND,
+  toLandContext,
+  type LandContextValue,
+} from "@/components/rank/LandContextCard";
 import { GuidedFlow } from "@/components/rank/GuidedFlow";
 import { EMPTY_PARTY, type PartyStatus } from "@/lib/rank/leaseTypes";
 import { compareLeaseRanks } from "@/lib/rank/leaseRankComparison";
@@ -18,7 +22,11 @@ export const Route = createFileRoute("/ranghely-kalkulator")({
   head: () => ({
     meta: [
       { title: "Ki áll előrébb a haszonbérleti rangsorban? | Dr Föld" },
-      { name: "description", content: "Dr Föld ranghely kalkulátor: jelöld be, mi igaz a kifüggesztett bérlőre és mi igaz rád. Megmutatjuk, kinek lehet erősebb előhaszonbérleti ranghelye." },
+      {
+        name: "description",
+        content:
+          "Dr Föld ranghely kalkulátor: jelöld be, mi igaz a kifüggesztett bérlőre és mi igaz rád. Megmutatjuk, kinek lehet erősebb előhaszonbérleti ranghelye.",
+      },
       { property: "og:title", content: "Dr Föld — Ranghely kalkulátor" },
       { property: "og:description", content: "Ravasz a gazda: nézd meg, hol állsz a sorban." },
     ],
@@ -43,8 +51,9 @@ function RankCalculatorPage() {
   const [me, setMe] = useState<PartyStatus>(() => ({ ...EMPTY_PARTY }));
 
   const result = useMemo(
-    () => compareLeaseRanks({ landContext: toLandContext(land), lesseeStatus: lessee, userStatus: me }),
-    [land, lessee, me]
+    () =>
+      compareLeaseRanks({ landContext: toLandContext(land), lesseeStatus: lessee, userStatus: me }),
+    [land, lessee, me],
   );
 
   const onAccept = () => {
@@ -59,7 +68,11 @@ function RankCalculatorPage() {
       warnings: result.warnings,
       createdAt: new Date().toISOString(),
     };
-    try { sessionStorage.setItem("rank_calculation_snapshot", JSON.stringify(snapshot)); } catch {}
+    try {
+      sessionStorage.setItem("rank_calculation_snapshot", JSON.stringify(snapshot));
+    } catch {
+      // sessionStorage may be unavailable in restricted browser contexts.
+    }
     toast.success("Számítás mentve. Folytasd az elfogadó nyilatkozat előkészítésével.");
   };
 
@@ -72,17 +85,20 @@ function RankCalculatorPage() {
 
   return (
     <PageShell>
-      <div className="space-y-6">
+      <div className="df-paper min-h-[calc(100vh-5rem)] space-y-6 px-4 py-8 md:px-8">
         <header className="space-y-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Badge variant="outline" className="border-primary/40 text-primary">Dr Föld</Badge>
+            <Badge variant="outline" className="border-primary/40 text-primary">
+              Dr Föld
+            </Badge>
             <span>Ranghely kalkulátor</span>
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold tracking-tight">
-            Ki áll előrébb a haszonbérleti rangsorban?
+          <h1 className="font-brand text-3xl font-black tracking-tight text-df-green md:text-5xl">
+            Ha előrébb állsz, ne maradj hátul.
           </h1>
           <p className="text-muted-foreground max-w-2xl">
-            Válaszolj pár egyszerű kérdésre. Dr Föld megmutatja, kinek lehet erősebb előhaszonbérleti ranghelye.
+            Válaszolj pár egyszerű kérdésre. Dr Föld megmutatja, kinek lehet erősebb
+            előhaszonbérleti ranghelye.
           </p>
           <p className="text-sm text-primary font-medium flex items-center gap-1.5">
             <Sparkles className="h-4 w-4" /> Ravasz a gazda: nézd meg, hol állsz a sorban.
@@ -91,7 +107,9 @@ function RankCalculatorPage() {
             <div className="pt-2">
               <div className="inline-flex items-center gap-2 text-xs bg-muted px-2.5 py-1 rounded-full">
                 Kifüggesztésből indítva
-                <button onClick={() => setShowNoticeChip(false)} aria-label="Bezár"><X className="h-3 w-3" /></button>
+                <button onClick={() => setShowNoticeChip(false)} aria-label="Bezár">
+                  <X className="h-3 w-3" />
+                </button>
               </div>
             </div>
           )}

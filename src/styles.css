@@ -59,34 +59,53 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-df-green: var(--df-green);
+  --color-df-cream: var(--df-cream);
+  --color-df-card: var(--df-card);
+  --color-df-red: var(--df-red);
+  --color-df-yellow: var(--df-yellow);
+  --color-df-ink: var(--df-ink);
+  --color-df-gray: var(--df-gray);
+  --color-df-border: var(--df-border);
+  --font-brand: var(--df-font-brand);
 }
 
 :root {
-  --radius: 0.625rem;
-  /* Natural agricultural palette */
-  --background: oklch(0.985 0.008 95);
-  --foreground: oklch(0.22 0.02 150);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 150);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 150);
-  --primary: oklch(0.42 0.08 145);
-  --primary-foreground: oklch(0.99 0.005 95);
-  --secondary: oklch(0.95 0.02 95);
-  --secondary-foreground: oklch(0.3 0.04 150);
-  --muted: oklch(0.95 0.015 95);
-  --muted-foreground: oklch(0.5 0.02 150);
-  --accent: oklch(0.88 0.06 90);
-  --accent-foreground: oklch(0.25 0.04 150);
-  --destructive: oklch(0.55 0.21 27);
-  --destructive-foreground: oklch(0.99 0.005 95);
+  --radius: 0.5rem;
+  --df-green: #21543a;
+  --df-cream: #f4e7cf;
+  --df-card: #fff9ec;
+  --df-red: #b43a2f;
+  --df-yellow: #e0a92f;
+  --df-ink: #1d211b;
+  --df-gray: #6b6f63;
+  --df-border: #d8c7a5;
+  --df-font-brand: "Roboto Slab", "Rockwell", "Georgia", serif;
+  --df-font-ui: "Atkinson Hyperlegible", "Lexend", "Trebuchet MS", system-ui, sans-serif;
+
+  --background: oklch(0.98 0.024 84.7);
+  --foreground: oklch(0.21 0.018 119.4);
+  --card: oklch(0.99 0.027 88.7);
+  --card-foreground: oklch(0.21 0.018 119.4);
+  --popover: oklch(0.99 0.027 88.7);
+  --popover-foreground: oklch(0.21 0.018 119.4);
+  --primary: oklch(0.39 0.081 153.4);
+  --primary-foreground: oklch(0.99 0.027 88.7);
+  --secondary: oklch(0.93 0.047 81.7);
+  --secondary-foreground: oklch(0.27 0.055 149.7);
+  --muted: oklch(0.93 0.047 81.7);
+  --muted-foreground: oklch(0.51 0.018 113.2);
+  --accent: oklch(0.77 0.135 79.4);
+  --accent-foreground: oklch(0.21 0.018 119.4);
+  --destructive: oklch(0.52 0.17 31.1);
+  --destructive-foreground: oklch(0.99 0.027 88.7);
   --warning: oklch(0.72 0.16 75);
   --warning-foreground: oklch(0.2 0.03 60);
   --success: oklch(0.55 0.13 145);
   --success-foreground: oklch(0.99 0.005 95);
-  --border: oklch(0.9 0.015 95);
-  --input: oklch(0.9 0.015 95);
-  --ring: oklch(0.5 0.09 145);
+  --border: oklch(0.84 0.052 82.5);
+  --input: oklch(0.84 0.052 82.5);
+  --ring: oklch(0.39 0.081 153.4);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -145,5 +164,34 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--df-font-ui);
+    letter-spacing: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-serif {
+    font-family: var(--df-font-brand);
+    letter-spacing: 0;
+  }
+
+  ::selection {
+    background: var(--df-yellow);
+    color: var(--df-ink);
+  }
+}
+
+@layer components {
+  .df-paper {
+    background-color: var(--df-card);
+    background-image:
+      linear-gradient(rgba(33, 84, 58, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(33, 84, 58, 0.025) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .df-stamp-logo {
+    box-shadow: inset 0 0 0 2px rgba(180, 58, 47, 0.18);
   }
 }

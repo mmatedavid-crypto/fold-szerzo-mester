@@ -13,6 +13,7 @@ import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as RanghelyKalkulatorRouteImport } from './routes/ranghely-kalkulator'
 import { Route as LeiratkozasRouteImport } from './routes/leiratkozas'
 import { Route as FoldAdasVetelRouteImport } from './routes/fold-adas-vetel'
+import { Route as FoldberletiSzerzodesRouteImport } from './routes/foldberleti-szerzodes'
 import { Route as ElfogadoNyilatkozatRouteImport } from './routes/elfogado-nyilatkozat'
 import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
 import { Route as CookieSzabalyzatRouteImport } from './routes/cookie-szabalyzat'
@@ -54,6 +55,11 @@ const LeiratkozasRoute = LeiratkozasRouteImport.update({
 const FoldAdasVetelRoute = FoldAdasVetelRouteImport.update({
   id: '/fold-adas-vetel',
   path: '/fold-adas-vetel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoldberletiSzerzodesRoute = FoldberletiSzerzodesRouteImport.update({
+  id: '/foldberleti-szerzodes',
+  path: '/foldberleti-szerzodes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ElfogadoNyilatkozatRoute = ElfogadoNyilatkozatRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/elfogado-nyilatkozat': typeof ElfogadoNyilatkozatRoute
   '/fold-adas-vetel': typeof FoldAdasVetelRoute
+  '/foldberleti-szerzodes': typeof FoldberletiSzerzodesRoute
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/elfogado-nyilatkozat': typeof ElfogadoNyilatkozatRoute
   '/fold-adas-vetel': typeof FoldAdasVetelRoute
+  '/foldberleti-szerzodes': typeof FoldberletiSzerzodesRoute
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/elfogado-nyilatkozat': typeof ElfogadoNyilatkozatRoute
   '/fold-adas-vetel': typeof FoldAdasVetelRoute
+  '/foldberleti-szerzodes': typeof FoldberletiSzerzodesRoute
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/dokumentum-ellenorzes'
     | '/elfogado-nyilatkozat'
     | '/fold-adas-vetel'
+    | '/foldberleti-szerzodes'
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/dokumentum-ellenorzes'
     | '/elfogado-nyilatkozat'
     | '/fold-adas-vetel'
+    | '/foldberleti-szerzodes'
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/dokumentum-ellenorzes'
     | '/elfogado-nyilatkozat'
     | '/fold-adas-vetel'
+    | '/foldberleti-szerzodes'
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
@@ -354,6 +366,7 @@ export interface RootRouteChildren {
   DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
   ElfogadoNyilatkozatRoute: typeof ElfogadoNyilatkozatRoute
   FoldAdasVetelRoute: typeof FoldAdasVetelRoute
+  FoldberletiSzerzodesRoute: typeof FoldberletiSzerzodesRoute
   LeiratkozasRoute: typeof LeiratkozasRoute
   RanghelyKalkulatorRoute: typeof RanghelyKalkulatorRoute
   RegisztracioRoute: typeof RegisztracioRoute
@@ -392,6 +405,13 @@ declare module '@tanstack/react-router' {
       path: '/fold-adas-vetel'
       fullPath: '/fold-adas-vetel'
       preLoaderRoute: typeof FoldAdasVetelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/foldberleti-szerzodes': {
+      id: '/foldberleti-szerzodes'
+      path: '/foldberleti-szerzodes'
+      fullPath: '/foldberleti-szerzodes'
+      preLoaderRoute: typeof FoldberletiSzerzodesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/elfogado-nyilatkozat': {
@@ -588,6 +608,7 @@ const rootRouteChildren: RootRouteChildren = {
   DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
   ElfogadoNyilatkozatRoute: ElfogadoNyilatkozatRoute,
   FoldAdasVetelRoute: FoldAdasVetelRoute,
+  FoldberletiSzerzodesRoute: FoldberletiSzerzodesRoute,
   LeiratkozasRoute: LeiratkozasRoute,
   RanghelyKalkulatorRoute: RanghelyKalkulatorRoute,
   RegisztracioRoute: RegisztracioRoute,
