@@ -88,8 +88,6 @@ function AdminPage() {
         </Card>
 
         <p className="text-xs text-muted-foreground mt-8">
-        </p>
-
         <h2 className="font-serif text-xl mt-8">Kifüggesztések importálása</h2>
         <NoticesImport />
 
