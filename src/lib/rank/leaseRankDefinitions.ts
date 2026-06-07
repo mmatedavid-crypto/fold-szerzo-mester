@@ -111,6 +111,7 @@ export const RANK_DEFINITIONS: RankDefinition[] = [
       const localish =
         p.local_resident || p.local_neighbor || p.within_20km || p.org_local || p.org_local_neighbor || p.org_within_20km;
       if (!localish) missing.push("helyben lakó / helybeli / 20 km-es feltétel");
+      if (!p.used_3_years) missing.push("legalább 3 éves közvetlen használat igazolása");
       if (missing.length) return { state: "incomplete", missing };
       return { state: "match" };
     },
@@ -129,6 +130,7 @@ export const RANK_DEFINITIONS: RankDefinition[] = [
         missing.push("helyben lakó vagy helybeli mg. szervezet státusz");
       if (!p.feed_purpose) missing.push("takarmányszükséglet a cél");
       if (!p.animal_density_ok) missing.push("megfelelő állatsűrűség igazolása");
+      if (!(isFarmerNatural(p) || isOrg(p))) missing.push("földműves / mg. termelőszervezeti státusz");
       if (missing.length) return { state: "incomplete", missing };
       return { state: "match" };
     },

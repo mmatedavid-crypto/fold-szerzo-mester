@@ -49,7 +49,7 @@ export async function renderContractPdf(input: PdfInput): Promise<Uint8Array> {
   const contentW = PAGE_W - MARGIN * 2;
 
   const drawFooter = (p: import("pdf-lib").PDFPage) => {
-    const footer = `foldberletiszerzodes.hu | Dokumentum ID: ${input.documentNumber} | Generálva: ${input.generatedAt.toISOString().slice(0, 10)} | Sablonverzió: ${input.templateVersion} | Klauzulacsomag: ${input.clauseVersion}`;
+    const footer = `drfold.hu | Dokumentum ID: ${input.documentNumber} | Generálva: ${input.generatedAt.toISOString().slice(0, 10)} | Sablonverzió: ${input.templateVersion} | Klauzulacsomag: ${input.clauseVersion}`;
     p.drawText(footer, { x: MARGIN, y: 24, size: 7, font, color: rgb(0.4, 0.4, 0.4) });
     p.drawText(`Hash: ${input.documentHash.slice(0, 32)}...`, { x: MARGIN, y: 14, size: 7, font, color: rgb(0.4, 0.4, 0.4) });
   };

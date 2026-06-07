@@ -14,6 +14,7 @@ export type Cultivation =
   | "szolo"
   | "gyumolcsos"
   | "rizstelep"
+  | "nadas_halastao"
   | "erdo"
   | "vegyes";
 
@@ -26,8 +27,25 @@ export interface LandContext {
   commonOwnership?: boolean;
   coOwnerLeaseToThirdParty?: boolean;
   wineGeoIndication?: boolean;
-  /** UI-only nyers Y/N/U → boolean konvertálva van. */
+  /** Vegyes alrészlet (erdő + nem erdő ugyanazon földrészleten). */
+  mixedParcel?: boolean;
+  /** Vegyes esetén melyik nagyobb. */
+  largerArea?: "non_forest" | "forest" | "unknown";
+  /** Egybefoglalt haszonbér több földre. */
+  bundledLease?: boolean;
+  /** Tranzakciós szintű kivételek (nem párthoz tartoznak). */
+  exceptions?: TransactionException[];
 }
+
+export type TransactionException =
+  | "kin_chain"
+  | "farm_transfer"
+  | "org_member"
+  | "forest_society_member"
+  | "homestead"
+  | "csmt_member_party"
+  | "irrigation_act"
+  | "unknown";
 
 /** Egyetlen párt (kifüggesztett bérlő VAGY user) deklarált státusza. */
 export interface PartyStatus {
@@ -48,7 +66,10 @@ export interface PartyStatus {
   former_lessee: boolean;
   used_3_years: boolean;
   metayer_lessee: boolean;
+  /** @deprecated csak proof condition, nem önálló ranghely. */
   current_user: boolean;
+  /** Erdő — volt erdőgazdálkodó. */
+  forest_former_manager: boolean;
 
   // Tulajdon
   co_owner_farmer: boolean;
@@ -94,6 +115,7 @@ export const EMPTY_PARTY: PartyStatus = {
   used_3_years: false,
   metayer_lessee: false,
   current_user: false,
+  forest_former_manager: false,
   co_owner_farmer: false,
   animal_holder: false,
   feed_purpose: false,

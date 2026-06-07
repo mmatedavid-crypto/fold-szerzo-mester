@@ -1,82 +1,93 @@
-# Ranghely kalkulátor — újratervezés
+# Ranghely kalkulátor újraépítés — Dr Föld
 
-Önálló, kalkulátor-szerű modul a `/ranghely-kalkulator` útvonalon, ami a jelenlegi 5 lépéses, kifüggesztéshez kötött varázslót helyettesíti. A meglévő `src/lib/rank/engine.ts` és admin-verziózás marad, mellé új, részletesebb haszonbérleti motor készül.
+Cél: a jelenlegi hosszú, wizard-szerű kalkulátort lecseréljük egy **gyors, mobilbarát, chip-alapú** összehasonlító eszközre. „Bejelölöm, mi ő. Bejelölöm, mi vagyok én. Dr Föld megmondja, ki áll előrébb."
 
-## Új útvonal és layout
+## Felhasználói élmény
 
-- Új fájl: `src/routes/ranghely-kalkulator.tsx`
-- Cím: „Ranghely kalkulátor", alcím a specifikációból, kampány-sor.
-- Desktop: 3 oszlop — `Föld és ügylet` (bal), `Kifüggesztett bérlő` + `Én` (közép, 2 kártya egymás mellett), `Eredmény` (jobb, sticky).
-- Mobil: accordion 4 szekcióval, sticky alsó CTA ha a user erősebb.
-- Élő frissítés inputváltozásra (controlled state, nincs „következő" gomb).
-- Kompakt jogi disclaimer minden nézet alján.
-- Kifüggesztés-integráció: query params olvasása, kis elbocsátható chip „Kifüggesztésből indítva". Nem mutat nagy notice headert.
+**Két mód, ugyanaz a motor:**
+1. **Gyors kalkulátor** (alapértelmezett, `/ranghely-kalkulator`) — egy oldal, négy kompakt blokk, sticky eredmény jobbra (desktop) / alulra (mobil).
+2. **Kérdezz-felelek** (toggle: „Nem tudom, mit válasszak — kérdezzen a Dr Föld") — max 6 nagy gombos képernyő.
 
-A `/kifuggesztesek` tetején lévő CTA és a `/kifuggesztesek/$noticeId` „Ranghely ellenőrzés" gomb erre az URL-re irányítanak át (query paramekkel előtöltve).
+**Oldalcím:** „Ki áll előrébb a haszonbérleti rangsorban?"
+**Alcím:** „Válaszd ki, mi igaz a kifüggesztett bérlőre és mi igaz rád. Dr Föld megmutatja, kinek lehet erősebb előhaszonbérleti ranghelye."
+**Kampány:** „Ravasz a gazda: nézd meg, hol állsz a sorban."
 
-## Rank engine refaktor
+## Oldalfelépítés (Gyors kalkulátor)
 
-Új fájlok, a meglévő `src/lib/rank/engine.ts` és `types.ts` érintetlen marad (admin-verzió és Notice-alapú futtatás miatt).
+**A. Föld** — kompakt kártya
+- Ügylet (Haszonbérlet / Adásvétel disabled)
+- Föld típusa: **Termőföld** / **Erdő / fásított terület** (nem „Nem erdő")
+- Művelési ág dropdown (szántó, rét/legelő/gyep, kert, szőlő, gyümölcsös, rizstelep, nádas/halastó/egyéb, erdő, nem tudom)
+- Közös tulajdon (igen/nem/nem tudom)
+- Accordion „Haladó földadatok": vegyes alrészlet + melyik nagyobb, tulajdonostárs harmadiknak ad, egybefoglalt haszonbér, borszőlő/hegyközség
 
-- `src/lib/rank/leaseRankDefinitions.ts` — minden ranghely-csoport (F10, F20, 10–80) deklaratív definíciója: `id`, `group`, `subPriority`, `branch` (forest/non_forest), `requiredConditions[]`, `legalRef`, `humanName`, `proofs[]`.
-- `src/lib/rank/proofRequirements.ts` — `BASE_PROOFS`, `CONDITIONAL_PROOFS`, kategória: `kotelezo | jogcim_fuggo | jogi_ellenorzes`. `getProofsFor(rankId, status)`.
-- `src/lib/rank/leaseRankEngine.ts` — `evaluateLeaseRanks({ landContext, partyStatus }) -> { possibleRanks, strongestRank, incompleteRanks, warnings, requiredProofs }`. Külön ág forest / non-forest. „Intra-group" prioritás: CSMT/ŐCSG > fiatal > sima — csak ugyanazon fő ranghelyen belül a `subPriority` tördelésével, soha nem ugrik át főcsoportot.
-- `src/lib/rank/leaseRankComparison.ts` — `compareLeaseRanks(lessee, user) -> { comparison, explanation, userStrongestRank, lesseeStrongestRank, requiredProofs, missingConditions, warnings }`. Comparison értékek: `user_stronger | same_rank | user_weaker | cannot_determine | no_valid_user_rank | no_prelease_right`. Adásvétel ág azonnal `no_prelease_right` placeholder. Kivételszabályok (közeli hozzátartozó stb.) → `no_prelease_right`.
-- `src/lib/rank/leaseRankEngine.test.ts` — a specifikáció 9 tesztesete.
+**B. Kifüggesztett bérlő** — nagy „Kiválasztom gyorsan" dropdown preset listával → kiválasztott chipek → „+ Másik jogcím hozzáadása" gomb nyit kompakt csoportos chip-választót (Alap / Hely és kapcsolat / Korábbi használat / Tulajdon / Erős speciális / Csoporton belüli előny / Akadályok). NEM 40-item legal checklist by default.
 
-`PartyStatus` típus tartalmazza az összes alap-, hely-, használat-, tulajdon-, speciális, csoport-belüli és kockázati flag-et a specifikáció szerint. `LandContext`: `transaction`, `branch`, `cultivationBranch`, `commonOwnership`, `coOwnerLeaseToThirdParty`, `wineGeoIndication`.
+**C. Te** — ugyanaz mint B, első személyben. „Nem vagyok biztos benne" gomb → Kérdezz-felelek mód.
 
-## Új UI komponensek
+**D. Eredmény** — sticky badge-stílusú panel
+- Empty state: „Pipálj be pár dolgot" (NEM negatív eredmény)
+- 6 result type, mindegyik saját badge + szöveg + CTA:
+  1. `user_stronger`: „TE ÁLLHATSZ ELŐRÉBB" → „Elfogadó nyilatkozatot készítek" (primary)
+  2. `same_rank`: „AZONOS RANGHELY" → „Elfogadó nyilatkozat előkészítése" + warning
+  3. `user_weaker`: „A BÉRLŐ ÁLLHAT ELŐRÉBB" → „Mi hiányozhat nálad?" lista, no paid CTA
+  4. `lessee_unknown`: „A BÉRLŐ RANGHELYE NEM ISMERT" → user legerősebb + CTA warninggel
+  5. `incomplete_special`: „HIÁNYOS ERŐS JOGCÍM" → „Hiányzó feltételek bepipálása"
+  6. `no_valid`: „NEM LÁTSZIK BIZTOS JOGCÍM"
+  7. `exception`: „KIVÉTEL LEHET" (tranzakciós kivétel esetén, no primary CTA)
+- Proof checklist 3 kategóriában (Alap / Jogcímtől függő / Jogi ellenőrzés) + „Igazolási lista másolása" gomb
+- Expandable „Jogszabályi háttér" csak releváns hivatkozásokkal
 
-- `src/components/rank/LandContextCard.tsx` — szekció 1. RadioGroup-ok, művelési ág Select.
-- `src/components/rank/PartyStatusCard.tsx` — szekciók 2 és 3 közös komponense, `title`, `subtitle`, preset Select, csoportosított checkbox-listák (Alap, Hely, Használat, Tulajdon, Speciális, Csoport, Kockázat). Minden checkbox: cím + egy soros magyarázat + opcionális `Mit jelent?` `Collapsible`. Touch-friendly méret.
-- `src/components/rank/ResultPanel.tsx` — 6 állapot badge-ek, kifüggesztett bérlő vs te legerősebb ranghelye, jogalap, proof checklist kategóriánként, CTA-k.
-- `src/components/rank/ExceptionsCollapsible.tsx` — alapból zárt, „Speciális kivételek".
+## Logikai motor változások
 
-## Acceptance statement CTA
+`src/lib/rank/leaseRankDefinitions.ts`, `leaseRankEngine.ts`, `leaseRankComparison.ts`, `proofRequirements.ts` finomítása + új `rankPresets.ts` (chip-presetek és dropdown opciók).
 
-`user_stronger` és `same_rank` esetén CTA. Kattintásra:
-- ha bejelentkezve: szerver fn `createAcceptanceFromCalculation(snapshot)` létrehoz drafthez tartozó record-ot, navigál `/elfogado-nyilatkozat/uj?fromRankCalculation={id}`-re.
-- ha anonim: `/belepes?redirect=...` + snapshot sessionStorage-ban tárolva.
+**Főbb pontosítások:**
+- Termőföld (non_forest) main groups: G10 (volt haszonbérlő + 46.§(3) speciálisok) → G20 (földműves tulajdonostárs) → G30 helybeli szomszéd → G40 helybeli → G50 20km → G60 helybeli szervezet szomszéd → G70 helybeli szervezet → G80 20km szervezet
+- Erdő (forest): külön ranghelyek, nem-erdő speciálisok itt nem érvényesek
+- Vegyes parcella: nagyobb terület határoz; ismeretlen → bizonytalanság
+- **Intra-group**: CSMT/ŐCSG > Fiatal > Sima — csak ugyanazon csoporton belül, természetes személy farmer-csoportokra. Nem ugrik főcsoportot. Szervezetekre nem alkalmazandó.
+- **Speciális top-rank feltételek** szigorúbb validálással (állattartó: helyben lakó + takarmány cél + állatsűrűség + 3 év; bio/öko csak szántó/kert/szőlő/gyümölcsös + helyben lakó + öko cél; kertészet csak kert/szőlő/gyümölcsös; szaporítóanyag csak szántó; öntözés szántó/szőlő/gyümölcsös/kert + ≥50% öntözhető + számviteli érték a futamidő feléig)
+- **„Jelenlegi földhasználó" rank törölve** — csak proof condition
+- **„Közeli hozzátartozó" checkbox törölve** a party kártyáról — tranzakciós kivételbe kerül („Ritkább kivételek" blokk a Föld kártya alján vagy külön Exceptions panelben)
+- Volt haszonbérlő: 3 éves közvetlen használat feltétel, ha nincs/unknown → incomplete
 
-Új `src/lib/rank/snapshot.functions.ts` `saveCalculationSnapshot` server fn-nel (auth védett), új tábla migrációval: `rank_calculations(id, user_id, land_context jsonb, lessee_status jsonb, user_status jsonb, user_strongest_rank, lessee_strongest_rank, comparison, created_at)`. RLS: user csak a sajátját lát/ír.
+## Kivételek
 
-A meglévő acceptance-flow most már a két forrást fogadja: kifüggesztésből vagy kalkulátorból. Ha a tartós acceptance-modul külön rendszer, csak a redirect linket frissítjük; integrációt nem bontunk.
+Külön „Ritkább kivételek" blokk (collapsed): hozzátartozói láncolat, gazdaságátadás, MgTermSzerv+tag, erdőbirtokossági társulat+tag, tanya, CSMT+tag, öntözéses tv. Ha bármelyik bejelölt → eredmény „KIVÉTEL LEHET", nincs primary CTA.
 
-## Régi varázsló sorsa
+## CTA flow
 
-- `src/routes/kifuggesztesek.$noticeId.tsx` jelenleg a 5-step wizard hostja. A wizard belső lépéseit megőrizzük, de a notice detail page jövőképében a „Ranghely kalkulátor megnyitása" gomb az új útvonalra visz át. A teljes 5-step UI lecserélése egy külön kör, most:
-  - a notice oldal tetejére kerül egy felhívás: „Próbáld ki az új Ranghely kalkulátort", ami `/ranghely-kalkulator?settlement=...&branch=...` linket nyit.
-  - a wizard maradhat fallback-ként, de a `/kifuggesztesek` CTA sáv az új URL-re mutat.
-- `/kifuggesztesek` tetején a meglévő CTA sáv (előfizetés) érintetlen, mellé kis link: „Ranghely kalkulátor".
+`user_stronger` / `same_rank` → snapshot mentés (sessionStorage + opcionálisan szerver), redirect `/elfogado-nyilatkozat/uj?fromRankCalculation={id}` átadva: landContext, statuses, strongest ranks, comparison, references, proofs, warnings.
 
-Ha a user határozott „távolítsd el a régi wizardot" igényt kifejez, külön körben töröljük; most a célt (önálló, egyszerű kalkulátor) az új útvonal teljesíti.
+## Brand / footer
 
-## Technikai részletek
+- „Dr Föld" mindenhol a kalkulátorban (nem „Földbérleti Szerződés")
+- Footer-ben és dokumentumokban `drfold.hu` referencia a `foldberletiszerzodes.hu` helyett (`src/components/layout/site-footer.tsx`)
 
-- Forms: controlled React state, nincs react-hook-form (egyszerű, élő frissítés).
-- Validáció a motorban, UI csak input.
-- Snapshot mentés csak CTA-ra.
-- Adásvétel branch: a `transaction === "sale"` ügyletre a komparáció `no_prelease_right` és egy magyarázó szöveg, nem fut a motor.
-- A meglévő `engine.ts` és Notice-alapú admin-verziózás változatlanul használható egyéb helyeken.
-- Tesztek `bunx vitest run src/lib/rank/leaseRankEngine.test.ts`-tel futnak.
+## Érintett fájlok
 
-## Fájlok
+**Frissítés:**
+- `src/routes/ranghely-kalkulator.tsx` — új layout, két mód toggle
+- `src/components/rank/LandContextCard.tsx` — Termőföld label, művelési ág bővítés, haladó accordion
+- `src/components/rank/PartyStatusCard.tsx` — chip-alapú UI, preset dropdown, csoportos hozzáadó
+- `src/components/rank/ResultPanel.tsx` — empty state, új result type-ok, proof copy, jogszabályi háttér
+- `src/components/rank/ExceptionsCollapsible.tsx` — tranzakciós kivételek
+- `src/lib/rank/leaseRankDefinitions.ts` — finomítások, „jelenlegi földhasználó" törlése
+- `src/lib/rank/leaseRankEngine.ts` — incomplete special detektálás, exception handling
+- `src/lib/rank/leaseRankComparison.ts` — új comparison típusok (lessee_unknown, incomplete_special, exception)
+- `src/lib/rank/leaseTypes.ts` — close_relative mező eltávolítva, tranzakciós exception mezők
+- `src/lib/rank/proofRequirements.ts` — Hely/Korábbi/Tulajdon csoportosítás
+- `src/components/layout/site-footer.tsx` — drfold.hu
 
-Új:
-- `src/routes/ranghely-kalkulator.tsx`
-- `src/lib/rank/leaseRankDefinitions.ts`
-- `src/lib/rank/leaseRankEngine.ts`
-- `src/lib/rank/leaseRankComparison.ts`
-- `src/lib/rank/proofRequirements.ts`
-- `src/lib/rank/leaseRankEngine.test.ts`
-- `src/lib/rank/snapshot.functions.ts`
-- `src/components/rank/LandContextCard.tsx`
-- `src/components/rank/PartyStatusCard.tsx`
-- `src/components/rank/ResultPanel.tsx`
-- `src/components/rank/ExceptionsCollapsible.tsx`
-- Supabase migration: `rank_calculations` tábla
+**Új:**
+- `src/lib/rank/rankPresets.ts` — preset dropdown opciók, chip csoportok
+- `src/components/rank/GuidedFlow.tsx` — Kérdezz-felelek mód (max 6 lépés)
+- `src/components/rank/ResultBadge.tsx` — stamp/badge komponens
 
-Módosítva:
-- `src/routes/kifuggesztesek.index.tsx` — másodlagos link az új kalkulátorra
-- `src/routes/kifuggesztesek.$noticeId.tsx` — felső banner az új kalkulátorra
+**Nem érintünk:**
+- elfogadó nyilatkozat generátor, payment, dashboard, admin, PDF, dokumentum-ellenőrzés, notice integráció
+
+## Tesztek
+
+A 10 megadott eset manuális verifikációja a preview-ban a build után.

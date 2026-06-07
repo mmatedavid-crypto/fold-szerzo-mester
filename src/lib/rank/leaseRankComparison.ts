@@ -1,17 +1,30 @@
 /**
  * Két fél (kifüggesztett bérlő vs user) ranghely-eredményeinek összehasonlítása.
+ * Új eredmény típusok:
+ *  - empty: nincs elég bemenet → ne mutassunk negatív eredményt.
+ *  - user_stronger / same_rank / user_weaker: klasszikus.
+ *  - lessee_unknown: usernek van rangja, de a bérlő ismeretlen.
+ *  - incomplete_special: a user bejelölt erős speciális jogcímet, de hiányos.
+ *  - no_valid_user_rank: a user semmilyen érvényes ranghelyet nem ér el.
+ *  - exception: tranzakciós kivétel áll fenn.
+ *  - no_prelease_right: adásvétel.
  */
 
 import { evaluateLeaseRanks, type LeaseRankResult, type EvaluatedRank } from "./leaseRankEngine";
-import type { LandContext, PartyStatus } from "./leaseTypes";
+import type { LandContext, PartyStatus, TransactionException } from "./leaseTypes";
+import { isPartyEmpty } from "./rankPresets";
 import type { ProofItem } from "./proofRequirements";
 
 export type ComparisonOutcome =
+  | "empty"
   | "user_stronger"
   | "same_rank"
   | "user_weaker"
+  | "lessee_unknown"
+  | "incomplete_special"
   | "cannot_determine"
   | "no_valid_user_rank"
+  | "exception"
   | "no_prelease_right";
 
 export interface LeaseComparisonResult {
@@ -24,12 +37,12 @@ export interface LeaseComparisonResult {
   warnings: string[];
   user: LeaseRankResult;
   lessee: LeaseRankResult;
+  exceptionsActive: TransactionException[];
 }
 
-function isUnknownLessee(p: PartyStatus): boolean {
+function lesseeUnknownLike(p: PartyStatus): boolean {
   if (p.unknown_status || p.unknown_base) return true;
-  // Ha semmi sincs bejelölve, nem összehasonlítható.
-  return Object.entries(p).every(([_, v]) => v === false);
+  return isPartyEmpty(p);
 }
 
 export function compareLeaseRanks(input: {
@@ -42,69 +55,111 @@ export function compareLeaseRanks(input: {
   const lessee = evaluateLeaseRanks({ landContext, partyStatus: lesseeStatus });
   const user = evaluateLeaseRanks({ landContext, partyStatus: userStatus });
 
+  const activeExceptions = (landContext.exceptions ?? []).filter((e) => e !== "unknown");
+
+  const base = {
+    user,
+    lessee,
+    exceptionsActive: activeExceptions,
+    warnings: [...user.warnings, ...lessee.warnings],
+  };
+
+  // Adásvétel
   if (landContext.transaction === "sale") {
     return {
+      ...base,
       comparison: "no_prelease_right",
-      explanation:
-        "Adásvételi ügyletre a haszonbérleti előhaszonbérleti ranghely nem értelmezhető. Az elővásárlási ranghely külön kalkulátorban készül.",
+      explanation: "Adásvételi ügyletre a haszonbérleti előhaszonbérleti ranghely nem értelmezhető. Az elővásárlási ranghely külön kalkulátorban készül.",
       userStrongestRank: null,
       lesseeStrongestRank: null,
       requiredProofs: [],
       missingConditions: [],
       warnings: ["Adásvételhez külön kalkulátor használandó."],
-      user,
-      lessee,
     };
   }
 
-  if (user.excluded) {
+  // Tranzakciós kivétel
+  if (activeExceptions.length > 0) {
     return {
-      comparison: "no_prelease_right",
-      explanation: user.excluded.reason,
-      userStrongestRank: null,
+      ...base,
+      comparison: "exception",
+      explanation: "Az ügylet egy ritkább kivétel hatálya alá eshet, ezért a főszabály szerinti előhaszonbérleti rangsor nem alkalmazható közvetlenül.",
+      userStrongestRank: user.strongestRank,
       lesseeStrongestRank: lessee.strongestRank,
       requiredProofs: [],
       missingConditions: [],
-      warnings: user.warnings,
-      user,
-      lessee,
+      warnings: [...base.warnings, "Kivétel esetén ügyvédi ellenőrzés javasolt."],
     };
   }
 
-  const lesseeUnknown = isUnknownLessee(lesseeStatus);
-  const missing: string[] = [];
-  if (lesseeUnknown) missing.push("A kifüggesztett bérlő jogcíme nem ismert");
-  if (!landContext.cultivationBranch) missing.push("Művelési ág nem ismert");
+  const userEmpty = isPartyEmpty(userStatus);
+  const lesseeEmpty = isPartyEmpty(lesseeStatus);
+
+  // Üres állapot: ne legyen negatív eredmény
+  if (userEmpty && lesseeEmpty) {
+    return {
+      ...base,
+      comparison: "empty",
+      explanation: "Pipálj be pár dolgot. Válaszd ki, mi igaz a bérlőre és mi igaz rád. Utána megmutatjuk, ki áll előrébb.",
+      userStrongestRank: null,
+      lesseeStrongestRank: null,
+      requiredProofs: [],
+      missingConditions: [],
+      warnings: [],
+    };
+  }
+
+  // Hiányos erős speciális jogcím — usernek nincs érvényes ranghelye, de bejelölt egy speciálisat
+  if (!user.strongestRank && user.incompleteSpecialRanks.length > 0) {
+    return {
+      ...base,
+      comparison: "incomplete_special",
+      explanation: "Bejelöltél egy erős speciális jogcímet, de nem adtál meg minden feltételt hozzá.",
+      userStrongestRank: null,
+      lesseeStrongestRank: lessee.strongestRank,
+      requiredProofs: [],
+      missingConditions: user.incompleteSpecialRanks.flatMap((r) => r.missing ?? []),
+      warnings: base.warnings,
+    };
+  }
 
   // Nincs érvényes user ranghely
   if (!user.strongestRank) {
-    const incomplete = user.incompleteRanks.length > 0;
+    if (userEmpty) {
+      return {
+        ...base,
+        comparison: "empty",
+        explanation: "Még nincs elég adat rólad. Jelölj be legalább egy jogcímet.",
+        userStrongestRank: null,
+        lesseeStrongestRank: lessee.strongestRank,
+        requiredProofs: [],
+        missingConditions: [],
+        warnings: [],
+      };
+    }
     return {
-      comparison: incomplete ? "no_valid_user_rank" : "no_valid_user_rank",
-      explanation:
-        "A bejelölt adatok alapján nem látszik olyan előhaszonbérleti jogcím, amelyre biztonsággal lehetne elfogadó nyilatkozatot alapozni.",
+      ...base,
+      comparison: "no_valid_user_rank",
+      explanation: "A bejelölt adatok alapján nem látszik olyan előhaszonbérleti jogcím, amelyre biztonsággal lehetne elfogadó nyilatkozatot alapozni.",
       userStrongestRank: null,
       lesseeStrongestRank: lessee.strongestRank,
       requiredProofs: [],
       missingConditions: user.incompleteRanks.flatMap((r) => r.missing ?? []),
-      warnings: user.warnings,
-      user,
-      lessee,
+      warnings: base.warnings,
     };
   }
 
-  if (lesseeUnknown || (!lessee.strongestRank && lessee.incompleteRanks.length === 0)) {
+  // A bérlő ismeretlen
+  if (lesseeUnknownLike(lesseeStatus) || (!lessee.strongestRank && lessee.incompleteRanks.length === 0)) {
     return {
-      comparison: "cannot_determine",
-      explanation:
-        "Hiányzik néhány adat, ezért nem lehet biztosan megmondani, ki áll előrébb. A te legerősebb jogcímedet és az igazoláslistát alább megtalálod.",
+      ...base,
+      comparison: "lessee_unknown",
+      explanation: "A saját legerősebb jogcímedet meg tudjuk mutatni, de a másik fél jogcíme nélkül nem lehet biztos összehasonlítást adni.",
       userStrongestRank: user.strongestRank,
       lesseeStrongestRank: lessee.strongestRank,
       requiredProofs: user.requiredProofs,
-      missingConditions: missing,
-      warnings: [...user.warnings, ...lessee.warnings],
-      user,
-      lessee,
+      missingConditions: ["A kifüggesztett bérlő jogcíme nem ismert"],
+      warnings: base.warnings,
     };
   }
 
@@ -112,55 +167,48 @@ export function compareLeaseRanks(input: {
   const userRank = user.strongestRank;
 
   if (!lesseeRank) {
-    // Bejelölt valamit a bérlőnél, de mind incomplete → nem összehasonlítható.
     return {
+      ...base,
       comparison: "cannot_determine",
-      explanation:
-        "A kifüggesztett bérlő státusza nem ad teljes érvényes ranghelyet a megadott adatokból.",
+      explanation: "A kifüggesztett bérlő státusza nem ad teljes érvényes ranghelyet a megadott adatokból.",
       userStrongestRank: userRank,
       lesseeStrongestRank: null,
       requiredProofs: user.requiredProofs,
-      missingConditions: missing,
-      warnings: [...user.warnings, ...lessee.warnings],
-      user,
-      lessee,
+      missingConditions: [],
+      warnings: base.warnings,
     };
   }
 
   if (userRank.group < lesseeRank.group) {
-    return mkOutcome("user_stronger", "A megadott adatok alapján előrébb állhatsz a sorban, mint a kifüggesztett szerződés szerinti bérlő.", user, lessee, userRank, lesseeRank);
+    return mk("user_stronger", "A megadott adatok alapján erősebb előhaszonbérleti ranghelyed lehet, mint a kifüggesztett bérlőnek.", base, user, userRank, lesseeRank);
   }
   if (userRank.group > lesseeRank.group) {
-    return mkOutcome("user_weaker", "A megadott adatok alapján valószínűleg hátrébb állsz a sorban.", user, lessee, userRank, lesseeRank);
+    return mk("user_weaker", "A megadott adatok alapján a kifüggesztett bérlő erősebb ranghelyen lehet.", base, user, userRank, lesseeRank);
   }
-  // Ugyanaz a group → intra-priority eldönti, de comparison szempontjából
-  // azonos főranghely; csak akkor "stronger", ha a usernek alacsonyabb intraPriority.
   if (userRank.intraPriority < lesseeRank.intraPriority) {
-    return mkOutcome("user_stronger", "Azonos ranghely-csoporton belül a te csoporton belüli prioritásod (pl. CSMT / ŐCSG / fiatal) erősebb.", user, lessee, userRank, lesseeRank);
+    return mk("user_stronger", "Azonos főcsoporton belül a te csoporton belüli prioritásod (pl. CSMT / ŐCSG / fiatal) erősebb.", base, user, userRank, lesseeRank);
   }
   if (userRank.intraPriority > lesseeRank.intraPriority) {
-    return mkOutcome("user_weaker", "Azonos ranghely-csoporton belül a kifüggesztett bérlő intra-csoport prioritása erősebb.", user, lessee, userRank, lesseeRank);
+    return mk("user_weaker", "Azonos főcsoporton belül a kifüggesztett bérlő intra-csoport prioritása erősebb.", base, user, userRank, lesseeRank);
   }
-  return mkOutcome("same_rank", "A megadott adatok alapján azonos ranghelyen állhattok. Ez nem jelenti automatikusan, hogy te lépsz a bérlő helyébe.", user, lessee, userRank, lesseeRank);
+  return mk("same_rank", "A megadott adatok alapján azonos ranghelyen állhattok. Ez nem jelenti automatikusan, hogy te lépsz a bérlő helyébe.", base, user, userRank, lesseeRank);
 }
 
-function mkOutcome(
+function mk(
   comparison: ComparisonOutcome,
   explanation: string,
+  base: { user: LeaseRankResult; lessee: LeaseRankResult; exceptionsActive: TransactionException[]; warnings: string[] },
   user: LeaseRankResult,
-  lessee: LeaseRankResult,
   userRank: EvaluatedRank,
   lesseeRank: EvaluatedRank | null
 ): LeaseComparisonResult {
   return {
+    ...base,
     comparison,
     explanation,
     userStrongestRank: userRank,
     lesseeStrongestRank: lesseeRank,
     requiredProofs: user.requiredProofs,
     missingConditions: [],
-    warnings: [...user.warnings, ...lessee.warnings],
-    user,
-    lessee,
   };
 }
