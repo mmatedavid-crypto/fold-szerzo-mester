@@ -64,12 +64,21 @@ function NoticesPage() {
     return Array.from(set).sort();
   }, [q.data]);
 
+  const settlements = useMemo(() => {
+    const set = new Set<string>();
+    (q.data ?? []).forEach((n) => {
+      const c = cleanSettlement(n.settlement);
+      if (c) set.add(c);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "hu"));
+  }, [q.data]);
+
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
     return (q.data ?? []).filter((n) => {
       if (type !== "all" && n.notice_type !== type) return false;
       if (!s) return true;
-      const hay = [n.settlement, n.municipality, n.subject, (n.parcel_numbers ?? []).join(" "), n.source_notice_id]
+      const hay = [cleanSettlement(n.settlement), n.municipality, n.subject, (n.parcel_numbers ?? []).join(" "), n.source_notice_id]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
