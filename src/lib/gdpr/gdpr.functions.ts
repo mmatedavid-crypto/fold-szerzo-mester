@@ -35,10 +35,15 @@ export const exportMyData = createServerFn({ method: "POST" })
       entity_id: userId,
     });
 
+    // Return as a pre-serialized JSON string to keep the RPC payload serializable.
     return {
       exported_at: new Date().toISOString(),
-      user_id: userId,
-      data,
+      user_id: userId as string,
+      json: JSON.stringify(
+        { exported_at: new Date().toISOString(), user_id: userId, data },
+        null,
+        2,
+      ),
     };
   });
 

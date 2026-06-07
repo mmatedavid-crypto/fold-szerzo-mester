@@ -21,8 +21,8 @@ export function GdprSection() {
   async function onExport() {
     try {
       setBusy(true);
-      const data = await doExport();
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const res = await doExport();
+      const blob = new Blob([res.json], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
