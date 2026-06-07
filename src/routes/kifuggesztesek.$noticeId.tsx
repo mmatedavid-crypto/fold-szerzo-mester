@@ -223,111 +223,43 @@ function NoticeDetailPage() {
                   </label>
                 </RadioGroup>
               </div>
-              <div className="space-y-2">
-                <Label>A kifüggesztésen szereplő szerződő fél ranghelye (ha ismert)</Label>
-                <RadioGroup
-                  value={contractingPartyRank?.toString() ?? "unknown"}
-                  onValueChange={(v) => setContractingPartyRank(v === "unknown" ? null : Number(v))}
-                  className="grid gap-2 md:grid-cols-5"
-                >
-                  {["1", "2", "3", "4", "unknown"].map((v) => (
-                    <label key={v} className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
-                      <RadioGroupItem value={v} /> {v === "unknown" ? "Nem tudom" : `${v}.`}
-                    </label>
-                  ))}
-                </RadioGroup>
-              </div>
             </div>
           )}
 
           {step === 2 && (
             <div className="space-y-4 text-sm">
-              <h2 className="font-serif text-lg">A te profilod</h2>
-              <CheckRow
-                checked={claimant.isFoldmuves}
-                onChange={(v) => setClaimant({ ...claimant, isFoldmuves: v })}
-                title="Földműves vagyok"
-                desc="A földműves nyilvántartásban szereplő természetes személy (Földforgalmi tv. 5. § 7. pont)."
-              />
-              <CheckRow
-                checked={claimant.isHelybenLako}
-                onChange={(v) => setClaimant({ ...claimant, isHelybenLako: v })}
-                title="Helyben lakó vagyok"
-                desc={`Életvitelszerűen a föld fekvése szerinti településen (${n.settlement ?? "—"}) lakom legalább 3 éve.`}
-              />
-              <CheckRow
-                checked={claimant.isCsaladiGazdasagTag}
-                onChange={(v) => setClaimant({ ...claimant, isCsaladiGazdasagTag: v })}
-                title="Családi mezőgazdasági társaság / őstermelők családi gazdaságának tagja vagyok"
-                desc="46. § (1) a) — a legerősebb 1. ranghelyi alcsoport."
-              />
-              <CheckRow
-                checked={claimant.isAllattarto}
-                onChange={(v) => setClaimant({ ...claimant, isAllattarto: v })}
-                title="Állattartó telepet üzemeltetek"
-                desc="46. § (1) c) — rét/legelő esetén külön preferencia."
+              <h2 className="font-serif text-lg">A szerződő fél státusza</h2>
+              <p className="text-xs text-muted-foreground">
+                Jelöld be a kifüggesztett szerződésben szereplő vevő/bérlő jogcímeit. Ezek alapján a rendszer kiszámolja a ranghelyét.
+                Több jogcím is jelölhető — a motor a legerősebb szerint sorolja be.
+              </p>
+              <ProfileFields
+                profile={contractingParty}
+                setProfile={setContractingParty}
+                settlement={n.settlement}
+                branch={branch}
+                role="party"
               />
               <Separator />
-              <CheckRow
-                checked={claimant.isCloseRelativeOfSeller}
-                onChange={(v) => setClaimant({ ...claimant, isCloseRelativeOfSeller: v })}
-                title="Közeli hozzátartozó vagyok az eladóval/bérbeadóval"
-                desc="Ptk. 8:1. § — ez kizárja az elővásárlási jog gyakorlását."
-              />
-              <CheckRow
-                checked={claimant.isExemptEntity}
-                onChange={(v) => setClaimant({ ...claimant, isExemptEntity: v })}
-                title="Állam, önkormányzat vagy egyházi jogi személy vagyok"
-                desc="Az általános 46. § szerinti ranghely nem alkalmazható."
-              />
+              <p className="text-xs text-muted-foreground">
+                Számított ranghely: <strong className="text-foreground">{formatRank(partyRank)}</strong>
+              </p>
             </div>
           )}
 
           {step === 3 && (
             <div className="space-y-4 text-sm">
-              <h2 className="font-serif text-lg">Földhasználat</h2>
-              <CheckRow
-                checked={claimant.isJelenlegiFoldhasznalo}
-                onChange={(v) => setClaimant({ ...claimant, isJelenlegiFoldhasznalo: v })}
-                title="Jelenleg én használom ezt a földet"
-                desc="A kifüggesztett parcellán jelenlegi haszonbérlő / földhasználó vagyok."
+              <h2 className="font-serif text-lg">A te státuszod</h2>
+              <p className="text-xs text-muted-foreground">
+                Jelöld be a saját jogcímeidet. Egyszerre több is bejelölhető (pl. helyben lakó + állattartó).
+              </p>
+              <ProfileFields
+                profile={claimant}
+                setProfile={setClaimant}
+                settlement={n.settlement}
+                branch={branch}
+                role="self"
               />
-              <CheckRow
-                checked={claimant.isSzomszedosFoldhasznalo}
-                onChange={(v) => setClaimant({ ...claimant, isSzomszedosFoldhasznalo: v })}
-                title="Szomszédos földhasználó vagyok"
-                desc="A kifüggesztett földdel közvetlenül határos parcellát használok."
-              />
-              <CheckRow
-                checked={claimant.isTelepulesiFoldhasznalo}
-                onChange={(v) => setClaimant({ ...claimant, isTelepulesiFoldhasznalo: v })}
-                title="A településen másik földön földhasználó vagyok"
-                desc={`A föld fekvése szerinti településen (${n.settlement ?? "—"}) más parcellán használok földet.`}
-              />
-              {branch === "forest" && (
-                <>
-                  <Separator />
-                  <p className="text-xs text-muted-foreground">Erdő esetén kiegészítő jogcímek (Evt., 2009. évi XXXVII. tv.):</p>
-                  <CheckRow
-                    checked={!!claimant.forest?.isAdjacentForestOwner}
-                    onChange={(v) => setClaimant({ ...claimant, forest: { ...claimant.forest, isAdjacentForestOwner: v } })}
-                    title="Szomszédos erdő tulajdonosa vagyok"
-                    desc="Evt. szerinti tulajdonosi szomszédság."
-                  />
-                  <CheckRow
-                    checked={!!claimant.forest?.isCommonForestOwner}
-                    onChange={(v) => setClaimant({ ...claimant, forest: { ...claimant.forest, isCommonForestOwner: v } })}
-                    title="Közös tulajdonú erdőben tulajdonostárs vagyok"
-                    desc="Evt. szerinti tulajdonostársi jogcím."
-                  />
-                  <CheckRow
-                    checked={!!claimant.forest?.isForestryProfessional}
-                    onChange={(v) => setClaimant({ ...claimant, forest: { ...claimant.forest, isForestryProfessional: v } })}
-                    title="Erdőgazdálkodói minősítéssel rendelkezem"
-                    desc="Bejegyzett erdőgazdálkodó / szakmai minősítéssel."
-                  />
-                </>
-              )}
             </div>
           )}
 
