@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -111,7 +112,7 @@ function RankCell({ title, rank, ref: legalRef }: { title: string; rank?: string
   );
 }
 
-const META: Record<LeaseComparisonResult["comparison"], { badge: string; cls: string; icon: JSX.Element }> = {
+const META: Record<LeaseComparisonResult["comparison"], { badge: string; cls: string; icon: ReactElement }> = {
   user_stronger: {
     badge: "ERŐSEBB RANGHELY VALÓSZÍNŰ",
     cls: "border-emerald-300 bg-emerald-50 text-emerald-900",
