@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSzerzodesUjRouteImport } from './routes/_authenticated/szerzodes.uj'
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 import { Route as ApiPublicHooksSyncNoticesRouteImport } from './routes/api/public/hooks/sync-notices'
+import { Route as ApiPublicHooksSendWeeklyDigestRouteImport } from './routes/api/public/hooks/send-weekly-digest'
 import { Route as AuthenticatedSzerzodesIdSzerkesztesRouteImport } from './routes/_authenticated/szerzodes.$id.szerkesztes'
 import { Route as AuthenticatedSzerzodesIdKeszRouteImport } from './routes/_authenticated/szerzodes.$id.kesz'
 import { Route as AuthenticatedSzerzodesIdFizetesRouteImport } from './routes/_authenticated/szerzodes.$id.fizetes'
@@ -118,6 +119,12 @@ const ApiPublicHooksSyncNoticesRoute =
     path: '/api/public/hooks/sync-notices',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSendWeeklyDigestRoute =
+  ApiPublicHooksSendWeeklyDigestRouteImport.update({
+    id: '/api/public/hooks/send-weekly-digest',
+    path: '/api/public/hooks/send-weekly-digest',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedSzerzodesIdSzerkesztesRoute =
   AuthenticatedSzerzodesIdSzerkesztesRouteImport.update({
     id: '/szerzodes/$id/szerkesztes',
@@ -162,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -184,6 +192,7 @@ export interface FileRoutesByTo {
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -208,6 +217,7 @@ export interface FileRoutesById {
   '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/_authenticated/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/_authenticated/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
+    | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
   fileRoutesByTo: FileRoutesByTo
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
+    | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
   id:
@@ -277,6 +289,7 @@ export interface FileRouteTypes {
     | '/_authenticated/szerzodes/$id/fizetes'
     | '/_authenticated/szerzodes/$id/kesz'
     | '/_authenticated/szerzodes/$id/szerkesztes'
+    | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
   fileRoutesById: FileRoutesById
@@ -293,6 +306,7 @@ export interface RootRouteChildren {
   DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
   KifuggesztesekRoute: typeof KifuggesztesekRouteWithChildren
   RegisztracioRoute: typeof RegisztracioRoute
+  ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
   ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
 }
@@ -418,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSyncNoticesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/send-weekly-digest': {
+      id: '/api/public/hooks/send-weekly-digest'
+      path: '/api/public/hooks/send-weekly-digest'
+      fullPath: '/api/public/hooks/send-weekly-digest'
+      preLoaderRoute: typeof ApiPublicHooksSendWeeklyDigestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/szerzodes/$id/szerkesztes': {
       id: '/_authenticated/szerzodes/$id/szerkesztes'
       path: '/szerzodes/$id/szerkesztes'
@@ -498,9 +519,20 @@ const rootRouteChildren: RootRouteChildren = {
   DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
   KifuggesztesekRoute: KifuggesztesekRouteWithChildren,
   RegisztracioRoute: RegisztracioRoute,
+  ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
   ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
