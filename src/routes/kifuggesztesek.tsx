@@ -94,6 +94,8 @@ function NoticesPage() {
           Aktuális termőföld kifüggesztések. A részletekért (terület, díj, határidő, csatolmány) nyisd meg a hivatalos oldalt.
         </p>
 
+        <SubscribeBanner settlements={settlements} />
+
         <Card className="p-4 mt-6">
           <div className="grid gap-3 md:grid-cols-[1fr,220px] items-center">
             <div className="relative">
@@ -133,7 +135,7 @@ function NoticesPage() {
             <TableBody>
               {filtered.map((n) => (
                 <TableRow key={n.id}>
-                  <TableCell>{n.settlement ?? "—"}</TableCell>
+                  <TableCell>{cleanSettlement(n.settlement) ?? n.settlement ?? "—"}</TableCell>
                   <TableCell className="text-xs">{(n.parcel_numbers ?? []).join(", ") || "—"}</TableCell>
                   <TableCell className="text-sm"><Badge variant="outline">{n.notice_type ?? "—"}</Badge></TableCell>
                   <TableCell className="text-right whitespace-nowrap">
