@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 import { computeRank, computeAcceptanceDeadline } from "@/lib/rank/engine";
 import type { ClaimantProfile, NoticeFacts, LandBranch, TransactionKind } from "@/lib/rank/types";
-import { ArrowLeft, ArrowRight, ExternalLink, FileCheck2, Loader2, ShieldAlert, ShieldCheck, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, FileCheck2, Loader2, ShieldAlert, ShieldCheck, Trophy, Scale } from "lucide-react";
 
 export const Route = createFileRoute("/kifuggesztesek/$noticeId")({
   head: ({ params }) => ({
@@ -42,7 +42,7 @@ type Notice = {
   original_detail_url: string | null;
 };
 
-const STEPS = ["Hirdetmény", "Föld", "Profil", "Földhasználat", "Eredmény"];
+const STEPS = ["Hirdetmény", "Föld", "Szerződő fél", "Te", "Eredmény"];
 
 const DEFAULT_CLAIMANT: ClaimantProfile = {
   isFoldmuves: false,
