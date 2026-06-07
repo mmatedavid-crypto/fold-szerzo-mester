@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
+import { Route as RanghelyKalkulatorRouteImport } from './routes/ranghely-kalkulator'
 import { Route as LeiratkozasRouteImport } from './routes/leiratkozas'
 import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
 import { Route as CookieSzabalyzatRouteImport } from './routes/cookie-szabalyzat'
@@ -36,6 +37,11 @@ import { Route as AuthenticatedSzerzodesIdEllenorzesRouteImport } from './routes
 const RegisztracioRoute = RegisztracioRouteImport.update({
   id: '/regisztracio',
   path: '/regisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RanghelyKalkulatorRoute = RanghelyKalkulatorRouteImport.update({
+  id: '/ranghely-kalkulator',
+  path: '/ranghely-kalkulator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeiratkozasRoute = LeiratkozasRouteImport.update({
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/leiratkozas': typeof LeiratkozasRoute
+  '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/leiratkozas': typeof LeiratkozasRoute
+  '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/leiratkozas': typeof LeiratkozasRoute
+  '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -242,6 +251,7 @@ export interface FileRouteTypes {
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/leiratkozas'
+    | '/ranghely-kalkulator'
     | '/regisztracio'
     | '/admin'
     | '/dashboard'
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/leiratkozas'
+    | '/ranghely-kalkulator'
     | '/regisztracio'
     | '/admin'
     | '/dashboard'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/leiratkozas'
+    | '/ranghely-kalkulator'
     | '/regisztracio'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
@@ -317,6 +329,7 @@ export interface RootRouteChildren {
   CookieSzabalyzatRoute: typeof CookieSzabalyzatRoute
   DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
   LeiratkozasRoute: typeof LeiratkozasRoute
+  RanghelyKalkulatorRoute: typeof RanghelyKalkulatorRoute
   RegisztracioRoute: typeof RegisztracioRoute
   KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
   KifuggesztesekIndexRoute: typeof KifuggesztesekIndexRoute
@@ -332,6 +345,13 @@ declare module '@tanstack/react-router' {
       path: '/regisztracio'
       fullPath: '/regisztracio'
       preLoaderRoute: typeof RegisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ranghely-kalkulator': {
+      id: '/ranghely-kalkulator'
+      path: '/ranghely-kalkulator'
+      fullPath: '/ranghely-kalkulator'
+      preLoaderRoute: typeof RanghelyKalkulatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leiratkozas': {
@@ -527,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookieSzabalyzatRoute: CookieSzabalyzatRoute,
   DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
   LeiratkozasRoute: LeiratkozasRoute,
+  RanghelyKalkulatorRoute: RanghelyKalkulatorRoute,
   RegisztracioRoute: RegisztracioRoute,
   KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
   KifuggesztesekIndexRoute: KifuggesztesekIndexRoute,
