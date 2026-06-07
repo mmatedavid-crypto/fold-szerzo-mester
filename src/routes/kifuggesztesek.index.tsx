@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/kifuggesztesek")({
+export const Route = createFileRoute("/kifuggesztesek/")({
   head: () => ({
     meta: [
       { title: "Kifüggesztés kereső — Földbérleti hirdetmények | Földbérleti Szerződés Generátor" },
