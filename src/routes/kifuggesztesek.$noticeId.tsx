@@ -268,7 +268,12 @@ function NoticeDetailPage() {
               result={result}
               noticeId={n.id}
               deadline={deadline}
-              onRestart={() => { setStep(0); setClaimant(DEFAULT_CLAIMANT); }}
+              partyRank={partyRank}
+              onRestart={() => {
+                setStep(0);
+                setClaimant(DEFAULT_CLAIMANT);
+                setContractingParty(DEFAULT_CLAIMANT);
+              }}
             />
           )}
 
@@ -312,15 +317,18 @@ function ResultPanel({
   result,
   noticeId,
   deadline,
+  partyRank,
   onRestart,
 }: {
   result: ReturnType<typeof computeRank>;
   noticeId: string;
   deadline: Date | null;
+  partyRank: number | null;
   onRestart: () => void;
 }) {
   const stronger = result.strongerThanContractingParty;
   const hasRank = result.rank !== null;
+  const sameRank = hasRank && partyRank !== null && result.rank === partyRank;
 
   return (
     <div className="space-y-4 text-sm">
@@ -339,23 +347,43 @@ function ResultPanel({
         </div>
       </div>
 
-      {stronger === true && (
-        <Alert>
-          <AlertTitle>Erősebb vagy a szerződő félnél</AlertTitle>
-          <AlertDescription>
-            Elfogadó nyilatkozattal beléphetsz a szerződésbe a 15 napos jogvesztő határidőn belül
-            {deadline ? <> ({formatDate(deadline.toISOString())}-ig)</> : null}.
-          </AlertDescription>
-        </Alert>
-      )}
-      {stronger === false && hasRank && (
-        <Alert>
-          <AlertTitle>Nem vagy erősebb a szerződő félnél</AlertTitle>
-          <AlertDescription>
-            A megadott profillal a szerződő fél ranghelye azonos vagy erősebb, így elfogadó nyilatkozattal nem léphetsz be.
-          </AlertDescription>
-        </Alert>
-      )}
+      <div className="grid gap-2 md:grid-cols-2 pt-2">
+        <div className="rounded-md border p-3">
+          <div className="text-xs text-muted-foreground">Te</div>
+          <div className="font-serif text-base">{formatRank(result.rank)}</div>
+        </div>
+        <div className="rounded-md border p-3">
+          <div className="text-xs text-muted-foreground">Szerződő fél</div>
+          <div className="font-serif text-base">{formatRank(partyRank)}</div>
+        </div>
+      </div>
+
+      <Alert>
+        <Scale className="h-4 w-4" />
+        <AlertTitle>
+          {stronger === true
+            ? "Erősebb vagy a szerződő félnél"
+            : sameRank
+              ? "Azonos ranghelyen álltok"
+              : hasRank && partyRank !== null
+                ? "A szerződő fél erősebb"
+                : "Összevetés nem értelmezhető"}
+        </AlertTitle>
+        <AlertDescription>
+          {stronger === true && (
+            <>Elfogadó nyilatkozattal beléphetsz a szerződésbe a 15 napos jogvesztő határidőn belül{deadline ? <> ({formatDate(deadline.toISOString())}-ig)</> : null}.</>
+          )}
+          {sameRank && (
+            <>Azonos ranghely esetén az elfogadó nyilatkozat csak akkor előzi meg a szerződő felet, ha azon belül erősebb alcsoportba tartozol — ezt a jegyző / mg-i igazgatási szerv bírálja el.</>
+          )}
+          {!stronger && !sameRank && hasRank && partyRank !== null && (
+            <>A szerződő fél ranghelye erősebb, így elfogadó nyilatkozattal nem léphetsz be.</>
+          )}
+          {!hasRank && (
+            <>A megadott profillal nincs elővásárlási / előhaszonbérleti jogod.</>
+          )}
+        </AlertDescription>
+      </Alert>
 
       {result.warnings.length > 0 && (
         <Alert>
