@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as RanghelyKalkulatorRouteImport } from './routes/ranghely-kalkulator'
 import { Route as LeiratkozasRouteImport } from './routes/leiratkozas'
+import { Route as FoldAdasVetelRouteImport } from './routes/fold-adas-vetel'
+import { Route as ElfogadoNyilatkozatRouteImport } from './routes/elfogado-nyilatkozat'
 import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
 import { Route as CookieSzabalyzatRouteImport } from './routes/cookie-szabalyzat'
 import { Route as BerletiDijIranytuRouteImport } from './routes/berleti-dij-iranytu'
@@ -47,6 +49,16 @@ const RanghelyKalkulatorRoute = RanghelyKalkulatorRouteImport.update({
 const LeiratkozasRoute = LeiratkozasRouteImport.update({
   id: '/leiratkozas',
   path: '/leiratkozas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoldAdasVetelRoute = FoldAdasVetelRouteImport.update({
+  id: '/fold-adas-vetel',
+  path: '/fold-adas-vetel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ElfogadoNyilatkozatRoute = ElfogadoNyilatkozatRouteImport.update({
+  id: '/elfogado-nyilatkozat',
+  path: '/elfogado-nyilatkozat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DokumentumEllenorzesRoute = DokumentumEllenorzesRouteImport.update({
@@ -171,6 +183,8 @@ export interface FileRoutesByFullPath {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
+  '/elfogado-nyilatkozat': typeof ElfogadoNyilatkozatRoute
+  '/fold-adas-vetel': typeof FoldAdasVetelRoute
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -196,6 +210,8 @@ export interface FileRoutesByTo {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
+  '/elfogado-nyilatkozat': typeof ElfogadoNyilatkozatRoute
+  '/fold-adas-vetel': typeof FoldAdasVetelRoute
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -223,6 +239,8 @@ export interface FileRoutesById {
   '/berleti-dij-iranytu': typeof BerletiDijIranytuRoute
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
+  '/elfogado-nyilatkozat': typeof ElfogadoNyilatkozatRoute
+  '/fold-adas-vetel': typeof FoldAdasVetelRoute
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
@@ -250,6 +268,8 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
+    | '/elfogado-nyilatkozat'
+    | '/fold-adas-vetel'
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
@@ -275,6 +295,8 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
+    | '/elfogado-nyilatkozat'
+    | '/fold-adas-vetel'
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
@@ -301,6 +323,8 @@ export interface FileRouteTypes {
     | '/berleti-dij-iranytu'
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
+    | '/elfogado-nyilatkozat'
+    | '/fold-adas-vetel'
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
@@ -328,6 +352,8 @@ export interface RootRouteChildren {
   BerletiDijIranytuRoute: typeof BerletiDijIranytuRoute
   CookieSzabalyzatRoute: typeof CookieSzabalyzatRoute
   DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
+  ElfogadoNyilatkozatRoute: typeof ElfogadoNyilatkozatRoute
+  FoldAdasVetelRoute: typeof FoldAdasVetelRoute
   LeiratkozasRoute: typeof LeiratkozasRoute
   RanghelyKalkulatorRoute: typeof RanghelyKalkulatorRoute
   RegisztracioRoute: typeof RegisztracioRoute
@@ -359,6 +385,20 @@ declare module '@tanstack/react-router' {
       path: '/leiratkozas'
       fullPath: '/leiratkozas'
       preLoaderRoute: typeof LeiratkozasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fold-adas-vetel': {
+      id: '/fold-adas-vetel'
+      path: '/fold-adas-vetel'
+      fullPath: '/fold-adas-vetel'
+      preLoaderRoute: typeof FoldAdasVetelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/elfogado-nyilatkozat': {
+      id: '/elfogado-nyilatkozat'
+      path: '/elfogado-nyilatkozat'
+      fullPath: '/elfogado-nyilatkozat'
+      preLoaderRoute: typeof ElfogadoNyilatkozatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dokumentum-ellenorzes': {
@@ -546,6 +586,8 @@ const rootRouteChildren: RootRouteChildren = {
   BerletiDijIranytuRoute: BerletiDijIranytuRoute,
   CookieSzabalyzatRoute: CookieSzabalyzatRoute,
   DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
+  ElfogadoNyilatkozatRoute: ElfogadoNyilatkozatRoute,
+  FoldAdasVetelRoute: FoldAdasVetelRoute,
   LeiratkozasRoute: LeiratkozasRoute,
   RanghelyKalkulatorRoute: RanghelyKalkulatorRoute,
   RegisztracioRoute: RegisztracioRoute,
