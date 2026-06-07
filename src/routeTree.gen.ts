@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
+import { Route as LeiratkozasRouteImport } from './routes/leiratkozas'
 import { Route as KifuggesztesekRouteImport } from './routes/kifuggesztesek'
 import { Route as DokumentumEllenorzesRouteImport } from './routes/dokumentum-ellenorzes'
 import { Route as CookieSzabalyzatRouteImport } from './routes/cookie-szabalyzat'
@@ -35,6 +36,11 @@ import { Route as AuthenticatedSzerzodesIdEllenorzesRouteImport } from './routes
 const RegisztracioRoute = RegisztracioRouteImport.update({
   id: '/regisztracio',
   path: '/regisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeiratkozasRoute = LeiratkozasRouteImport.update({
+  id: '/leiratkozas',
+  path: '/leiratkozas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KifuggesztesekRoute = KifuggesztesekRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRouteWithChildren
+  '/leiratkozas': typeof LeiratkozasRoute
   '/regisztracio': typeof RegisztracioRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRouteWithChildren
+  '/leiratkozas': typeof LeiratkozasRoute
   '/regisztracio': typeof RegisztracioRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/cookie-szabalyzat': typeof CookieSzabalyzatRoute
   '/dokumentum-ellenorzes': typeof DokumentumEllenorzesRoute
   '/kifuggesztesek': typeof KifuggesztesekRouteWithChildren
+  '/leiratkozas': typeof LeiratkozasRoute
   '/regisztracio': typeof RegisztracioRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
+    | '/leiratkozas'
     | '/regisztracio'
     | '/admin'
     | '/dashboard'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
+    | '/leiratkozas'
     | '/regisztracio'
     | '/admin'
     | '/dashboard'
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/cookie-szabalyzat'
     | '/dokumentum-ellenorzes'
     | '/kifuggesztesek'
+    | '/leiratkozas'
     | '/regisztracio'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
@@ -305,6 +317,7 @@ export interface RootRouteChildren {
   CookieSzabalyzatRoute: typeof CookieSzabalyzatRoute
   DokumentumEllenorzesRoute: typeof DokumentumEllenorzesRoute
   KifuggesztesekRoute: typeof KifuggesztesekRouteWithChildren
+  LeiratkozasRoute: typeof LeiratkozasRoute
   RegisztracioRoute: typeof RegisztracioRoute
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/regisztracio'
       fullPath: '/regisztracio'
       preLoaderRoute: typeof RegisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leiratkozas': {
+      id: '/leiratkozas'
+      path: '/leiratkozas'
+      fullPath: '/leiratkozas'
+      preLoaderRoute: typeof LeiratkozasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kifuggesztesek': {
@@ -518,6 +538,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookieSzabalyzatRoute: CookieSzabalyzatRoute,
   DokumentumEllenorzesRoute: DokumentumEllenorzesRoute,
   KifuggesztesekRoute: KifuggesztesekRouteWithChildren,
+  LeiratkozasRoute: LeiratkozasRoute,
   RegisztracioRoute: RegisztracioRoute,
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
