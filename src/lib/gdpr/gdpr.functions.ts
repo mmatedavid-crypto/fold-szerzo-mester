@@ -21,19 +21,11 @@ export const exportMyData = createServerFn({ method: "POST" })
       "document_verifications",
     ] as const;
 
-    const result: Record<string, unknown> = {
-      exported_at: new Date().toISOString(),
-      user_id: userId,
-    };
-
+    const data: Record<string, unknown[]> = {};
     for (const t of tables) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any).from(t).select("*").eq("user_id", userId);
-      if (error) {
-        result[t] = { error: error.message };
-      } else {
-        result[t] = data ?? [];
-      }
+      const res = await (supabase as any).from(t).select("*").eq("user_id", userId);
+      data[t] = (res.data as unknown[]) ?? [];
     }
 
     await supabase.from("usage_logs").insert({
@@ -43,7 +35,11 @@ export const exportMyData = createServerFn({ method: "POST" })
       entity_id: userId,
     });
 
-    return result;
+    return {
+      exported_at: new Date().toISOString(),
+      user_id: userId,
+      data,
+    };
   });
 
 /**
@@ -67,11 +63,6 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
         lessee_name: "(törölt felhasználó)",
       })
       .eq("user_id", userId);
-    await supabaseAdmin
-      .from("payments")
-      .update({ user_id: null })
-      .eq("user_id", userId);
-
     // Best-effort delete user-scoped working data
     await supabaseAdmin.from("contract_drafts").delete().eq("user_id", userId);
     await supabaseAdmin.from("document_credits").delete().eq("user_id", userId);

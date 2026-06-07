@@ -11,6 +11,7 @@ import { formatDate } from "@/lib/format";
 import { Download, FilePlus2, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { GdprSection } from "@/components/dashboard/gdpr-section";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Műhely — Földbérleti Szerződés Generátor" }] }),
@@ -145,6 +146,8 @@ function Dashboard() {
             </TableBody>
           </Table>
         </Card>
+
+        <GdprSection />
       </section>
     </PageShell>
   );
