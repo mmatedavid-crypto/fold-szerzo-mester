@@ -1,63 +1,82 @@
-# Phase 2 — Ranghely kalkulátor és Elfogadó nyilatkozat generátor
+# Ranghely kalkulátor — újratervezés
 
-Nagy, önálló feature. A Phase 1 (szerződés generálás) és Phase 3 (kifüggesztés szinkron) érintetlenül marad. Több részből álló munka — a terv lebontva sprintekre, hogy követhető legyen.
+Önálló, kalkulátor-szerű modul a `/ranghely-kalkulator` útvonalon, ami a jelenlegi 5 lépéses, kifüggesztéshez kötött varázslót helyettesíti. A meglévő `src/lib/rank/engine.ts` és admin-verziózás marad, mellé új, részletesebb haszonbérleti motor készül.
 
-## Mit építünk
+## Új útvonal és layout
 
-A földforgalmi törvény (2013. évi CXXII. tv.) 46. §-a alapján egy elővásárlási/előhaszonbérleti **ranghely-kalkulátor**, ami megmondja egy felhasználónak (földhasználónak / földművesnek / helyi lakosnak / stb.):
-- van-e elővásárlási vagy előhaszonbérleti joga a kifüggesztett ajánlatra,
-- ha igen, milyen ranghelyen,
-- erősebb-e, mint a szerződő fél ranghelye,
-- ha erősebb → felajánljuk az **elfogadó nyilatkozat** generálását (15 napos határidőre figyelmeztetéssel).
+- Új fájl: `src/routes/ranghely-kalkulator.tsx`
+- Cím: „Ranghely kalkulátor", alcím a specifikációból, kampány-sor.
+- Desktop: 3 oszlop — `Föld és ügylet` (bal), `Kifüggesztett bérlő` + `Én` (közép, 2 kártya egymás mellett), `Eredmény` (jobb, sticky).
+- Mobil: accordion 4 szekcióval, sticky alsó CTA ha a user erősebb.
+- Élő frissítés inputváltozásra (controlled state, nincs „következő" gomb).
+- Kompakt jogi disclaimer minden nézet alján.
+- Kifüggesztés-integráció: query params olvasása, kis elbocsátható chip „Kifüggesztésből indítva". Nem mutat nagy notice headert.
 
-A generált elfogadó nyilatkozat fizetés mögötti PDF, QR kóddal, publikus verifikációs URL-lel, audit loggal.
+A `/kifuggesztesek` tetején lévő CTA és a `/kifuggesztesek/$noticeId` „Ranghely ellenőrzés" gomb erre az URL-re irányítanak át (query paramekkel előtöltve).
 
-## Sprintek (külön körökben mergelve)
+## Rank engine refaktor
 
-### Sprint 1 — Adatmodell + Rank engine váz
-- Új táblák: `rank_rules` (verzionált szabálykészlet), `acceptance_drafts`, `acceptance_documents`, `acceptance_verifications`.
-- Rank engine `src/lib/rank/engine.ts` tisztán függvénykönyvtárként:
-  - bemenet: `Notice` + `ClaimantProfile` (földműves-e, helyi lakos-e, szomszédos földhasználó-e, állattartó-e, családi gazdaság tag-e, erdő-e a föld, stb.)
-  - kimenet: `{ rank: number|null, reason: string, branch: 'forest'|'non_forest', warnings: string[] }`
-- Külön ág: `non_forest_46` (1)/(2)/(3)/(4) bekezdés, és `forest_*` (Evt. szerinti) — nem keverjük.
-- Nincs jog összeadás — mindig **a legerősebb egy** ranghely.
-- Same-rank tiebreaker logika (helyi lakos < földműves, stb. ahol a törvény írja).
-- "No-prelease" kivételek (közeli hozzátartozó, állam, önkormányzat, egyházi jogi személy adott esetben) → engine visszaadja `null` ranghelyet + warning.
-- 100% unit teszt coverage az engine-re (Vitest), legalább 25 case.
+Új fájlok, a meglévő `src/lib/rank/engine.ts` és `types.ts` érintetlen marad (admin-verzió és Notice-alapú futtatás miatt).
 
-### Sprint 2 — UI: Ranghely kalkulátor a kifüggesztés cardon
-- `/kifuggesztesek/$noticeId` route (új): bemutatja a hirdetményt.
-- "Van-e elővásárlási jogom?" wizard (4-5 lépés, mobilra optimalizált, magyar nyelv).
-- Eredmény panel: rangsor, indoklás, figyelmeztetések (törvényhivatkozással).
-- Ha a felhasználó ranghelye erősebb mint a szerződő fél (akit a kifüggesztés említ) → **CTA**: "Készíts elfogadó nyilatkozatot".
-- Anonim felhasználó futtathat számítást, de nem mentődik el (csak session state).
+- `src/lib/rank/leaseRankDefinitions.ts` — minden ranghely-csoport (F10, F20, 10–80) deklaratív definíciója: `id`, `group`, `subPriority`, `branch` (forest/non_forest), `requiredConditions[]`, `legalRef`, `humanName`, `proofs[]`.
+- `src/lib/rank/proofRequirements.ts` — `BASE_PROOFS`, `CONDITIONAL_PROOFS`, kategória: `kotelezo | jogcim_fuggo | jogi_ellenorzes`. `getProofsFor(rankId, status)`.
+- `src/lib/rank/leaseRankEngine.ts` — `evaluateLeaseRanks({ landContext, partyStatus }) -> { possibleRanks, strongestRank, incompleteRanks, warnings, requiredProofs }`. Külön ág forest / non-forest. „Intra-group" prioritás: CSMT/ŐCSG > fiatal > sima — csak ugyanazon fő ranghelyen belül a `subPriority` tördelésével, soha nem ugrik át főcsoportot.
+- `src/lib/rank/leaseRankComparison.ts` — `compareLeaseRanks(lessee, user) -> { comparison, explanation, userStrongestRank, lesseeStrongestRank, requiredProofs, missingConditions, warnings }`. Comparison értékek: `user_stronger | same_rank | user_weaker | cannot_determine | no_valid_user_rank | no_prelease_right`. Adásvétel ág azonnal `no_prelease_right` placeholder. Kivételszabályok (közeli hozzátartozó stb.) → `no_prelease_right`.
+- `src/lib/rank/leaseRankEngine.test.ts` — a specifikáció 9 tesztesete.
 
-### Sprint 3 — Elfogadó nyilatkozat draft + 15 napos határidő
-- Bejelentkezés kötelező a draft mentéshez.
-- `acceptance_drafts` tábla: user_id, notice_id, claimant_data, computed_rank, deadline_date (kifüggesztés publication_date + 15 nap), status (draft/finalized).
-- Deadline UI: countdown timer, lejárt drafton nem lehet finalizálni.
-- RLS: `user_id = auth.uid()` szigorúan — senki nem látja más drafját.
+`PartyStatus` típus tartalmazza az összes alap-, hely-, használat-, tulajdon-, speciális, csoport-belüli és kockázati flag-et a specifikáció szerint. `LandContext`: `transaction`, `branch`, `cultivationBranch`, `commonOwnership`, `coOwnerLeaseToThirdParty`, `wineGeoIndication`.
 
-### Sprint 4 — Fizetés + PDF generálás + QR + verifikáció
-- Új plan SKU: `acceptance_statement_single` (egyszeri vásárlás) — reuse existing `document_credits` infra.
-- PDF generálás server functionben (`pdf-lib`, ugyanaz a stack mint a szerződéseknél).
-- QR kód a PDF-en → `https://<host>/v/acceptance/<token>` publikus verifikáció.
-- `acceptance_verifications` tábla: token, document_hash, issued_at, **semmi PII** — a publikus oldal csak ezt mutatja: "Ez egy eredeti, [dátum]-on kibocsátott elfogadó nyilatkozat. Település: X. Hrsz.: Y."
-- Tárolás: `contracts` bucket-be új mappa, signed URL.
-- `usage_logs` minden lépéshez (draft.created, draft.finalized, document.downloaded, verification.viewed).
+## Új UI komponensek
 
-### Sprint 5 — Admin szabálykezelő + audit
-- `/admin/rank-rules` — admin szerkesztheti az aktív `rank_rules` verziót (csak `has_role(admin)`).
-- Verziózás: új szabálykészlet aktiválása új sor (immutable history).
-- Minden kalkuláció elmenti, hogy melyik `rank_rules.version`-nel készült (audit trail).
-- Külső jogszabály (Evt., családi gazdaság tv.) → placeholder modul `src/lib/rank/external/` jelöli a TODO pontokat.
+- `src/components/rank/LandContextCard.tsx` — szekció 1. RadioGroup-ok, művelési ág Select.
+- `src/components/rank/PartyStatusCard.tsx` — szekciók 2 és 3 közös komponense, `title`, `subtitle`, preset Select, csoportosított checkbox-listák (Alap, Hely, Használat, Tulajdon, Speciális, Csoport, Kockázat). Minden checkbox: cím + egy soros magyarázat + opcionális `Mit jelent?` `Collapsible`. Touch-friendly méret.
+- `src/components/rank/ResultPanel.tsx` — 6 állapot badge-ek, kifüggesztett bérlő vs te legerősebb ranghelye, jogalap, proof checklist kategóriánként, CTA-k.
+- `src/components/rank/ExceptionsCollapsible.tsx` — alapból zárt, „Speciális kivételek".
 
-## Mit kérek tőled most
+## Acceptance statement CTA
 
-Ez 5 sprint, jól láthatóan nem fér egy körbe. Javaslatom:
+`user_stronger` és `same_rank` esetén CTA. Kattintásra:
+- ha bejelentkezve: szerver fn `createAcceptanceFromCalculation(snapshot)` létrehoz drafthez tartozó record-ot, navigál `/elfogado-nyilatkozat/uj?fromRankCalculation={id}`-re.
+- ha anonim: `/belepes?redirect=...` + snapshot sessionStorage-ban tárolva.
 
-**Most ebben a körben Sprint 1-et csinálom meg teljesen** (DB migráció + rank engine + 25+ unit teszt). Ez a feature gerince, és önállóan reviewálható.
+Új `src/lib/rank/snapshot.functions.ts` `saveCalculationSnapshot` server fn-nel (auth védett), új tábla migrációval: `rank_calculations(id, user_id, land_context jsonb, lessee_status jsonb, user_status jsonb, user_strongest_rank, lessee_strongest_rank, comparison, created_at)`. RLS: user csak a sajátját lát/ír.
 
-Utána egy-egy körben jönnek a többi sprintek a sorrendben.
+A meglévő acceptance-flow most már a két forrást fogadja: kifüggesztésből vagy kalkulátorból. Ha a tartós acceptance-modul külön rendszer, csak a redirect linket frissítjük; integrációt nem bontunk.
 
-Ha jóváhagyod a tervet, **Sprint 1**-gyel indítok. Ha más sorrendet vagy más bontást szeretnél (pl. előbb a UI mockot lássuk működő engine nélkül), írd meg.
+## Régi varázsló sorsa
+
+- `src/routes/kifuggesztesek.$noticeId.tsx` jelenleg a 5-step wizard hostja. A wizard belső lépéseit megőrizzük, de a notice detail page jövőképében a „Ranghely kalkulátor megnyitása" gomb az új útvonalra visz át. A teljes 5-step UI lecserélése egy külön kör, most:
+  - a notice oldal tetejére kerül egy felhívás: „Próbáld ki az új Ranghely kalkulátort", ami `/ranghely-kalkulator?settlement=...&branch=...` linket nyit.
+  - a wizard maradhat fallback-ként, de a `/kifuggesztesek` CTA sáv az új URL-re mutat.
+- `/kifuggesztesek` tetején a meglévő CTA sáv (előfizetés) érintetlen, mellé kis link: „Ranghely kalkulátor".
+
+Ha a user határozott „távolítsd el a régi wizardot" igényt kifejez, külön körben töröljük; most a célt (önálló, egyszerű kalkulátor) az új útvonal teljesíti.
+
+## Technikai részletek
+
+- Forms: controlled React state, nincs react-hook-form (egyszerű, élő frissítés).
+- Validáció a motorban, UI csak input.
+- Snapshot mentés csak CTA-ra.
+- Adásvétel branch: a `transaction === "sale"` ügyletre a komparáció `no_prelease_right` és egy magyarázó szöveg, nem fut a motor.
+- A meglévő `engine.ts` és Notice-alapú admin-verziózás változatlanul használható egyéb helyeken.
+- Tesztek `bunx vitest run src/lib/rank/leaseRankEngine.test.ts`-tel futnak.
+
+## Fájlok
+
+Új:
+- `src/routes/ranghely-kalkulator.tsx`
+- `src/lib/rank/leaseRankDefinitions.ts`
+- `src/lib/rank/leaseRankEngine.ts`
+- `src/lib/rank/leaseRankComparison.ts`
+- `src/lib/rank/proofRequirements.ts`
+- `src/lib/rank/leaseRankEngine.test.ts`
+- `src/lib/rank/snapshot.functions.ts`
+- `src/components/rank/LandContextCard.tsx`
+- `src/components/rank/PartyStatusCard.tsx`
+- `src/components/rank/ResultPanel.tsx`
+- `src/components/rank/ExceptionsCollapsible.tsx`
+- Supabase migration: `rank_calculations` tábla
+
+Módosítva:
+- `src/routes/kifuggesztesek.index.tsx` — másodlagos link az új kalkulátorra
+- `src/routes/kifuggesztesek.$noticeId.tsx` — felső banner az új kalkulátorra

@@ -96,6 +96,15 @@ function NoticesPage() {
 
         <SubscribeBanner settlements={settlements} />
 
+        <div className="mt-4 rounded border bg-primary/5 border-primary/30 p-3 flex flex-wrap items-center gap-2 text-sm">
+          <Calculator className="h-4 w-4 text-primary" />
+          <span className="font-medium">Új: önálló Ranghely kalkulátor</span>
+          <span className="text-muted-foreground">— jelöld be, mi igaz rád, és nézd meg, ki áll előrébb a sorban.</span>
+          <Button asChild size="sm" className="ml-auto">
+            <Link to="/ranghely-kalkulator">Kalkulátor megnyitása</Link>
+          </Button>
+        </div>
+
         <Card className="p-4 mt-6">
           <div className="grid gap-3 md:grid-cols-[1fr,220px] items-center">
             <div className="relative">
