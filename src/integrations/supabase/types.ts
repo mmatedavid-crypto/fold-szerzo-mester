@@ -577,7 +577,6 @@ export type Database = {
           last_fetched_at: string
           municipality: string | null
           notice_type: string | null
-          normalized_notice_category: string | null
           original_attachment_url: string | null
           original_detail_url: string | null
           parcel_numbers: string[] | null
@@ -587,14 +586,10 @@ export type Database = {
           rent_normalized_huf_per_ha_year: number | null
           rent_raw: string | null
           rent_unit: string | null
-          registry_number: string | null
           settlement: string | null
           source: string
           source_attachment_id: string | null
-          source_case_number: string | null
-          source_deadline_date: string | null
           source_notice_id: string | null
-          source_notice_type: string | null
           subject: string | null
         }
         Insert: {
@@ -607,7 +602,6 @@ export type Database = {
           last_fetched_at?: string
           municipality?: string | null
           notice_type?: string | null
-          normalized_notice_category?: string | null
           original_attachment_url?: string | null
           original_detail_url?: string | null
           parcel_numbers?: string[] | null
@@ -617,14 +611,10 @@ export type Database = {
           rent_normalized_huf_per_ha_year?: number | null
           rent_raw?: string | null
           rent_unit?: string | null
-          registry_number?: string | null
           settlement?: string | null
           source?: string
           source_attachment_id?: string | null
-          source_case_number?: string | null
-          source_deadline_date?: string | null
           source_notice_id?: string | null
-          source_notice_type?: string | null
           subject?: string | null
         }
         Update: {
@@ -637,7 +627,6 @@ export type Database = {
           last_fetched_at?: string
           municipality?: string | null
           notice_type?: string | null
-          normalized_notice_category?: string | null
           original_attachment_url?: string | null
           original_detail_url?: string | null
           parcel_numbers?: string[] | null
@@ -647,14 +636,10 @@ export type Database = {
           rent_normalized_huf_per_ha_year?: number | null
           rent_raw?: string | null
           rent_unit?: string | null
-          registry_number?: string | null
           settlement?: string | null
           source?: string
           source_attachment_id?: string | null
-          source_case_number?: string | null
-          source_deadline_date?: string | null
           source_notice_id?: string | null
-          source_notice_type?: string | null
           subject?: string | null
         }
         Relationships: []
