@@ -625,6 +625,98 @@ export type Database = {
           },
         ]
       }
+      notice_sale_price_observations: {
+        Row: {
+          area_ha: number | null
+          confidence: number
+          county: string | null
+          created_at: string
+          cultivation_branch: string | null
+          extraction_method: string
+          id: string
+          lat: number | null
+          lng: number | null
+          municipality: string | null
+          notice_id: string | null
+          observed_at: string
+          parse_version: string
+          price_huf_per_ha: number | null
+          price_raw: string | null
+          price_total_huf: number | null
+          price_unit: string | null
+          publication_date: string | null
+          raw_text_excerpt: string | null
+          settlement: string | null
+          settlement_clean: string | null
+          source: string
+          source_attachment_url: string | null
+          source_notice_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          area_ha?: number | null
+          confidence?: number
+          county?: string | null
+          created_at?: string
+          cultivation_branch?: string | null
+          extraction_method?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          municipality?: string | null
+          notice_id?: string | null
+          observed_at?: string
+          parse_version?: string
+          price_huf_per_ha?: number | null
+          price_raw?: string | null
+          price_total_huf?: number | null
+          price_unit?: string | null
+          publication_date?: string | null
+          raw_text_excerpt?: string | null
+          settlement?: string | null
+          settlement_clean?: string | null
+          source?: string
+          source_attachment_url?: string | null
+          source_notice_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area_ha?: number | null
+          confidence?: number
+          county?: string | null
+          created_at?: string
+          cultivation_branch?: string | null
+          extraction_method?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          municipality?: string | null
+          notice_id?: string | null
+          observed_at?: string
+          parse_version?: string
+          price_huf_per_ha?: number | null
+          price_raw?: string | null
+          price_total_huf?: number | null
+          price_unit?: string | null
+          publication_date?: string | null
+          raw_text_excerpt?: string | null
+          settlement?: string | null
+          settlement_clean?: string | null
+          source?: string
+          source_attachment_url?: string | null
+          source_notice_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notice_sale_price_observations_notice_id_fkey"
+            columns: ["notice_id"]
+            isOneToOne: false
+            referencedRelation: "notices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notice_subscriptions: {
         Row: {
           created_at: string
@@ -1073,6 +1165,21 @@ export type Database = {
       }
     }
     Views: {
+      rent_observation_county_stats: {
+        Row: {
+          avg_huf_per_ha_year: number | null
+          county_name: string | null
+          latest_observed_at: string | null
+          latest_publication_date: string | null
+          max_huf_per_ha_year: number | null
+          median_huf_per_ha_year: number | null
+          min_huf_per_ha_year: number | null
+          p25_huf_per_ha_year: number | null
+          p75_huf_per_ha_year: number | null
+          sample_count: number | null
+        }
+        Relationships: []
+      }
       rent_observation_settlement_stats: {
         Row: {
           avg_huf_per_ha_year: number | null
@@ -1090,6 +1197,21 @@ export type Database = {
           sample_count: number | null
           settlement_clean: string | null
           settlement_label: string | null
+        }
+        Relationships: []
+      }
+      sale_price_county_stats: {
+        Row: {
+          avg_huf_per_ha: number | null
+          county_name: string | null
+          latest_observed_at: string | null
+          latest_publication_date: string | null
+          max_huf_per_ha: number | null
+          median_huf_per_ha: number | null
+          min_huf_per_ha: number | null
+          p25_huf_per_ha: number | null
+          p75_huf_per_ha: number | null
+          sample_count: number | null
         }
         Relationships: []
       }
@@ -1133,6 +1255,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      infer_hu_county: { Args: { input: string }; Returns: string }
       move_to_dlq: {
         Args: {
           dlq_name: string
