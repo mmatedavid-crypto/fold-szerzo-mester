@@ -1,5 +1,11 @@
 import type { Draft } from "./types";
 import { preLeaseRank, rentDescription, allLessors } from "./logic";
+import {
+  auditLeaseDraftAgainstRuleset,
+  legalAuditText,
+  legalSourcesSummary,
+  LEGAL_RULESET_VERSION,
+} from "@/lib/legal/ruleset";
 
 type Clause = { clause_key: string; title: string; text: string; sort_order: number };
 
@@ -7,7 +13,10 @@ function substitute(text: string, vars: Record<string, string>): string {
   return text.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? "");
 }
 
-export function composeContract(draft: Draft, clauses: Clause[]): { title: string; sections: { title: string; text: string }[] } {
+export function composeContract(
+  draft: Draft,
+  clauses: Clause[],
+): { title: string; sections: { title: string; text: string }[] } {
   const L = draft.lessor_data ?? {};
   const lessors = allLessors(L);
   const E = draft.lessee_data ?? {};
@@ -17,12 +26,21 @@ export function composeContract(draft: Draft, clauses: Clause[]): { title: strin
   const pre = preLeaseRank(draft.prelease ?? {});
 
   const parcels_block = parcels
-    .map((p, i) => `${i + 1}. ${p.settlement ?? ""} ${p.location_type ?? ""}, helyrajzi szám: ${p.parcel_number ?? ""}, terület: ${p.area_ha ?? ""} ha, művelési ág: ${p.cultivation_branch ?? ""}, aranykorona: ${p.aranykorona ?? "—"}`)
+    .map(
+      (p, i) =>
+        `${i + 1}. ${p.settlement ?? ""} ${p.location_type ?? ""}, helyrajzi szám: ${p.parcel_number ?? ""}, terület: ${p.area_ha ?? ""} ha, művelési ág: ${p.cultivation_branch ?? ""}, aranykorona: ${p.aranykorona ?? "—"}`,
+    )
     .join("\n");
 
   const vars: Record<string, string> = {
-    lessor_name: lessors.map((x) => x.name).filter(Boolean).join("; "),
-    lessor_address: lessors.map((x) => x.address).filter(Boolean).join("; "),
+    lessor_name: lessors
+      .map((x) => x.name)
+      .filter(Boolean)
+      .join("; "),
+    lessor_address: lessors
+      .map((x) => x.address)
+      .filter(Boolean)
+      .join("; "),
     lessor_tax: L.tax_id ?? L.company_tax_number ?? "",
     lessor_block: lessors
       .map((x, i) => {
@@ -43,14 +61,34 @@ export function composeContract(draft: Draft, clauses: Clause[]): { title: strin
     rent_description: rentDescription(r),
     rent_deadline: r.deadline ?? "",
     rent_method: r.method ?? "",
-    rent_indexation: r.indexation === "ksh" ? "A díj a KSH inflációs adatai szerint évente felülvizsgálható."
-      : r.indexation === "fixed" ? `A díj évente ${r.fixed_pct ?? 0}%-kal emelkedik.`
-      : r.indexation === "custom" ? "A díj egyedi indexálási rendelkezés szerint kerül módosításra." : "",
+    rent_indexation:
+      r.indexation === "ksh"
+        ? "A díj a KSH inflációs adatai szerint évente felülvizsgálható."
+        : r.indexation === "fixed"
+          ? `A díj évente ${r.fixed_pct ?? 0}%-kal emelkedik.`
+          : r.indexation === "custom"
+            ? "A díj egyedi indexálási rendelkezés szerint kerül módosításra."
+            : "",
     prelease_rank: pre.rank,
     prelease_basis: pre.basis,
   };
 
   const ordered = [...clauses].sort((a, b) => a.sort_order - b.sort_order);
   const sections = ordered.map((c) => ({ title: c.title, text: substitute(c.text, vars) }));
+  const legalAudit = auditLeaseDraftAgainstRuleset(draft);
+  sections.push({
+    title: "Jogszabályi alap és ellenőrzési nyom",
+    text: [
+      `Ruleset verzió: ${LEGAL_RULESET_VERSION}`,
+      "",
+      "Felhasznált jogszabályi források:",
+      legalSourcesSummary(),
+      "",
+      "Dokumentum-ellenőrzési pontok:",
+      legalAuditText(legalAudit),
+      "",
+      "A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás, nem ügyvédi iroda. Egyedi, vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.",
+    ].join("\n"),
+  });
   return { title: "TERMŐFÖLD HASZONBÉRLETI SZERZŐDÉS", sections };
 }
