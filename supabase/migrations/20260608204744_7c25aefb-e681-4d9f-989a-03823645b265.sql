@@ -1,0 +1,1 @@
+ALTER VIEW public.rent_observation_settlement_stats SET (security_invoker = true);
