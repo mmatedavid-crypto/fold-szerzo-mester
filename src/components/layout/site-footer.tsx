@@ -26,6 +26,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link to="/berleti-dij-iranytu" className="hover:text-primary">
+                Bérleti díj iránytű
+              </Link>
+            </li>
+            <li>
               <Link to="/foldberleti-szerzodes" className="hover:text-primary">
                 Bérleti szerződés
               </Link>

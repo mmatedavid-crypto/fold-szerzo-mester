@@ -32,7 +32,10 @@ function parseSubject(rawTitle: string): {
   parcel_numbers: string[];
 } {
   // multi entries split by | — same notice id, multiple parcels
-  const parts = rawTitle.split("|").map((p) => p.trim()).filter(Boolean);
+  const parts = rawTitle
+    .split("|")
+    .map((p) => p.trim())
+    .filter(Boolean);
   const types = new Set<string>();
   let settlement: string | null = null;
   const parcels: string[] = [];
@@ -40,7 +43,7 @@ function parseSubject(rawTitle: string): {
     const m = part.match(/^(.+?)\s*-\s*(.+?)\s*hrsz\.?:?\s*(.+)$/i);
     if (m) {
       types.add(m[1].trim());
-      if (!settlement) settlement = m[2].trim();
+      if (!settlement) settlement = extractSettlementBeforeHrsz(m[2]);
       const tail = m[3].replace(/külterület|zártkert|hrsz\.?/gi, " ").trim();
       for (const p of tail.split(/[,\s]+/)) {
         const cleaned = p.replace(/[^0-9A-Za-z/]/g, "");
@@ -49,7 +52,11 @@ function parseSubject(rawTitle: string): {
     }
   }
   const type = Array.from(types).join(" / ") || "Egyéb";
-  return { notice_type: type, settlement, parcel_numbers: Array.from(new Set(parcels)).slice(0, 50) };
+  return {
+    notice_type: type,
+    settlement,
+    parcel_numbers: Array.from(new Set(parcels)).slice(0, 50),
+  };
 }
 
 function parseMunicipality(desc: string): string | null {
@@ -108,13 +115,16 @@ type ApiRow = {
 };
 
 function parseSubjectParts(rawTitle: string): { settlement: string | null; parcels: string[] } {
-  const parts = rawTitle.split("|").map((p) => p.trim()).filter(Boolean);
+  const parts = rawTitle
+    .split("|")
+    .map((p) => p.trim())
+    .filter(Boolean);
   let settlement: string | null = null;
   const parcels: string[] = [];
   for (const part of parts) {
     const m = part.match(/^(.+?)\s*-\s*(.+?)\s*hrsz\.?:?\s*(.+)$/i);
     if (m) {
-      if (!settlement) settlement = m[2].trim();
+      if (!settlement) settlement = extractSettlementBeforeHrsz(m[2]);
       const tail = m[3].replace(/külterület|zártkert|hrsz\.?/gi, " ").trim();
       for (const p of tail.split(/[,\s]+/)) {
         const cleaned = p.replace(/[^0-9A-Za-z/]/g, "");
@@ -125,7 +135,18 @@ function parseSubjectParts(rawTitle: string): { settlement: string | null; parce
   return { settlement, parcels: Array.from(new Set(parcels)).slice(0, 50) };
 }
 
-async function fetchPage(pageIndex: number, pageSize: number): Promise<{ rows: ApiRow[]; total: number }> {
+function extractSettlementBeforeHrsz(raw: string): string {
+  const chunks = raw
+    .split(/\s+-\s+/)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean);
+  return (chunks.at(-1) ?? raw).replace(/^(adás-vétel|haszonbérlet|vétel)\s*-\s*/i, "").trim();
+}
+
+async function fetchPage(
+  pageIndex: number,
+  pageSize: number,
+): Promise<{ rows: ApiRow[]; total: number }> {
   const url = `https://hirdetmenyek.gov.hu/api/hirdetmenyek?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=kifuggesztesNapja&order=desc`;
   const res = await fetch(url, {
     headers: { "User-Agent": "Foldberleti-Szerzodes-Generator/1.0", Accept: "application/json" },
@@ -152,7 +173,9 @@ function mapRow(r: ApiRow) {
   };
 }
 
-export async function syncFromApi(opts: { incremental?: boolean; maxPages?: number } = {}): Promise<{
+export async function syncFromApi(
+  opts: { incremental?: boolean; maxPages?: number } = {},
+): Promise<{
   fetched: number;
   upserted: number;
 }> {

@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { normalizeRent, parseAreaHa } from "./rent-normalizer";
 
 export type ParsedNotice = {
   source_notice_id: string;
@@ -17,51 +18,10 @@ export type ParsedNotice = {
   notice_type: string;
 };
 
-function toNumberHU(s: string): number | null {
-  // "150.000,-" / "120.960" / "1,6050" — HU: . = thousand sep, , = decimal
-  const cleaned = s.replace(/\s/g, "").replace(/Ft.*$/i, "").replace(/,-$/, "");
-  // Try HU decimal first
-  if (/,\d+$/.test(cleaned)) {
-    const n = Number(cleaned.replace(/\./g, "").replace(",", "."));
-    return Number.isFinite(n) ? n : null;
-  }
-  const n = Number(cleaned.replace(/\./g, ""));
-  return Number.isFinite(n) ? n : null;
-}
-
-function parseArea(raw: string): number | null {
-  if (!raw) return null;
-  const s = raw.replace(/\s/g, "").toLowerCase();
-  const haMatch = s.match(/([0-9.,]+)ha/);
-  if (haMatch) {
-    const n = Number(haMatch[1].replace(/\./g, "").replace(",", "."));
-    return Number.isFinite(n) ? n : null;
-  }
-  const m2Match = s.match(/([0-9.,]+)m2/);
-  if (m2Match) {
-    const n = Number(m2Match[1].replace(/\./g, "").replace(",", "."));
-    return Number.isFinite(n) ? n / 10000 : null;
-  }
-  return null;
-}
-
-function parseRentPerHaPerYear(raw: string, areaHa: number | null): number | null {
-  if (!raw) return null;
-  const s = raw.toLowerCase();
-  if (s.includes("szerz") || s.includes("csatolm")) return null;
-  // "150.000,-Ft/ha/év"
-  const perHa = raw.match(/([0-9.,]+)\s*,?-?\s*ft\s*\/\s*ha/i);
-  if (perHa) return toNumberHU(perHa[1]);
-  // "120.960.- Ft/év" → total per year, divide by area
-  const perYear = raw.match(/([0-9.,]+)\s*\.?-?\s*ft\s*\/\s*év/i);
-  if (perYear) {
-    const total = toNumberHU(perYear[1]);
-    if (total != null && areaHa && areaHa > 0) return Math.round(total / areaHa);
-  }
-  return null;
-}
-
-function parseHrsz(subject: string, settlementHint?: string): { settlement: string | null; parcels: string[] } {
+function parseHrsz(
+  subject: string,
+  settlementHint?: string,
+): { settlement: string | null; parcels: string[] } {
   // "Gyomaendrőd hrsz.: 02124/31" or "Dörgicse hrsz.: 0197/2 területen belül a 0197/2/C terület"
   const m = subject.match(/^([^h]+?)\s*hrsz\.?:?\s*(.+)$/i);
   let settlement = settlementHint?.trim() ?? null;
@@ -70,7 +30,9 @@ function parseHrsz(subject: string, settlementHint?: string): { settlement: stri
     settlement = settlement ?? m[1].trim();
     tail = m[2];
   }
-  const parcels = Array.from(tail.matchAll(/(\d+\/?\d*\/?[A-Z]?)/g)).map((x) => x[1]).filter((p) => /\d/.test(p));
+  const parcels = Array.from(tail.matchAll(/(\d+\/?\d*\/?[A-Z]?)/g))
+    .map((x) => x[1])
+    .filter((p) => /\d/.test(p));
   return { settlement, parcels };
 }
 
@@ -93,7 +55,11 @@ export function parseNoticesXlsx(buffer: ArrayBuffer): ParsedNotice[] {
   const out: ParsedNotice[] = [];
   for (const sheetName of wb.SheetNames) {
     const ws = wb.Sheets[sheetName];
-    const rows: unknown[][] = XLSX.utils.sheet_to_json(ws, { header: 1, blankrows: false, defval: null });
+    const rows: unknown[][] = XLSX.utils.sheet_to_json(ws, {
+      header: 1,
+      blankrows: false,
+      defval: null,
+    });
     // find header row (contains "Azonosító szám")
     let headerIdx = -1;
     for (let i = 0; i < rows.length; i++) {
@@ -104,7 +70,8 @@ export function parseNoticesXlsx(buffer: ArrayBuffer): ParsedNotice[] {
     }
     if (headerIdx < 0) continue;
     const headers = rows[headerIdx].map((h) => (typeof h === "string" ? h.trim() : ""));
-    const col = (name: string) => headers.findIndex((h) => h.toLowerCase().includes(name.toLowerCase()));
+    const col = (name: string) =>
+      headers.findIndex((h) => h.toLowerCase().includes(name.toLowerCase()));
     const cAzon = col("Azonosító");
     const cHat = col("határidő");
     const cOnk = col("Illetékes");
@@ -123,8 +90,9 @@ export function parseNoticesXlsx(buffer: ArrayBuffer): ParsedNotice[] {
       const settlementHint = (r[cTel] as string) ?? "";
       const { settlement, parcels } = parseHrsz(subject, settlementHint);
       const areaRaw = r[cTer] != null ? String(r[cTer]) : null;
-      const areaHa = areaRaw ? parseArea(areaRaw) : null;
+      const areaHa = areaRaw ? parseAreaHa(areaRaw) : null;
       const rentRaw = r[cBer] != null ? String(r[cBer]) : null;
+      const normalizedRent = normalizeRent(rentRaw, areaHa);
       const url = (r[cCsat] as string) ?? null;
       const attachmentId = url ? (url.match(/\/(\d+)\/?$/)?.[1] ?? null) : null;
       out.push({
@@ -139,7 +107,7 @@ export function parseNoticesXlsx(buffer: ArrayBuffer): ParsedNotice[] {
         area_ha: areaHa,
         cultivation_branch: (r[cMuv] as string) ?? null,
         rent_raw: rentRaw,
-        rent_normalized_huf_per_ha_year: rentRaw ? parseRentPerHaPerYear(rentRaw, areaHa) : null,
+        rent_normalized_huf_per_ha_year: normalizedRent.rentHufPerHaYear,
         deadline_date: toIsoDate(r[cHat]),
         notice_type: "haszonberlet",
       });

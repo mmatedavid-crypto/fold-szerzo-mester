@@ -77,6 +77,9 @@ export function SiteHeader() {
             <Link to="/kifuggesztesek" onClick={() => setMenuOpen(false)}>
               Kifüggesztések
             </Link>
+            <Link to="/berleti-dij-iranytu" onClick={() => setMenuOpen(false)}>
+              Bérleti díj iránytű
+            </Link>
             <Link to="/ranghely-kalkulator" onClick={() => setMenuOpen(false)}>
               Ranghely kalkulátor
             </Link>
