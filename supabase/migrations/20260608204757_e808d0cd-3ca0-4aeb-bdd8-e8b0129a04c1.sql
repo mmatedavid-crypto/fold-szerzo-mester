@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.upsert_notice_rent_observation_from_notice() FROM PUBLIC, anon, authenticated;

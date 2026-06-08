@@ -530,6 +530,101 @@ export type Database = {
         }
         Relationships: []
       }
+      notice_rent_observations: {
+        Row: {
+          area_ha: number | null
+          confidence: number
+          county: string | null
+          created_at: string
+          cultivation_branch: string | null
+          extraction_method: string
+          id: string
+          lat: number | null
+          lng: number | null
+          municipality: string | null
+          notice_id: string | null
+          observed_at: string
+          parse_version: string
+          publication_date: string | null
+          raw_text_excerpt: string | null
+          rent_huf_per_ak_year: number | null
+          rent_huf_per_ha_year: number | null
+          rent_raw: string | null
+          rent_total_huf_year: number | null
+          rent_unit: string | null
+          settlement: string | null
+          settlement_clean: string | null
+          source: string
+          source_attachment_url: string | null
+          source_notice_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          area_ha?: number | null
+          confidence?: number
+          county?: string | null
+          created_at?: string
+          cultivation_branch?: string | null
+          extraction_method?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          municipality?: string | null
+          notice_id?: string | null
+          observed_at?: string
+          parse_version?: string
+          publication_date?: string | null
+          raw_text_excerpt?: string | null
+          rent_huf_per_ak_year?: number | null
+          rent_huf_per_ha_year?: number | null
+          rent_raw?: string | null
+          rent_total_huf_year?: number | null
+          rent_unit?: string | null
+          settlement?: string | null
+          settlement_clean?: string | null
+          source?: string
+          source_attachment_url?: string | null
+          source_notice_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area_ha?: number | null
+          confidence?: number
+          county?: string | null
+          created_at?: string
+          cultivation_branch?: string | null
+          extraction_method?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          municipality?: string | null
+          notice_id?: string | null
+          observed_at?: string
+          parse_version?: string
+          publication_date?: string | null
+          raw_text_excerpt?: string | null
+          rent_huf_per_ak_year?: number | null
+          rent_huf_per_ha_year?: number | null
+          rent_raw?: string | null
+          rent_total_huf_year?: number | null
+          rent_unit?: string | null
+          settlement?: string | null
+          settlement_clean?: string | null
+          source?: string
+          source_attachment_url?: string | null
+          source_notice_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notice_rent_observations_notice_id_fkey"
+            columns: ["notice_id"]
+            isOneToOne: false
+            referencedRelation: "notices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notice_subscriptions: {
         Row: {
           created_at: string
@@ -972,9 +1067,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      rent_observation_settlement_stats: {
+        Row: {
+          avg_huf_per_ha_year: number | null
+          county: string | null
+          lat: number | null
+          latest_observed_at: string | null
+          latest_publication_date: string | null
+          lng: number | null
+          max_huf_per_ha_year: number | null
+          median_huf_per_ha_year: number | null
+          min_huf_per_ha_year: number | null
+          municipality: string | null
+          p25_huf_per_ha_year: number | null
+          p75_huf_per_ha_year: number | null
+          sample_count: number | null
+          settlement_clean: string | null
+          settlement_label: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      classify_hirdetmeny_category: {
+        Args: { source_type: string; subject: string }
+        Returns: string
+      }
+      clean_hu_settlement_name: { Args: { input: string }; Returns: string }
       clean_settlement: { Args: { _raw: string }; Returns: string }
       delete_email: {
         Args: { message_id: number; queue_name: string }
