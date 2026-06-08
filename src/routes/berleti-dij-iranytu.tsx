@@ -159,6 +159,8 @@ function RentCompassPage() {
     .filter(Boolean)
     .sort()
     .at(-1);
+  const dbSetupMissing =
+    isMissingRelationError(statsQuery.error) || isMissingRelationError(observationsQuery.error);
 
   return (
     <PageShell>
@@ -202,12 +204,17 @@ function RentCompassPage() {
                 />
                 <Metric label="Forrás" value="hirdetmény" />
               </div>
-              {totalSamples === 0 && (
+              {dbSetupMissing ? (
+                <p className="mt-4 rounded-md border border-df-red/40 bg-df-red/10 p-3 text-xs leading-5 text-df-ink">
+                  A bérleti díj statisztikai adatbázis-réteg még nincs aktiválva a live
+                  környezetben. A Supabase migration lefuttatása után indulhat az árpontok gyűjtése.
+                </p>
+              ) : totalSamples === 0 ? (
                 <p className="mt-4 rounded-md border border-df-yellow/40 bg-df-yellow/10 p-3 text-xs leading-5 text-df-ink">
                   A live adatbázisban még nincs normalizált Ft/ha/év árpont. A statisztikai réteg
                   készen áll; az első XLSX/PDF import után automatikusan megjelennek az adatok.
                 </p>
-              )}
+              ) : null}
             </Card>
           </div>
         </section>
@@ -366,6 +373,13 @@ function RentCompassPage() {
       </main>
     </PageShell>
   );
+}
+
+function isMissingRelationError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const message = "message" in error ? String(error.message) : "";
+  const code = "code" in error ? String(error.code) : "";
+  return code === "PGRST205" || /schema cache|relation|does not exist/i.test(message);
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
