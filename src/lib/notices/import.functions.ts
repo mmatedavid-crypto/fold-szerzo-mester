@@ -15,15 +15,19 @@ const RowSchema = z.object({
   cultivation_branch: z.string().max(255).nullable(),
   rent_raw: z.string().max(255).nullable(),
   rent_normalized_huf_per_ha_year: z.number().nullable(),
-  deadline_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  price_raw: z.string().max(255).nullable(),
+  price_total_huf: z.number().nullable(),
+  price_normalized_huf_per_ha: z.number().nullable(),
+  deadline_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable(),
   notice_type: z.string().max(64),
 });
 
 export const importNotices = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ rows: z.array(RowSchema).min(1).max(2000) }).parse(input),
-  )
+  .inputValidator((input) => z.object({ rows: z.array(RowSchema).min(1).max(2000) }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: role } = await supabase

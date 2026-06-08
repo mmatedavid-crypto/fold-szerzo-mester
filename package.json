@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "notices:enrich": "node scripts/enrich-notice-source-data.mjs"
+    "notices:enrich": "node scripts/enrich-notice-source-data.mjs",
+    "notices:extract-prices": "node scripts/extract-notice-price-observations.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -58,6 +59,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38",
     "qrcode": "^1.5.4",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",

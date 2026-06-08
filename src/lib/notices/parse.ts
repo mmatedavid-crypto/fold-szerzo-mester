@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx";
 import { normalizeRent, parseAreaHa } from "./rent-normalizer";
+import { normalizeSalePrice } from "./sale-price-normalizer";
 
 export type ParsedNotice = {
   source_notice_id: string;
@@ -14,6 +15,9 @@ export type ParsedNotice = {
   cultivation_branch: string | null;
   rent_raw: string | null;
   rent_normalized_huf_per_ha_year: number | null;
+  price_raw: string | null;
+  price_total_huf: number | null;
+  price_normalized_huf_per_ha: number | null;
   deadline_date: string | null; // YYYY-MM-DD
   notice_type: string;
 };
@@ -50,6 +54,12 @@ function toIsoDate(v: unknown): string | null {
   return null;
 }
 
+function cellText(value: unknown): string | null {
+  if (value == null) return null;
+  const text = String(value).trim();
+  return text || null;
+}
+
 export function parseNoticesXlsx(buffer: ArrayBuffer): ParsedNotice[] {
   const wb = XLSX.read(buffer, { type: "array", cellDates: true });
   const out: ParsedNotice[] = [];
@@ -70,14 +80,18 @@ export function parseNoticesXlsx(buffer: ArrayBuffer): ParsedNotice[] {
     }
     if (headerIdx < 0) continue;
     const headers = rows[headerIdx].map((h) => (typeof h === "string" ? h.trim() : ""));
-    const col = (name: string) =>
-      headers.findIndex((h) => h.toLowerCase().includes(name.toLowerCase()));
+    const col = (...names: string[]) =>
+      headers.findIndex((h) => {
+        const header = h.toLowerCase();
+        return names.some((name) => header.includes(name.toLowerCase()));
+      });
     const cAzon = col("Azonosító");
     const cHat = col("határidő");
     const cOnk = col("Illetékes");
     const cTargy = col("tárgya");
     const cTel = col("Település");
-    const cBer = col("Haszonbér");
+    const cBer = col("Haszonbér", "Bérleti díj", "Bérleti díj / év");
+    const cAr = col("Vételár", "Vetelar", "Eladási ár", "Eladasi ar", "Ajánlati ár");
     const cTer = col("Terület");
     const cMuv = col("Művelési");
     const cCsat = col("csatolmány");
@@ -86,30 +100,35 @@ export function parseNoticesXlsx(buffer: ArrayBuffer): ParsedNotice[] {
       const r = rows[i];
       const azon = r[cAzon];
       if (!azon || typeof azon !== "string") continue;
-      const subject = (r[cTargy] as string) ?? "";
-      const settlementHint = (r[cTel] as string) ?? "";
+      const subject = cellText(r[cTargy]) ?? "";
+      const settlementHint = cellText(r[cTel]) ?? "";
       const { settlement, parcels } = parseHrsz(subject, settlementHint);
-      const areaRaw = r[cTer] != null ? String(r[cTer]) : null;
+      const areaRaw = cellText(r[cTer]);
       const areaHa = areaRaw ? parseAreaHa(areaRaw) : null;
-      const rentRaw = r[cBer] != null ? String(r[cBer]) : null;
+      const rentRaw = cellText(r[cBer]);
       const normalizedRent = normalizeRent(rentRaw, areaHa);
-      const url = (r[cCsat] as string) ?? null;
+      const priceRaw = cellText(r[cAr]);
+      const normalizedSalePrice = normalizeSalePrice(priceRaw, areaHa);
+      const url = cellText(r[cCsat]);
       const attachmentId = url ? (url.match(/\/(\d+)\/?$/)?.[1] ?? null) : null;
       out.push({
         source_notice_id: azon.trim(),
         source_attachment_id: attachmentId,
         original_attachment_url: url,
-        municipality: (r[cOnk] as string) ?? null,
+        municipality: cellText(r[cOnk]),
         subject,
         settlement,
         parcel_numbers: parcels,
         area_raw: areaRaw,
         area_ha: areaHa,
-        cultivation_branch: (r[cMuv] as string) ?? null,
+        cultivation_branch: cellText(r[cMuv]),
         rent_raw: rentRaw,
         rent_normalized_huf_per_ha_year: normalizedRent.rentHufPerHaYear,
+        price_raw: priceRaw,
+        price_total_huf: normalizedSalePrice.priceTotalHuf,
+        price_normalized_huf_per_ha: normalizedSalePrice.priceHufPerHa,
         deadline_date: toIsoDate(r[cHat]),
-        notice_type: "haszonberlet",
+        notice_type: priceRaw ? "adasvetel" : "haszonberlet",
       });
     }
   }
