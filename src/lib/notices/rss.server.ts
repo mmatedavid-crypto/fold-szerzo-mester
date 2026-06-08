@@ -111,6 +111,9 @@ type ApiRow = {
   targy: string;
   forrasIntezmenyNeve: string | null;
   kifuggesztesNapja: string | null;
+  lejaratNapja?: string | null;
+  ugyiratszam: string | null;
+  iktatasiszam: string | null;
   hirdetmenyTipusNev: string | null;
 };
 
@@ -146,8 +149,12 @@ function extractSettlementBeforeHrsz(raw: string): string {
 async function fetchPage(
   pageIndex: number,
   pageSize: number,
+  mode: "latest" | "expiring" = "latest",
 ): Promise<{ rows: ApiRow[]; total: number }> {
-  const url = `https://hirdetmenyek.gov.hu/api/hirdetmenyek?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=kifuggesztesNapja&order=desc`;
+  const endpoint = mode === "expiring" ? "hirdetmenyek/lejaro" : "hirdetmenyek";
+  const sort = mode === "expiring" ? "lejaratNapja" : "kifuggesztesNapja";
+  const order = mode === "expiring" ? "asc" : "desc";
+  const url = `https://hirdetmenyek.gov.hu/api/${endpoint}?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&order=${order}`;
   const res = await fetch(url, {
     headers: { "User-Agent": "Foldberleti-Szerzodes-Generator/1.0", Accept: "application/json" },
   });
@@ -159,6 +166,8 @@ function mapRow(r: ApiRow) {
   const { settlement, parcels } = parseSubjectParts(r.targy ?? "");
   const typeLabel = TYPE_LABEL[r.hirdetmenyTipusNev ?? ""] ?? r.hirdetmenyTipusNev ?? "Egyéb";
   const pub = r.kifuggesztesNapja ? new Date(r.kifuggesztesNapja).toISOString().slice(0, 10) : null;
+  const deadline = r.lejaratNapja ? new Date(r.lejaratNapja).toISOString().slice(0, 10) : null;
+  const normalizedCategory = classifyNoticeCategory(r.hirdetmenyTipusNev, r.targy);
   return {
     source: "hirdetmenyek.gov.hu",
     source_notice_id: String(r.id),
@@ -169,18 +178,25 @@ function mapRow(r: ApiRow) {
     parcel_numbers: parcels,
     municipality: r.forrasIntezmenyNeve?.slice(0, 255) ?? null,
     publication_date: pub,
+    deadline_date: deadline,
+    source_deadline_date: deadline,
+    source_case_number: r.ugyiratszam?.slice(0, 255) ?? null,
+    registry_number: r.iktatasiszam?.slice(0, 255) ?? null,
+    source_notice_type: r.hirdetmenyTipusNev?.slice(0, 64) ?? null,
+    normalized_notice_category: normalizedCategory,
+    raw_json: r,
     last_fetched_at: new Date().toISOString(),
   };
 }
 
 export async function syncFromApi(
-  opts: { incremental?: boolean; maxPages?: number } = {},
+  opts: { incremental?: boolean; maxPages?: number; includeExpiring?: boolean } = {},
 ): Promise<{
   fetched: number;
   upserted: number;
 }> {
   const pageSize = 100;
-  const first = await fetchPage(0, pageSize);
+  const first = await fetchPage(0, pageSize, "latest");
   const total = first.total;
   const totalPages = Math.ceil(total / pageSize);
   const cap = opts.maxPages ?? (opts.incremental ? 2 : totalPages);
@@ -203,10 +219,23 @@ export async function syncFromApi(
   await flush(first.rows);
 
   for (let i = 1; i < pages; i++) {
-    const page = await fetchPage(i, pageSize);
+    const page = await fetchPage(i, pageSize, "latest");
     await flush(page.rows);
     if (page.rows.length === 0) break;
   }
 
+  if (opts.includeExpiring ?? opts.incremental) {
+    const expiring = await fetchPage(0, pageSize, "expiring");
+    await flush(expiring.rows);
+  }
+
   return { fetched, upserted };
+}
+
+function classifyNoticeCategory(sourceType: string | null, subject: string | null): string | null {
+  const hay = `${sourceType ?? ""} ${subject ?? ""}`.toLowerCase();
+  if (/haszonb[ée]r|b[ée]rleti|földhaszonb[ée]r|foldhaszonber/.test(hay)) return "haszonberlet";
+  if (/adás-vétel|adas-vetel|elővásárl|elovasarl|foldelovasarlasos/.test(hay)) return "adasvetel";
+  if (sourceType === "foldhivatali") return "foldhivatali";
+  return sourceType?.toLowerCase() ?? null;
 }

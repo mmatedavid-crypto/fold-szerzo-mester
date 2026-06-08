@@ -9,7 +9,8 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "notices:enrich": "node scripts/enrich-notice-source-data.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
