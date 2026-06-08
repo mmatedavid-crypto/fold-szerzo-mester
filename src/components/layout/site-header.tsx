@@ -78,7 +78,7 @@ export function SiteHeader() {
               Kifüggesztések
             </Link>
             <Link to="/berleti-dij-iranytu" onClick={() => setMenuOpen(false)}>
-              Bérleti díj iránytű
+              Ár iránytű
             </Link>
             <Link to="/ranghely-kalkulator" onClick={() => setMenuOpen(false)}>
               Ranghely kalkulátor

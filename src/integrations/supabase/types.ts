@@ -676,7 +676,9 @@ export type Database = {
           original_attachment_url: string | null
           original_detail_url: string | null
           parcel_numbers: string[] | null
+          price_normalized_huf_per_ha: number | null
           price_raw: string | null
+          price_total_huf: number | null
           publication_date: string | null
           raw_json: Json | null
           registry_number: string | null
@@ -706,7 +708,9 @@ export type Database = {
           original_attachment_url?: string | null
           original_detail_url?: string | null
           parcel_numbers?: string[] | null
+          price_normalized_huf_per_ha?: number | null
           price_raw?: string | null
+          price_total_huf?: number | null
           publication_date?: string | null
           raw_json?: Json | null
           registry_number?: string | null
@@ -736,7 +740,9 @@ export type Database = {
           original_attachment_url?: string | null
           original_detail_url?: string | null
           parcel_numbers?: string[] | null
+          price_normalized_huf_per_ha?: number | null
           price_raw?: string | null
+          price_total_huf?: number | null
           publication_date?: string | null
           raw_json?: Json | null
           registry_number?: string | null
