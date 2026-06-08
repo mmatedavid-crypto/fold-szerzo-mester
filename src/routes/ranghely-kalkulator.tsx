@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/ranghely-kalkulator")({
 
 function RankCalculatorPage() {
   const search = useSearch({ from: "/ranghely-kalkulator" });
+  const navigate = useNavigate();
   const [showNoticeChip, setShowNoticeChip] = useState(!!search.from);
   const [resetKey, setResetKey] = useState(0);
 
@@ -74,6 +75,7 @@ function RankCalculatorPage() {
       // sessionStorage may be unavailable in restricted browser contexts.
     }
     toast.success("Számítás mentve. Folytasd az elfogadó nyilatkozat előkészítésével.");
+    void navigate({ to: "/elfogado-nyilatkozat" });
   };
 
   const restart = () => {

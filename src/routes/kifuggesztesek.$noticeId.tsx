@@ -15,13 +15,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 import { computeRank, computeAcceptanceDeadline } from "@/lib/rank/engine";
 import type { ClaimantProfile, NoticeFacts, LandBranch, TransactionKind } from "@/lib/rank/types";
-import { ArrowLeft, ArrowRight, ExternalLink, FileCheck2, Loader2, ShieldAlert, ShieldCheck, Trophy, Scale } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ExternalLink,
+  FileCheck2,
+  Loader2,
+  ShieldAlert,
+  ShieldCheck,
+  Trophy,
+  Scale,
+} from "lucide-react";
 
 export const Route = createFileRoute("/kifuggesztesek/$noticeId")({
   head: ({ params }) => ({
     meta: [
       { title: `Ranghely-kalkulátor — ${params.noticeId} | Földbérleti Szerződés Generátor` },
-      { name: "description", content: "Ellenőrizd a Földforgalmi tv. 46. §-a szerinti elővásárlási/előhaszonbérleti ranghelyedet a kifüggesztett hirdetményhez." },
+      {
+        name: "description",
+        content:
+          "Ellenőrizd a Földforgalmi tv. 46. §-a szerinti elővásárlási/előhaszonbérleti ranghelyedet a kifüggesztett hirdetményhez.",
+      },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -65,7 +79,9 @@ function NoticeDetailPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("notices")
-        .select("id, source_notice_id, subject, settlement, municipality, parcel_numbers, notice_type, cultivation_branch, publication_date, deadline_date, original_detail_url")
+        .select(
+          "id, source_notice_id, subject, settlement, municipality, parcel_numbers, notice_type, cultivation_branch, publication_date, deadline_date, original_detail_url",
+        )
         .eq("id", noticeId)
         .maybeSingle();
       if (error) throw error;
@@ -100,17 +116,20 @@ function NoticeDetailPage() {
     return computeRank(baseFacts, contractingParty).rank;
   }, [branch, transaction, q.data?.settlement, cultivationTags, contractingParty]);
 
-  const facts: NoticeFacts = {
-    branch,
-    transaction,
-    settlement: q.data?.settlement ?? "",
-    contractingPartyRank: partyRank,
-    cultivationBranchTags: cultivationTags,
-  };
+  const facts: NoticeFacts = useMemo(
+    () => ({
+      branch,
+      transaction,
+      settlement: q.data?.settlement ?? "",
+      contractingPartyRank: partyRank,
+      cultivationBranchTags: cultivationTags,
+    }),
+    [branch, transaction, q.data?.settlement, partyRank, cultivationTags],
+  );
 
   const result = useMemo(
     () => (step === 4 ? computeRank(facts, claimant) : null),
-    [step, facts, claimant]
+    [step, facts, claimant],
   );
 
   const deadline = useMemo(() => {
@@ -134,7 +153,9 @@ function NoticeDetailPage() {
         <div className="container mx-auto px-4 py-16 max-w-3xl">
           <h1 className="font-serif text-2xl">A hirdetmény nem található</h1>
           <Button asChild className="mt-4" variant="outline">
-            <Link to="/kifuggesztesek"><ArrowLeft className="h-4 w-4 mr-1" /> Vissza a listához</Link>
+            <Link to="/kifuggesztesek">
+              <ArrowLeft className="h-4 w-4 mr-1" /> Vissza a listához
+            </Link>
           </Button>
         </div>
       </PageShell>
@@ -147,7 +168,9 @@ function NoticeDetailPage() {
     <PageShell>
       <section className="container mx-auto px-4 py-8 max-w-3xl">
         <Button asChild variant="ghost" size="sm" className="mb-2 -ml-2">
-          <Link to="/kifuggesztesek"><ArrowLeft className="h-4 w-4 mr-1" /> Vissza</Link>
+          <Link to="/kifuggesztesek">
+            <ArrowLeft className="h-4 w-4 mr-1" /> Vissza
+          </Link>
         </Button>
 
         <Card className="p-5">
@@ -157,14 +180,22 @@ function NoticeDetailPage() {
                 {n.notice_type && <Badge variant="outline">{n.notice_type}</Badge>}
                 {n.cultivation_branch && <Badge variant="secondary">{n.cultivation_branch}</Badge>}
               </div>
-              <h1 className="font-serif text-xl leading-tight">{n.subject ?? n.source_notice_id ?? "Kifüggesztés"}</h1>
+              <h1 className="font-serif text-xl leading-tight">
+                {n.subject ?? n.source_notice_id ?? "Kifüggesztés"}
+              </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 {n.settlement ?? "—"} {n.municipality ? `• ${n.municipality}` : ""}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Közzététel: {n.publication_date ? formatDate(n.publication_date) : "—"}
                 {deadline && (
-                  <> • Elfogadás határideje (15 nap): <strong className="text-foreground">{formatDate(deadline.toISOString())}</strong></>
+                  <>
+                    {" "}
+                    • Elfogadás határideje (15 nap):{" "}
+                    <strong className="text-foreground">
+                      {formatDate(deadline.toISOString())}
+                    </strong>
+                  </>
                 )}
               </p>
             </div>
@@ -177,7 +208,9 @@ function NoticeDetailPage() {
             )}
           </div>
           {n.parcel_numbers?.length ? (
-            <p className="text-xs text-muted-foreground mt-3">Hrsz.: {n.parcel_numbers.join(", ")}</p>
+            <p className="text-xs text-muted-foreground mt-3">
+              Hrsz.: {n.parcel_numbers.join(", ")}
+            </p>
           ) : null}
         </Card>
 
@@ -190,7 +223,8 @@ function NoticeDetailPage() {
             <div className="space-y-3 text-sm">
               <h2 className="font-serif text-lg">Van-e elővásárlási / előhaszonbérleti jogod?</h2>
               <p className="text-muted-foreground">
-                A 2013. évi CXXII. tv. (Földforgalmi tv.) 46. §-a alapján egy rövid kérdéssorral kiszámoljuk a ranghelyedet, és összevetjük a szerződő félével.
+                A 2013. évi CXXII. tv. (Földforgalmi tv.) 46. §-a alapján egy rövid kérdéssorral
+                kiszámoljuk a ranghelyedet, és összevetjük a szerződő félével.
               </p>
               <p className="text-xs text-muted-foreground">
                 Tájékoztató jellegű, hatósági döntést nem helyettesít. Az adatok nem mentődnek.
@@ -203,9 +237,14 @@ function NoticeDetailPage() {
               <h2 className="font-serif text-lg">A föld besorolása és az ügylet típusa</h2>
               <div className="space-y-2">
                 <Label>Föld típusa</Label>
-                <RadioGroup value={branch} onValueChange={(v) => setBranch(v as LandBranch)} className="grid gap-2">
+                <RadioGroup
+                  value={branch}
+                  onValueChange={(v) => setBranch(v as LandBranch)}
+                  className="grid gap-2"
+                >
                   <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
-                    <RadioGroupItem value="non_forest" /> Nem erdő (szántó, rét, legelő, szőlő, gyümölcs, stb.)
+                    <RadioGroupItem value="non_forest" /> Nem erdő (szántó, rét, legelő, szőlő,
+                    gyümölcs, stb.)
                   </label>
                   <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
                     <RadioGroupItem value="forest" /> Erdő (Evt. szerinti speciális szabályok)
@@ -214,7 +253,11 @@ function NoticeDetailPage() {
               </div>
               <div className="space-y-2">
                 <Label>Ügylet típusa</Label>
-                <RadioGroup value={transaction} onValueChange={(v) => setTransaction(v as TransactionKind)} className="grid gap-2 md:grid-cols-2">
+                <RadioGroup
+                  value={transaction}
+                  onValueChange={(v) => setTransaction(v as TransactionKind)}
+                  className="grid gap-2 md:grid-cols-2"
+                >
                   <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
                     <RadioGroupItem value="lease" /> Haszonbérlet (előhaszonbérleti jog)
                   </label>
@@ -230,8 +273,9 @@ function NoticeDetailPage() {
             <div className="space-y-4 text-sm">
               <h2 className="font-serif text-lg">A szerződő fél státusza</h2>
               <p className="text-xs text-muted-foreground">
-                Jelöld be a kifüggesztett szerződésben szereplő vevő/bérlő jogcímeit. Ezek alapján a rendszer kiszámolja a ranghelyét.
-                Több jogcím is jelölhető — a motor a legerősebb szerint sorolja be.
+                Jelöld be a kifüggesztett szerződésben szereplő vevő/bérlő jogcímeit. Ezek alapján a
+                rendszer kiszámolja a ranghelyét. Több jogcím is jelölhető — a motor a legerősebb
+                szerint sorolja be.
               </p>
               <ProfileFields
                 profile={contractingParty}
@@ -242,7 +286,8 @@ function NoticeDetailPage() {
               />
               <Separator />
               <p className="text-xs text-muted-foreground">
-                Számított ranghely: <strong className="text-foreground">{formatRank(partyRank)}</strong>
+                Számított ranghely:{" "}
+                <strong className="text-foreground">{formatRank(partyRank)}</strong>
               </p>
             </div>
           )}
@@ -251,7 +296,8 @@ function NoticeDetailPage() {
             <div className="space-y-4 text-sm">
               <h2 className="font-serif text-lg">A te státuszod</h2>
               <p className="text-xs text-muted-foreground">
-                Jelöld be a saját jogcímeidet. Egyszerre több is bejelölhető (pl. helyben lakó + állattartó).
+                Jelöld be a saját jogcímeidet. Egyszerre több is bejelölhető (pl. helyben lakó +
+                állattartó).
               </p>
               <ProfileFields
                 profile={claimant}
@@ -278,7 +324,12 @@ function NoticeDetailPage() {
           )}
 
           <div className="flex items-center justify-between mt-6">
-            <Button variant="outline" size="sm" disabled={step === 0} onClick={() => setStep(Math.max(0, step - 1))}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={step === 0}
+              onClick={() => setStep(Math.max(0, step - 1))}
+            >
               <ArrowLeft className="h-4 w-4 mr-1" /> Vissza
             </Button>
             {step < STEPS.length - 1 ? (
@@ -294,17 +345,32 @@ function NoticeDetailPage() {
         </Card>
 
         <p className="text-xs text-muted-foreground mt-4">
-          A számítás csak előzetes tájékoztatás — a jogosultság megállapítása a jegyző / mezőgazdasági igazgatási szerv hatáskörébe tartozik.
+          A számítás csak előzetes tájékoztatás — a jogosultság megállapítása a jegyző /
+          mezőgazdasági igazgatási szerv hatáskörébe tartozik.
         </p>
       </section>
     </PageShell>
   );
 }
 
-function CheckRow({ checked, onChange, title, desc }: { checked: boolean; onChange: (v: boolean) => void; title: string; desc: string }) {
+function CheckRow({
+  checked,
+  onChange,
+  title,
+  desc,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  title: string;
+  desc: string;
+}) {
   return (
     <label className="flex items-start gap-3 border rounded-md px-3 py-3 cursor-pointer hover:bg-muted/30">
-      <Checkbox checked={checked} onCheckedChange={(v) => onChange(v === true)} className="mt-0.5" />
+      <Checkbox
+        checked={checked}
+        onCheckedChange={(v) => onChange(v === true)}
+        className="mt-0.5"
+      />
       <div className="min-w-0">
         <div className="font-medium">{title}</div>
         <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
@@ -383,7 +449,11 @@ function ProfileFields({
       <CheckRow
         checked={profile.isCloseRelativeOfSeller}
         onChange={(v) => setProfile({ ...profile, isCloseRelativeOfSeller: v })}
-        title={role === "self" ? "Közeli hozzátartozó vagyok az eladóval/bérbeadóval" : "Az eladó/bérbeadó közeli hozzátartozója"}
+        title={
+          role === "self"
+            ? "Közeli hozzátartozó vagyok az eladóval/bérbeadóval"
+            : "Az eladó/bérbeadó közeli hozzátartozója"
+        }
         desc="Ptk. 8:1. § — kizárja az elővásárlási jog gyakorlását (46. § (5))."
       />
       <CheckRow
@@ -395,7 +465,9 @@ function ProfileFields({
       {branch === "forest" && (
         <>
           <Separator />
-          <p className="text-xs text-muted-foreground">Erdő esetén kiegészítő jogcímek (Evt., 2009. évi XXXVII. tv.):</p>
+          <p className="text-xs text-muted-foreground">
+            Erdő esetén kiegészítő jogcímek (Evt., 2009. évi XXXVII. tv.):
+          </p>
           <CheckRow
             checked={!!profile.forest?.isAdjacentForestOwner}
             onChange={(v) => setForest({ isAdjacentForestOwner: v })}
@@ -440,11 +512,23 @@ function ResultPanel({
   return (
     <div className="space-y-4 text-sm">
       <div className="flex items-start gap-3">
-        <div className={
-          "h-10 w-10 rounded-full flex items-center justify-center shrink-0 " +
-          (stronger ? "bg-primary/10 text-primary" : hasRank ? "bg-muted text-foreground" : "bg-destructive/10 text-destructive")
-        }>
-          {stronger ? <Trophy className="h-5 w-5" /> : hasRank ? <ShieldCheck className="h-5 w-5" /> : <ShieldAlert className="h-5 w-5" />}
+        <div
+          className={
+            "h-10 w-10 rounded-full flex items-center justify-center shrink-0 " +
+            (stronger
+              ? "bg-primary/10 text-primary"
+              : hasRank
+                ? "bg-muted text-foreground"
+                : "bg-destructive/10 text-destructive")
+          }
+        >
+          {stronger ? (
+            <Trophy className="h-5 w-5" />
+          ) : hasRank ? (
+            <ShieldCheck className="h-5 w-5" />
+          ) : (
+            <ShieldAlert className="h-5 w-5" />
+          )}
         </div>
         <div className="min-w-0">
           <h2 className="font-serif text-lg">
@@ -478,17 +562,22 @@ function ResultPanel({
         </AlertTitle>
         <AlertDescription>
           {stronger === true && (
-            <>Elfogadó nyilatkozattal beléphetsz a szerződésbe a 15 napos jogvesztő határidőn belül{deadline ? <> ({formatDate(deadline.toISOString())}-ig)</> : null}.</>
+            <>
+              Elfogadó nyilatkozattal beléphetsz a szerződésbe a 15 napos jogvesztő határidőn belül
+              {deadline ? <> ({formatDate(deadline.toISOString())}-ig)</> : null}.
+            </>
           )}
           {sameRank && (
-            <>Azonos ranghely esetén az elfogadó nyilatkozat csak akkor előzi meg a szerződő felet, ha azon belül erősebb alcsoportba tartozol — ezt a jegyző / mg-i igazgatási szerv bírálja el.</>
+            <>
+              Azonos ranghely esetén az elfogadó nyilatkozat csak akkor előzi meg a szerződő felet,
+              ha azon belül erősebb alcsoportba tartozol — ezt a jegyző / mg-i igazgatási szerv
+              bírálja el.
+            </>
           )}
           {!stronger && !sameRank && hasRank && partyRank !== null && (
             <>A szerződő fél ranghelye erősebb, így elfogadó nyilatkozattal nem léphetsz be.</>
           )}
-          {!hasRank && (
-            <>A megadott profillal nincs elővásárlási / előhaszonbérleti jogod.</>
-          )}
+          {!hasRank && <>A megadott profillal nincs elővásárlási / előhaszonbérleti jogod.</>}
         </AlertDescription>
       </Alert>
 
@@ -497,7 +586,9 @@ function ResultPanel({
           <AlertTitle>Figyelmeztetések</AlertTitle>
           <AlertDescription>
             <ul className="list-disc pl-5 space-y-1">
-              {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
+              {result.warnings.map((w, i) => (
+                <li key={i}>{w}</li>
+              ))}
             </ul>
           </AlertDescription>
         </Alert>
@@ -506,16 +597,19 @@ function ResultPanel({
       <div className="flex flex-wrap gap-2 pt-2">
         {stronger === true && (
           <Button asChild>
-            <Link to="/belepes">
-              <FileCheck2 className="h-4 w-4 mr-1" /> Elfogadó nyilatkozat (hamarosan)
+            <Link to="/elfogado-nyilatkozat">
+              <FileCheck2 className="h-4 w-4 mr-1" /> Elfogadó nyilatkozatot készítek
             </Link>
           </Button>
         )}
-        <Button variant="outline" onClick={onRestart}>Új számítás</Button>
+        <Button variant="outline" onClick={onRestart}>
+          Új számítás
+        </Button>
       </div>
 
       <p className="text-[11px] text-muted-foreground pt-2">
-        Szabálykészlet verzió: {result.rulesVersion} • Indoklás-kód: <code>{result.reasonCode}</code>
+        Szabálykészlet verzió: {result.rulesVersion} • Indoklás-kód:{" "}
+        <code>{result.reasonCode}</code>
       </p>
     </div>
   );
