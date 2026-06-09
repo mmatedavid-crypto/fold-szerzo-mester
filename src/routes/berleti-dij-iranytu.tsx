@@ -260,7 +260,6 @@ function PriceCompassPage() {
     return stats.filter((row) => row.county_name.toLowerCase().includes(needle));
   }, [search, stats]);
 
-  const maxTrimmedAverage = Math.max(0, ...stats.map((row) => row.avg_value ?? 0));
   const totalSamples = stats.reduce((sum, row) => sum + row.sample_count, 0);
   const latestObserved = stats
     .map((row) => row.latest_observed_at)
@@ -423,6 +422,13 @@ function PriceCompassPage() {
                         </TableCell>
                       </TableRow>
                     )}
+                    {activeCountyQuery.isLoading && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="py-10 text-center text-df-gray">
+                          Megyei árstatisztika betöltése…
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -441,7 +447,12 @@ function PriceCompassPage() {
                 </Badge>
               </div>
 
-              <CountyHeatmap stats={stats} mode={mode} maxTrimmedAverage={maxTrimmedAverage} />
+              <CountyHeatmap
+                stats={stats}
+                mode={mode}
+                loading={activeCountyQuery.isLoading}
+                emptyHint={copy.empty}
+              />
             </Card>
           </div>
 
@@ -467,6 +478,11 @@ function PriceCompassPage() {
                   Még nincs árpont. {copy.nextStep}
                 </div>
               )}
+              {activeObservationsQuery.isLoading && (
+                <div className="rounded-md border border-dashed border-df-border p-5 text-sm text-df-gray md:col-span-2 xl:col-span-3">
+                  Legutóbbi árpontok betöltése…
+                </div>
+              )}
             </div>
           </Card>
         </section>
@@ -478,10 +494,13 @@ function PriceCompassPage() {
 function CountyHeatmap({
   stats,
   mode,
+  loading,
+  emptyHint,
 }: {
   stats: CountyStat[];
   mode: CompassMode;
-  maxTrimmedAverage: number;
+  loading: boolean;
+  emptyHint: string;
 }) {
   const values: CountyValue[] = stats.map((row) => ({
     name: row.county_name,
@@ -497,6 +516,8 @@ function CountyHeatmap({
         values={values}
         unit={mode === "rent" ? "Ft / ha / év" : "Ft / ha"}
         formatLegendValue={(v) => formatUnitValue(v, mode)}
+        loading={loading}
+        emptyHint={emptyHint}
       />
     </div>
   );
@@ -605,7 +626,6 @@ function formatShortHuf(value: number): string {
   if (value >= 1000) return `${Math.round(value / 1000)}e Ft`;
   return formatHuf(value);
 }
-
 
 function valueOrNull(value: unknown): string | null {
   return typeof value === "string" && value ? value : null;

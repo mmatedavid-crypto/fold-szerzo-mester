@@ -42,6 +42,7 @@ export type HungaryCountyMapProps = {
   values: CountyValue[];
   unit: string;
   formatLegendValue: (value: number) => string;
+  loading?: boolean;
   lowSampleThreshold?: number;
   emptyHint?: string;
 };
@@ -93,6 +94,7 @@ export function HungaryCountyMap({
   values,
   unit,
   formatLegendValue,
+  loading = false,
   lowSampleThreshold = LOW_SAMPLE_DEFAULT,
   emptyHint,
 }: HungaryCountyMapProps) {
@@ -102,10 +104,7 @@ export function HungaryCountyMap({
     return m;
   }, [values]);
 
-  const max = useMemo(
-    () => Math.max(0, ...values.map((v) => v.avg ?? 0)),
-    [values],
-  );
+  const max = useMemo(() => Math.max(0, ...values.map((v) => v.avg ?? 0)), [values]);
 
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -119,6 +118,7 @@ export function HungaryCountyMap({
   const sorted = useMemo(() => {
     return [...values].sort((a, b) => (b.avg ?? -1) - (a.avg ?? -1));
   }, [values]);
+  const hasAnyData = values.some((v) => v.avg != null && v.samples > 0);
 
   return (
     <div ref={wrapRef} className="relative">
@@ -173,9 +173,7 @@ export function HungaryCountyMap({
               <g
                 key={county.name}
                 onMouseEnter={() => setHovered(county.name)}
-                onClick={() =>
-                  setSelected((prev) => (prev === county.name ? null : county.name))
-                }
+                onClick={() => setSelected((prev) => (prev === county.name ? null : county.name))}
                 style={{ cursor: "pointer" }}
               >
                 <path
@@ -187,8 +185,7 @@ export function HungaryCountyMap({
                   strokeLinecap="round"
                   style={{
                     transition: "fill 200ms ease, stroke 150ms ease",
-                    filter:
-                      isHover || isSel ? `url(#${patternId}-shadow)` : undefined,
+                    filter: isHover || isSel ? `url(#${patternId}-shadow)` : undefined,
                   }}
                   opacity={isBudapest ? 0.95 : 1}
                 >
@@ -208,26 +205,41 @@ export function HungaryCountyMap({
                     style={{ pointerEvents: "none" }}
                   />
                 )}
-                {/* Desktop county label only */}
                 {!isMobile && (
-                <text
-                  x={county.c[0]}
-                  y={county.c[1]}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fill={t > 0.55 ? "#FFFFFF" : "#1F2A22"}
-                  fontSize={isBudapest ? 8 : 9}
-                  fontWeight={600}
-                  className="pointer-events-none select-none"
-                  style={{ paintOrder: "stroke", stroke: t > 0.55 ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.6)", strokeWidth: 0.6 }}
-                >
-                  {shortLabel(county.name)}
-                </text>
+                  <text
+                    x={county.c[0]}
+                    y={county.c[1]}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill={t > 0.55 ? "#FFFFFF" : "#1F2A22"}
+                    fontSize={isBudapest ? 8 : 9}
+                    fontWeight={600}
+                    className="pointer-events-none select-none"
+                    style={{
+                      paintOrder: "stroke",
+                      stroke: t > 0.55 ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.6)",
+                      strokeWidth: 0.6,
+                    }}
+                  >
+                    {shortLabel(county.name)}
+                  </text>
                 )}
               </g>
             );
           })}
         </svg>
+
+        {(loading || !hasAnyData) && (
+          <div className="mt-3 rounded-xl border border-df-border bg-white/85 p-3 text-sm leading-5 text-df-gray">
+            <span className="font-semibold text-df-green">
+              {loading ? "Térképadatok betöltése…" : "A térkép készen áll."}
+            </span>{" "}
+            {loading
+              ? "A megyei trimmelt árstatisztikát kérjük le."
+              : (emptyHint ??
+                "Amint elég megbízható hirdetményi árpont érkezik, a vármegyék színezése automatikusan megjelenik.")}
+          </div>
+        )}
 
         {hoveredValue && hovered && mouse && (
           <div
@@ -265,8 +277,7 @@ export function HungaryCountyMap({
             <span
               className="inline-block h-3 w-3 rounded-sm border border-df-border"
               style={{
-                background:
-                  "repeating-linear-gradient(45deg,#F6F1E4 0 3px,#E1D9C0 3px 4px)",
+                background: "repeating-linear-gradient(45deg,#F6F1E4 0 3px,#E1D9C0 3px 4px)",
               }}
             />
             nincs adat
@@ -282,35 +293,34 @@ export function HungaryCountyMap({
       </div>
 
       {/* Selected detail */}
-      {selected && (() => {
-        const v = valueByCanonical.get(canonicalName(selected));
-        return (
-          <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-df-border bg-white p-3 shadow-sm">
-            <div>
-              <div className="text-xs uppercase tracking-wide text-df-gray">
-                Kiválasztott vármegye
+      {selected &&
+        (() => {
+          const v = valueByCanonical.get(canonicalName(selected));
+          return (
+            <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-df-border bg-white p-3 shadow-sm">
+              <div>
+                <div className="text-xs uppercase tracking-wide text-df-gray">
+                  Kiválasztott vármegye
+                </div>
+                <div className="mt-0.5 font-brand text-lg font-bold text-df-green">{selected}</div>
+                <div className="mt-1 font-brand text-2xl font-bold text-df-ink">
+                  {v?.formatted ?? "nincs adat"}
+                </div>
+                <div className="text-[11px] text-df-gray">
+                  {unit} · {v?.samples ?? 0} minta
+                  {v && v.samples < lowSampleThreshold ? " · kevés adat" : ""}
+                </div>
               </div>
-              <div className="mt-0.5 font-brand text-lg font-bold text-df-green">
-                {selected}
-              </div>
-              <div className="mt-1 font-brand text-2xl font-bold text-df-ink">
-                {v?.formatted ?? "nincs adat"}
-              </div>
-              <div className="text-[11px] text-df-gray">
-                {unit} · {v?.samples ?? 0} minta
-                {v && v.samples < lowSampleThreshold ? " · kevés adat" : ""}
-              </div>
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="text-xs text-df-gray hover:text-df-green"
+              >
+                Bezárás
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setSelected(null)}
-              className="text-xs text-df-gray hover:text-df-green"
-            >
-              Bezárás
-            </button>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       {/* Mobile-friendly sorted list (also useful on desktop as scannable view) */}
       <div className="mt-4">
@@ -318,53 +328,55 @@ export function HungaryCountyMap({
           <div className="text-xs font-semibold uppercase tracking-wide text-df-gray">
             Vármegyei rangsor
           </div>
-          {emptyHint && sorted.every((s) => s.avg == null) && (
+          {!loading && !hasAnyData && (
             <Badge variant="outline" className="border-df-yellow text-df-green">
-              {emptyHint}
+              adatgyűjtés alatt
             </Badge>
           )}
         </div>
         <ul className="divide-y divide-df-border/70 overflow-hidden rounded-xl border border-df-border bg-white">
-          {sorted.length === 0 && (
-            <li className="p-3 text-sm text-df-gray">Még nincs adat.</li>
+          {loading && <li className="p-3 text-sm text-df-gray">Vármegyei lista betöltése…</li>}
+          {!loading && sorted.length === 0 && (
+            <li className="p-3 text-sm text-df-gray">Még nincs megyei áradat.</li>
           )}
-          {sorted.map((row) => {
-            const t = max > 0 && row.avg ? row.avg / max : 0;
-            const low = row.samples > 0 && row.samples < lowSampleThreshold;
-            const has = row.avg != null && row.samples > 0;
-            return (
-              <li
-                key={row.name}
-                onClick={() =>
-                  setSelected((prev) => (prev === row.name ? null : row.name))
-                }
-                className={`flex cursor-pointer items-center gap-3 px-3 py-2 transition hover:bg-df-cream/60 ${
-                  selected === row.name ? "bg-df-cream/80" : ""
-                }`}
-              >
-                <span
-                  className="h-3 w-3 shrink-0 rounded-sm border border-df-border"
-                  style={{
-                    background: has ? scaleColor(t) : "repeating-linear-gradient(45deg,#F6F1E4 0 4px,#E1D9C0 4px 5px)",
-                  }}
-                />
-                <span className="min-w-0 flex-1 truncate text-sm font-medium text-df-ink">
-                  {row.name}
-                  {low && (
-                    <span className="ml-2 align-middle text-[10px] font-normal text-df-gray">
-                      kevés adat
-                    </span>
-                  )}
-                </span>
-                <span className="font-brand text-sm font-bold text-df-green">
-                  {has ? formatLegendValue(row.avg as number) : "—"}
-                </span>
-                <span className="w-14 text-right text-[11px] text-df-gray">
-                  {row.samples} minta
-                </span>
-              </li>
-            );
-          })}
+          {!loading &&
+            sorted.map((row) => {
+              const t = max > 0 && row.avg ? row.avg / max : 0;
+              const low = row.samples > 0 && row.samples < lowSampleThreshold;
+              const has = row.avg != null && row.samples > 0;
+              return (
+                <li
+                  key={row.name}
+                  onClick={() => setSelected((prev) => (prev === row.name ? null : row.name))}
+                  className={`flex cursor-pointer items-center gap-3 px-3 py-2 transition hover:bg-df-cream/60 ${
+                    selected === row.name ? "bg-df-cream/80" : ""
+                  }`}
+                >
+                  <span
+                    className="h-3 w-3 shrink-0 rounded-sm border border-df-border"
+                    style={{
+                      background: has
+                        ? scaleColor(t)
+                        : "repeating-linear-gradient(45deg,#F6F1E4 0 4px,#E1D9C0 4px 5px)",
+                    }}
+                  />
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-df-ink">
+                    {row.name}
+                    {low && (
+                      <span className="ml-2 align-middle text-[10px] font-normal text-df-gray">
+                        kevés adat
+                      </span>
+                    )}
+                  </span>
+                  <span className="font-brand text-sm font-bold text-df-green">
+                    {has ? formatLegendValue(row.avg as number) : "—"}
+                  </span>
+                  <span className="w-14 text-right text-[11px] text-df-gray">
+                    {row.samples} minta
+                  </span>
+                </li>
+              );
+            })}
         </ul>
       </div>
     </div>
