@@ -24,7 +24,7 @@ export interface NoticeFacts {
   settlement: string;
   /** A szerződő fél deklarált ranghelye (ha ismert) — 46. § (1)-(4). */
   contractingPartyRank?: number | null;
-  /** Speciális ági kizárások (pl. szőlő-ültetvény) — placeholder. */
+  /** Speciális ági jelzések és kizárási kockázatok (pl. szőlő-ültetvény). */
   cultivationBranchTags?: string[];
 }
 
@@ -88,7 +88,7 @@ export interface RankResult {
   reasonCode: RankReasonCode;
   /** Emberi olvasású indoklás magyarul (jogszabályi hivatkozással). */
   reason: string;
-  /** Figyelmeztetések (placeholder szabályok, hiányzó input, stb.). */
+  /** Figyelmeztetések (óvatos jogi ágak, hiányzó input, stb.). */
   warnings: string[];
   /** Erősebb-e mint a szerződő fél ranghelye. null, ha nem összehasonlítható. */
   strongerThanContractingParty: boolean | null;

@@ -83,6 +83,29 @@ export function compareLeaseRanks(input: {
     };
   }
 
+  if (landContext.mixedParcel && landContext.largerArea === "unknown") {
+    const user = evaluateLeaseRanks({ landContext, partyStatus: userStatus });
+    const lessee = evaluateLeaseRanks({ landContext, partyStatus: lesseeStatus });
+    const warnings = [
+      ...user.warnings,
+      ...lessee.warnings,
+      "Vegyes alrészletnél előbb tisztázni kell, hogy az erdő vagy a nem erdő rész a meghatározó. Addig nem adunk erős ranghely-állítást.",
+    ];
+    return {
+      user,
+      lessee,
+      exceptionsActive: [],
+      warnings: Array.from(new Set(warnings)),
+      comparison: "cannot_determine",
+      explanation:
+        "Vegyes alrészletnél nem állapítható meg biztonsággal a ranghely, amíg nem ismert, hogy az erdő vagy a termőföld rész a meghatározó.",
+      userStrongestRank: user.strongestRank,
+      lesseeStrongestRank: lessee.strongestRank,
+      requiredProofs: [],
+      missingConditions: ["Tisztázni kell, hogy a vegyes alrészletben melyik területrész nagyobb"],
+    };
+  }
+
   const lessee = evaluateLeaseRanks({ landContext, partyStatus: lesseeStatus });
   const user = evaluateLeaseRanks({ landContext, partyStatus: userStatus });
 

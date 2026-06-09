@@ -104,6 +104,11 @@ export function evaluateLeaseRanks(input: {
   if (p.has_use_debt) {
     warnings.push("Földhasználati díjtartozás a jogcím érvényesítését akadályozhatja.");
   }
+  if (ctx.branch === "forest") {
+    warnings.push(
+      "Erdő esetén az Evt. szerinti speciális szabályok és erdészeti hatósági szempontok is számíthatnak. Az eredményt előzetes tájékoztatásként kezeld.",
+    );
+  }
   if (input.landContext.mixedParcel && input.landContext.largerArea === "unknown") {
     warnings.push(
       "Vegyes alrészlet — nem ismert melyik nagyobb. Az erdő/nem erdő szabálykészlet közötti választás bizonytalan.",

@@ -102,11 +102,19 @@ export function GuidedFlow({
                 label: "Termőföld",
               },
               { value: "forest", label: "Erdő" },
-              { value: "non_forest", label: "Gyep" },
+              { value: "gyep", label: "Gyep" },
               { value: "out_of_scope", label: "Kivett terület" },
             ]}
             onPick={(v) => {
-              setLand({ ...land, branch: v as "forest" | "non_forest" | "out_of_scope" });
+              if (v === "gyep") {
+                setLand({ ...land, branch: "non_forest", cultivationBranch: "ret" });
+              } else {
+                setLand({
+                  ...land,
+                  branch: v as "forest" | "non_forest" | "out_of_scope",
+                  cultivationBranch: undefined,
+                });
+              }
               next();
             }}
           />

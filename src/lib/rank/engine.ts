@@ -3,7 +3,7 @@
  *
  * Jogszabályi alap:
  *   - 2013. évi CXXII. tv. (Földforgalmi tv.) 46. § (1)-(4) — nem erdő.
- *   - 2009. évi XXXVII. tv. (Erdő tv., Evt.) — erdő, placeholder.
+ *   - 2009. évi XXXVII. tv. (Erdő tv., Evt.) — erdő, külön előzetes ág.
  *
  * Tervezési elvek:
  *   1) Erdő és nem-erdő logika SZIGORÚAN különválasztva.
@@ -11,15 +11,10 @@
  *   3) Azonos ranghelyen belüli "tiebreaker" sorrendet a `subRank` adja meg
  *      (kisebb = erősebb), de a publikus `rank` csak az integer ranghelyet adja vissza.
  *   4) Kizárások (közeli hozzátartozó, kivett alanyok) → null + warning.
- *   5) Külső jogszabályok (Evt., családi gazdaság tv.) → placeholder + warning.
+ *   5) Külső jogszabályok (Evt., családi gazdaság tv.) → külön figyelmeztetés.
  */
 
-import type {
-  ClaimantProfile,
-  NoticeFacts,
-  RankResult,
-  RankReasonCode,
-} from "./types";
+import type { ClaimantProfile, NoticeFacts, RankResult, RankReasonCode } from "./types";
 
 export const RANK_RULES_VERSION = "v1.0.0";
 
@@ -36,7 +31,7 @@ function buildResult(
   branch: NoticeFacts["branch"],
   warnings: string[],
   contractingPartyRank: number | null | undefined,
-  fallback: { reasonCode: RankReasonCode; reason: string }
+  fallback: { reasonCode: RankReasonCode; reason: string },
 ): RankResult {
   if (!best) {
     return {
@@ -73,7 +68,7 @@ function buildResult(
  * lenne-e ranghely.
  */
 function checkExclusions(
-  claimant: ClaimantProfile
+  claimant: ClaimantProfile,
 ): { excluded: true; reasonCode: RankReasonCode; reason: string } | { excluded: false } {
   if (claimant.isCloseRelativeOfSeller) {
     // 46. § (5) — a közeli hozzátartozóval kötött adásvétel mentes
@@ -105,7 +100,7 @@ function checkExclusions(
  *      a) családi gazdaság tagja, ha helyben lakó földműves,
  *      b) helyben lakó földműves,
  *      c) állattartó telepet üzemeltető helyben lakó földműves
- *         (rét/legelő esetén külön preferencia — TODO külön branch tag).
+ *         (rét/legelő esetén külön figyelmeztetéssel).
  *   2. ranghely — 46. § (2): helyben lakó földműves (más jogcímen).
  *   3. ranghely — 46. § (3): a település közigazgatási határán belül
  *      földhasználó földműves.
@@ -117,7 +112,7 @@ function checkExclusions(
 function evaluateNonForest(
   notice: NoticeFacts,
   claimant: ClaimantProfile,
-  warnings: string[]
+  warnings: string[],
 ): InternalRankCandidate | null {
   // Az összes nem-erdő szabály FÖLDMŰVES státuszt feltételez.
   if (!claimant.isFoldmuves) {
@@ -143,7 +138,7 @@ function evaluateNonForest(
   if (helybeliFoldmuves && claimant.isAllattarto) {
     if (notice.cultivationBranchTags?.some((t) => t === "ret" || t === "legelo")) {
       warnings.push(
-        "A művelési ág (rét/legelő) miatt az állattartó telepet üzemeltető helyben lakó földműves preferencia érvényesül — kérjük ellenőrizze a hatósági jóváhagyási kritériumokat (46. § (1) c))."
+        "A művelési ág (rét/legelő) miatt az állattartó telepet üzemeltető helyben lakó földműves preferencia érvényesül — kérjük ellenőrizze a hatósági jóváhagyási kritériumokat (46. § (1) c)).",
       );
     }
     candidates.push({
@@ -161,8 +156,7 @@ function evaluateNonForest(
       rank: 1,
       subRank: 3,
       reasonCode: "non_forest_46_1_b",
-      reason:
-        "1. ranghely — Földforgalmi tv. 46. § (1) bek. b) pont: helyben lakó földműves.",
+      reason: "1. ranghely — Földforgalmi tv. 46. § (1) bek. b) pont: helyben lakó földműves.",
     });
   }
 
@@ -175,8 +169,7 @@ function evaluateNonForest(
       rank: 2,
       subRank: 1,
       reasonCode: "non_forest_46_2",
-      reason:
-        "2. ranghely — Földforgalmi tv. 46. § (2) bek.: helyben lakó földműves.",
+      reason: "2. ranghely — Földforgalmi tv. 46. § (2) bek.: helyben lakó földműves.",
     });
   }
 
@@ -187,11 +180,7 @@ function evaluateNonForest(
     claimant.isTelepulesiFoldhasznalo
   ) {
     // Tiebreaker: jelenlegi (1) > szomszédos (2) > települési (3).
-    const sub = claimant.isJelenlegiFoldhasznalo
-      ? 1
-      : claimant.isSzomszedosFoldhasznalo
-        ? 2
-        : 3;
+    const sub = claimant.isJelenlegiFoldhasznalo ? 1 : claimant.isSzomszedosFoldhasznalo ? 2 : 3;
     candidates.push({
       rank: 3,
       subRank: sub,
@@ -206,8 +195,7 @@ function evaluateNonForest(
     rank: 4,
     subRank: 1,
     reasonCode: "non_forest_46_4",
-    reason:
-      "4. ranghely — Földforgalmi tv. 46. § (4) bek.: földműves.",
+    reason: "4. ranghely — Földforgalmi tv. 46. § (4) bek.: földműves.",
   });
 
   // Legerősebb: kisebb rank, majd kisebb subRank.
@@ -216,25 +204,22 @@ function evaluateNonForest(
 }
 
 /**
- * Erdő ág: Evt. szerinti speciális jogok — PLACEHOLDER.
- * A részletes szabálykészlet egy későbbi sprintben kerül modellezésre.
- * Most: ha bármely erdő-jogcímet bejelölt a felhasználó, 4. ranghelyet kap
- * és warning-ot, hogy a hatósági jóváhagyás során a részleteket ellenőrizni kell.
+ * Erdő ág: Evt. szerinti speciális jogok — előzetes, óvatos becslés.
+ * Ha bármely erdő-jogcímet bejelölt a felhasználó, előzetes ranghelyet kap
+ * és figyelmeztetést, hogy a hatósági jóváhagyás során a részleteket ellenőrizni kell.
  */
 function evaluateForest(
   _notice: NoticeFacts,
   claimant: ClaimantProfile,
-  warnings: string[]
+  warnings: string[],
 ): InternalRankCandidate | null {
   warnings.push(
-    "Erdő esetén az elővásárlási / előhaszonbérleti jog részletes szabályait az Evt. (2009. évi XXXVII. tv.) tartalmazza. A jelenlegi szabálykészlet csak előzetes tájékoztatást ad — végleges álláspontot az erdészeti hatóság ad."
+    "Erdő esetén az elővásárlási / előhaszonbérleti jog részletes szabályait az Evt. (2009. évi XXXVII. tv.) tartalmazza. A jelenlegi szabálykészlet csak előzetes tájékoztatást ad — végleges álláspontot az erdészeti hatóság ad.",
   );
 
   const forest = claimant.forest ?? {};
   const hasAny =
-    forest.isCommonForestOwner ||
-    forest.isAdjacentForestOwner ||
-    forest.isForestryProfessional;
+    forest.isCommonForestOwner || forest.isAdjacentForestOwner || forest.isForestryProfessional;
 
   if (!hasAny) {
     return null;
@@ -252,10 +237,7 @@ function evaluateForest(
 /**
  * Fő belépési pont.
  */
-export function computeRank(
-  notice: NoticeFacts,
-  claimant: ClaimantProfile
-): RankResult {
+export function computeRank(notice: NoticeFacts, claimant: ClaimantProfile): RankResult {
   const warnings: string[] = [];
 
   // 1. Kizárások — minden ág előtt.
