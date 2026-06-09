@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { BrandBadge, StampBadge } from "@/components/brand/brand-elements";
 import {
   composeAcceptanceStatement,
   type AcceptanceInput,
@@ -75,67 +75,78 @@ function AcceptancePage() {
 
   return (
     <PageShell>
-      <section className="container mx-auto max-w-7xl px-4 py-10 md:py-14">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr,1.05fr]">
-          <div>
-            <Badge className="border-df-yellow bg-df-yellow/15 text-df-green" variant="outline">
-              Nem trükk. Ranghely.
-            </Badge>
-            <div className="mt-4 flex items-center gap-3">
-              <FileSignature className="h-8 w-8 text-primary" />
-              <h1 className="font-serif text-3xl md:text-5xl">Elfogadó nyilatkozat előkészítése</h1>
-            </div>
-            <p className="mt-4 max-w-3xl text-muted-foreground">
-              Ha már tudod, melyik kifüggesztésre akarsz belépni, itt közvetlenül is elindíthatod.
-              Add meg a konkrét hirdetményt, a jogalapodat, a törvény szerinti ranghelyedet és az
-              igazolásokat.
-            </p>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Button asChild variant="outline" className="justify-start">
-                <Link to="/kifuggesztesek">
-                  <Search className="h-4 w-4" /> Kifüggesztést keresek
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="justify-start">
-                <Link to="/ranghely-kalkulator">
-                  <Sparkles className="h-4 w-4" /> Ranghelyet ellenőrzök
-                </Link>
-              </Button>
-            </div>
-
-            <Card className="mt-6 border-destructive/30 bg-destructive/5 p-5">
-              <div className="flex gap-3">
-                <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
-                <p className="text-sm text-muted-foreground">
-                  A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás, nem ügyvédi iroda.
-                  Egyedi, vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.
-                </p>
+      <section className="border-b border-df-border bg-gradient-to-b from-df-card to-df-cream/70">
+        <div className="container mx-auto max-w-7xl px-4 py-10 md:py-14">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr,1.05fr]">
+            <div>
+              <BrandBadge>Nem trükk. Ranghely.</BrandBadge>
+              <div className="mt-4 flex items-center gap-3">
+                <span className="grid h-12 w-12 place-items-center rounded-md border border-df-border bg-df-card text-df-green">
+                  <FileSignature className="h-7 w-7" />
+                </span>
+                <h1 className="font-brand text-4xl font-bold leading-tight text-df-green md:text-6xl">
+                  Elfogadó nyilatkozat előkészítése
+                </h1>
               </div>
+              <p className="mt-4 max-w-3xl text-base leading-7 text-df-gray md:text-lg">
+                Ha már tudod, melyik kifüggesztésre akarsz belépni, itt közvetlenül is elindíthatod.
+                Add meg a konkrét hirdetményt, a jogalapodat, a törvény szerinti ranghelyedet és az
+                igazolásokat.
+              </p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="justify-start border-df-green text-df-green"
+                >
+                  <Link to="/kifuggesztesek">
+                    <Search className="h-4 w-4" /> Kifüggesztést keresek
+                  </Link>
+                </Button>
+                <Button asChild className="justify-start bg-df-green text-white hover:bg-[#173B2A]">
+                  <Link to="/ranghely-kalkulator">
+                    <Sparkles className="h-4 w-4" /> Ranghelyet ellenőrzök
+                  </Link>
+                </Button>
+              </div>
+
+              <Card className="mt-6 border-df-red/40 bg-df-red/10 p-5">
+                <div className="flex gap-3">
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-df-red" />
+                  <p className="text-sm leading-6 text-df-ink">
+                    A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás, nem ügyvédi iroda.
+                    Egyedi, vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.
+                  </p>
+                </div>
+              </Card>
+            </div>
+
+            <Card className="df-dark-card relative overflow-hidden border-df-green p-6 text-df-card shadow-[0_18px_45px_rgba(26,26,26,0.14)]">
+              <StampBadge className="absolute right-5 top-5 border-df-yellow text-df-yellow">
+                Időben lépj
+              </StampBadge>
+              <div className="flex items-center gap-2 pr-28 font-semibold text-df-cream">
+                <CheckCircle2 className="h-5 w-5 text-df-yellow" />
+                Akkor indulj innen, ha ezek megvannak
+              </div>
+              <ul className="mt-5 grid gap-3 text-sm text-df-cream sm:grid-cols-2">
+                <li>Kifüggesztett szerződés azonosítója</li>
+                <li>15 napos jogvesztő határidő</li>
+                <li>Jogalap és törvény szerinti ranghely</li>
+                <li>Igazoló okiratok listája</li>
+                <li>Benyújtás helye és időpontja</li>
+                <li>Aláírás, tanúk vagy hiteles forma</li>
+              </ul>
             </Card>
           </div>
-
-          <Card className="border-primary/20 bg-primary p-6 text-primary-foreground">
-            <div className="flex items-center gap-2 font-medium">
-              <CheckCircle2 className="h-5 w-5" />
-              Akkor indulj innen, ha ezek megvannak
-            </div>
-            <ul className="mt-4 grid gap-2 text-sm text-primary-foreground/90 sm:grid-cols-2">
-              <li>Kifüggesztett szerződés azonosítója</li>
-              <li>15 napos jogvesztő határidő</li>
-              <li>Jogalap és törvény szerinti ranghely</li>
-              <li>Igazoló okiratok listája</li>
-              <li>Benyújtás helye és időpontja</li>
-              <li>Aláírás, tanúk vagy hiteles forma</li>
-            </ul>
-          </Card>
         </div>
       </section>
 
       <section className="container mx-auto grid max-w-7xl gap-6 px-4 pb-12 lg:grid-cols-[0.95fr,1.05fr]">
         <div className="space-y-4">
-          <Card className="p-5">
-            <h2 className="font-serif text-2xl">1. Kifüggesztés</h2>
+          <Card className="border-df-border bg-df-card p-5 shadow-sm">
+            <h2 className="font-brand text-2xl font-bold text-df-green">1. Kifüggesztés</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field label="Hirdetmény / ügy azonosító">
                 <Input
@@ -175,8 +186,8 @@ function AcceptancePage() {
             </Field>
           </Card>
 
-          <Card className="p-5">
-            <h2 className="font-serif text-2xl">2. Nyilatkozattevő</h2>
+          <Card className="border-df-border bg-df-card p-5 shadow-sm">
+            <h2 className="font-brand text-2xl font-bold text-df-green">2. Nyilatkozattevő</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field label="Név / megnevezés">
                 <Input
@@ -218,8 +229,10 @@ function AcceptancePage() {
             </div>
           </Card>
 
-          <Card className="p-5">
-            <h2 className="font-serif text-2xl">3. Jogalap és igazolások</h2>
+          <Card className="border-df-border bg-df-card p-5 shadow-sm">
+            <h2 className="font-brand text-2xl font-bold text-df-green">
+              3. Jogalap és igazolások
+            </h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field label="Megjelölt jogalap">
                 <Input
@@ -262,8 +275,8 @@ function AcceptancePage() {
             </Field>
           </Card>
 
-          <Card className="p-5">
-            <h2 className="font-serif text-2xl">4. Keltezés és tanúk</h2>
+          <Card className="border-df-border bg-df-card p-5 shadow-sm">
+            <h2 className="font-brand text-2xl font-bold text-df-green">4. Keltezés és tanúk</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <Field label="Benyújtás napja">
                 <Input
@@ -316,30 +329,40 @@ function AcceptancePage() {
         </div>
 
         <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          <Card className="p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="font-serif text-2xl">Nyilatkozat előnézet</h2>
-                <p className="text-sm text-muted-foreground">Élőben frissül az adatok alapján.</p>
+          <Card className="overflow-hidden border-df-border bg-df-card shadow-[0_18px_45px_rgba(26,26,26,0.10)]">
+            <div className="df-dark-card p-5 text-df-card">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-df-yellow">
+                    Dokumentum előnézet
+                  </div>
+                  <h2 className="mt-2 font-brand text-2xl font-bold">Nyilatkozat előnézet</h2>
+                  <p className="mt-1 text-sm text-df-cream">Élőben frissül az adatok alapján.</p>
+                </div>
+                <Button
+                  onClick={copyDocument}
+                  className="gap-2 bg-df-card text-df-green hover:bg-df-cream"
+                >
+                  <ClipboardCopy className="h-4 w-4" />
+                  Szöveg másolása
+                </Button>
               </div>
-              <Button onClick={copyDocument} className="gap-2">
-                <ClipboardCopy className="h-4 w-4" />
-                Szöveg másolása
-              </Button>
             </div>
-            {composition.warnings.length > 0 && (
-              <div className="mt-4 rounded-md border border-df-yellow/60 bg-df-yellow/10 p-4">
-                <div className="font-medium text-df-ink">Még ellenőrizd</div>
-                <ul className="mt-2 space-y-1 text-sm text-df-gray">
-                  {composition.warnings.map((warning) => (
-                    <li key={warning}>- {warning}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <pre className="mt-4 max-h-[720px] overflow-auto whitespace-pre-wrap rounded-md border bg-df-card p-4 text-sm leading-6 text-df-ink">
-              {documentText}
-            </pre>
+            <div className="p-5">
+              {composition.warnings.length > 0 && (
+                <div className="mt-4 rounded-md border border-df-yellow/60 bg-df-yellow/10 p-4">
+                  <div className="font-medium text-df-ink">Még ellenőrizd</div>
+                  <ul className="mt-2 space-y-1 text-sm text-df-gray">
+                    {composition.warnings.map((warning) => (
+                      <li key={warning}>- {warning}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <pre className="mt-4 max-h-[720px] overflow-auto whitespace-pre-wrap rounded-md border border-df-border bg-white p-4 text-sm leading-6 text-df-ink">
+                {documentText}
+              </pre>
+            </div>
           </Card>
         </div>
       </section>
