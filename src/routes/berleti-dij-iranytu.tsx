@@ -606,20 +606,6 @@ function formatShortHuf(value: number): string {
   return formatHuf(value);
 }
 
-function formatMapValue(value: number | null | undefined): string {
-  if (value == null) return "nincs adat";
-  if (value >= 1000000) return `${(value / 1000000).toFixed(value >= 10000000 ? 0 : 1)}M`;
-  if (value >= 1000) return `${Math.round(value / 1000)}e`;
-  return String(Math.round(value));
-}
-
-function heatColor(intensity: number): string {
-  if (intensity <= 0) return "#FFFDF7";
-  if (intensity < 0.25) return "#DDE8D2";
-  if (intensity < 0.5) return "#95B985";
-  if (intensity < 0.75) return "#4F8057";
-  return "#1F4D37";
-}
 
 function valueOrNull(value: unknown): string | null {
   return typeof value === "string" && value ? value : null;
