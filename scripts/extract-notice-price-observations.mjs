@@ -425,6 +425,7 @@ function buildObservations(notice, text, sourceAttachmentUrl) {
   const rent = normalizeRent(text, areaHa);
   const sale = normalizeSalePrice(text, areaHa);
   const settlement = notice.settlement || extractSettlement(text);
+  const cultivationBranch = notice.cultivation_branch || extractCultivationBranch(text);
   const category = String(
     notice.normalized_notice_category || notice.notice_type || "",
   ).toLowerCase();
@@ -443,7 +444,7 @@ function buildObservations(notice, text, sourceAttachmentUrl) {
             municipality: notice.municipality,
             publication_date: notice.publication_date,
             area_ha: areaHa,
-            cultivation_branch: notice.cultivation_branch,
+            cultivation_branch: cultivationBranch,
             rent_raw: rent.rentRaw || excerptAroundPrice(text),
             rent_total_huf_year: rent.rentTotalHufYear,
             rent_huf_per_ha_year: rent.rentHufPerHaYear,
@@ -473,7 +474,7 @@ function buildObservations(notice, text, sourceAttachmentUrl) {
             municipality: notice.municipality,
             publication_date: notice.publication_date,
             area_ha: areaHa,
-            cultivation_branch: notice.cultivation_branch,
+            cultivation_branch: cultivationBranch,
             price_raw: sale.priceRaw || excerptAroundPrice(text),
             price_total_huf: sale.priceTotalHuf,
             price_huf_per_ha: sale.priceHufPerHa,
@@ -520,9 +521,19 @@ async function updateNoticePriceFields(notice, observations) {
     patch.area_ha = rent?.area_ha || sale?.area_ha;
   }
 
+  const sourceRow = rent || sale;
+  if (sourceRow?.settlement && !notice.settlement) {
+    patch.settlement = sourceRow.settlement;
+  }
+  if (sourceRow?.county && !notice.county) {
+    patch.county = sourceRow.county;
+  }
+  if (sourceRow?.cultivation_branch && !notice.cultivation_branch) {
+    patch.cultivation_branch = sourceRow.cultivation_branch;
+  }
+
   if (rent) {
     patch.rent_raw = rent.rent_raw;
-    patch.rent_total_huf_year = rent.rent_total_huf_year;
     patch.rent_normalized_huf_per_ha_year = rent.rent_huf_per_ha_year;
     patch.rent_unit = rent.rent_unit;
   }
@@ -531,7 +542,6 @@ async function updateNoticePriceFields(notice, observations) {
     patch.price_raw = sale.price_raw;
     patch.price_total_huf = sale.price_total_huf;
     patch.price_normalized_huf_per_ha = sale.price_huf_per_ha;
-    patch.price_unit = sale.price_unit;
   }
 
   const { error } = await supabase.from("notices").update(patch).eq("id", notice.id);
@@ -684,6 +694,14 @@ function extractSettlement(text) {
   return (
     text.match(/foldreszlet\.telepules\d*:\s*([^\n]+)/i)?.[1]?.trim() ||
     text.match(/telep[üu]l[ée]s\d*:\s*([^\n]+)/i)?.[1]?.trim() ||
+    null
+  );
+}
+
+function extractCultivationBranch(text) {
+  return (
+    text.match(/foldreszlet\.muvelesi_ag\d*:\s*([^\n]+)/i)?.[1]?.trim() ||
+    text.match(/m[űu]vel[ée]si [áa]g\d*:\s*([^\n]+)/i)?.[1]?.trim() ||
     null
   );
 }

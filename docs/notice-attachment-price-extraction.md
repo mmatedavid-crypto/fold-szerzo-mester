@@ -32,14 +32,15 @@ DRY_RUN=1 PRICE_EXTRACT_LIMIT=20 npm run notices:extract-prices
 4. In normal write mode, the script updates normalized fields on `notices`:
 
 - `area_ha`
+- `settlement`
+- `county`
+- `cultivation_branch`
 - `rent_raw`
-- `rent_total_huf_year`
 - `rent_normalized_huf_per_ha_year`
 - `rent_unit`
 - `price_raw`
 - `price_total_huf`
 - `price_normalized_huf_per_ha`
-- `price_unit`
 
 5. Production triggers then write:
 
