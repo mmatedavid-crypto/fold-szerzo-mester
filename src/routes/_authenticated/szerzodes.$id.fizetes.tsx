@@ -12,7 +12,14 @@ import { getCheckoutAvailability, startCheckout } from "@/lib/payments/checkout.
 import { formatHuf } from "@/lib/format";
 import { toast } from "sonner";
 import { paymentErrorMessage } from "@/lib/user-facing-errors";
-import { ArrowRight, CheckCircle2, CreditCard, FileCheck2 } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  CreditCard,
+  FileCheck2,
+  Loader2,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/fizetes")({
   head: () => ({ meta: [{ title: "Fizetés és véglegesítés | Dr Föld" }] }),
@@ -64,6 +71,9 @@ function PayPage() {
   const hasAny = hasCredit || hasSubQuota;
   const checkoutEnabled = checkoutAvailability.data?.enabled ?? false;
   const mockCheckoutActive = checkoutAvailability.data?.provider === "mock";
+  const plansLoading = plans.isLoading || checkoutAvailability.isLoading;
+  const paymentSetupProblem = plans.isError || checkoutAvailability.isError;
+  const visiblePlans = plans.data ?? [];
 
   return (
     <PageShell>
@@ -79,7 +89,26 @@ function PayPage() {
             A végleges PDF csak sikeres fizetés vagy elérhető előfizetési keret felhasználása után
             készül el. A szerződés a megadott felekhez és helyrajzi számokhoz kötött.
           </p>
+          <div className="mt-5 grid gap-3 text-sm text-df-gray md:grid-cols-3">
+            <TrustChip text="A PDF csak véglegesítés után készül el." />
+            <TrustChip text="A keret felhasználását külön jelöljük." />
+            <TrustChip text="Vitás ügyben ügyvédi ellenőrzés javasolt." />
+          </div>
         </div>
+
+        {quota.isLoading && (
+          <Card className="mt-6 border-df-border bg-df-card p-5 text-sm text-df-gray shadow-sm">
+            <Loader2 className="mr-2 inline h-4 w-4 animate-spin text-df-green" />
+            Elérhető kreditek és előfizetési keret ellenőrzése…
+          </Card>
+        )}
+
+        {quota.isError && (
+          <Card className="mt-6 border-df-yellow bg-df-yellow/10 p-5 text-sm leading-6 text-df-ink shadow-sm">
+            Most nem látjuk biztosan, van-e elérhető kereted. Új vásárlást lent indíthatsz, vagy
+            próbáld újra az oldal frissítésével.
+          </Card>
+        )}
 
         {hasAny && (
           <Card className="mt-6 border-df-green bg-df-card p-6 shadow-[0_18px_45px_rgba(31,77,55,0.14)]">
@@ -140,26 +169,57 @@ function PayPage() {
               fizetést, vagy állíts be valódi fizetési szolgáltatót.
             </div>
           )}
+          {paymentSetupProblem && (
+            <div className="mt-4 flex gap-3 rounded-md border border-df-red/40 bg-df-red/10 p-3 text-sm text-df-ink">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-df-red" />
+              <p>
+                A fizetési csomagok vagy az online fizetés állapota most nem töltött be biztosan. Ha
+                van elérhető kereted, a véglegesítés továbbra is használható.
+              </p>
+            </div>
+          )}
           <div className="mt-4 grid gap-3 md:grid-cols-3">
-            {(plans.data ?? []).map((p) => (
-              <div key={p.id} className="rounded-md border border-df-border bg-df-cream/60 p-4">
-                <div className="font-semibold text-df-green">{p.name}</div>
-                <div className="mt-1 font-brand text-2xl font-bold text-df-ink">
-                  {formatHuf(p.monthly_price_huf)}
-                </div>
-                <div className="mt-1 text-xs leading-5 text-df-gray">{p.description}</div>
-                <Button
-                  className="mt-3 w-full bg-df-green text-white hover:bg-[#173B2A]"
-                  disabled={busy || !checkoutEnabled}
-                  onClick={() => onBuy(p.slug as "single" | "gazda" | "pro")}
-                >
-                  {p.slug === "single" ? "Megveszem" : "Előfizetek"}
-                </Button>
+            {plansLoading && (
+              <div className="rounded-md border border-df-border bg-df-cream/60 p-4 text-sm text-df-gray md:col-span-3">
+                <Loader2 className="mr-2 inline h-4 w-4 animate-spin text-df-green" />
+                Csomagok és fizetési állapot betöltése…
               </div>
-            ))}
+            )}
+            {!plansLoading && visiblePlans.length === 0 && (
+              <div className="rounded-md border border-dashed border-df-border p-4 text-sm leading-6 text-df-gray md:col-span-3">
+                Most nincs megjeleníthető vásárlási csomag. Ha van kereted, fent véglegesíthetsz; ha
+                nincs, nézz vissza később vagy folytasd a vázlat ellenőrzését.
+              </div>
+            )}
+            {!plansLoading &&
+              visiblePlans.map((p) => (
+                <div key={p.id} className="rounded-md border border-df-border bg-df-cream/60 p-4">
+                  <div className="font-semibold text-df-green">{p.name}</div>
+                  <div className="mt-1 font-brand text-2xl font-bold text-df-ink">
+                    {formatHuf(p.monthly_price_huf)}
+                  </div>
+                  <div className="mt-1 text-xs leading-5 text-df-gray">{p.description}</div>
+                  <Button
+                    className="mt-3 w-full bg-df-green text-white hover:bg-[#173B2A]"
+                    disabled={busy || !checkoutEnabled}
+                    onClick={() => onBuy(p.slug as "single" | "gazda" | "pro")}
+                  >
+                    {p.slug === "single" ? "Megveszem" : "Előfizetek"}
+                  </Button>
+                </div>
+              ))}
           </div>
         </Card>
       </section>
     </PageShell>
+  );
+}
+
+function TrustChip({ text }: { text: string }) {
+  return (
+    <div className="flex gap-2 rounded-md border border-df-border bg-df-card p-3">
+      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-df-green" />
+      <span>{text}</span>
+    </div>
   );
 }
