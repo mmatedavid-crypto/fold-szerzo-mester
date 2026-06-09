@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { CookieBanner } from "@/components/legal/cookie-banner";
+import { company } from "@/lib/company";
 
 function NotFoundComponent() {
   return (
@@ -79,42 +80,40 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#1F4D37" },
       { title: "Dr Föld | Ha előrébb állsz, ne maradj hátul." },
       {
         name: "description",
         content:
           "Dr Föld ranghely-kalkulátor, kifüggesztés kereső és földbérleti szerződés-előkészítés magyar gazdáknak.",
       },
-      { name: "author", content: "Dr Föld" },
+      { name: "author", content: company.brandName },
       { property: "og:title", content: "Dr Föld | Ha előrébb állsz, ne maradj hátul." },
       {
         property: "og:description",
         content: "Ravasz a gazda. Nézd meg, hol állsz a ranghelyben, és lépj időben.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:site_name", content: company.brandName },
+      { property: "og:locale", content: "hu_HU" },
+      { property: "og:image", content: `${company.websiteUrl}/og/drfold-og.svg` },
+      { property: "og:image:alt", content: "Dr Föld — Ravasz a gazda" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Dr Föld | Ha előrébb állsz, ne maradj hátul." },
-      {
-        property: "og:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/hi1om8j0elZ5DuxO0fCooVpBb7O2/social-images/social-1780872566645-Image_3.webp",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/hi1om8j0elZ5DuxO0fCooVpBb7O2/social-images/social-1780872566645-Image_3.webp",
-      },
       {
         name: "twitter:description",
         content:
           "Dr Föld segít gazdáknak és földtulajdonosoknak kifüggesztéseket figyelni, előhaszonbérleti ranghelyet ellenőrizni, elfogadó nyilatkozatot és földbérleti szerződést készíteni.",
       },
+      { name: "twitter:image", content: `${company.websiteUrl}/og/drfold-og.svg` },
+      { name: "twitter:image:alt", content: "Dr Föld — Ravasz a gazda" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     ],
   }),
   shellComponent: RootShell,

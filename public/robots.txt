@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://drfold.hu/sitemap.xml
