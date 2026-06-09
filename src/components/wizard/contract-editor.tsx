@@ -12,7 +12,7 @@ import { updateDraft } from "@/lib/contracts/drafts.functions";
 import type { Draft, Parcel, Lessor, Lessee, Rent, Term, PreLease, ClausesSelection } from "@/lib/contracts/types";
 import { WizardStepper } from "./wizard-stepper";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { ArrowRight, FileText, Plus, Save, ShieldCheck, Trash2 } from "lucide-react";
 
 const STEPS = [
   "Felek", "Földterület", "Időtartam", "Díj", "Előhaszonbérlet", "Klauzulák",
@@ -111,15 +111,35 @@ export function ContractEditor({ draft }: { draft: Draft }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <WizardStepper steps={STEPS} current={0} />
-        <div className="text-xs text-muted-foreground">{saving ? "Mentés…" : "Automatikus mentés bekapcsolva"}</div>
-      </div>
-
-      <div>
-        <Label htmlFor="title">Szerződés címe (belső)</Label>
-        <Input id="title" value={state.title} onChange={(e) => set("title", e.target.value)} />
-      </div>
+      <Card className="overflow-hidden border-df-border bg-df-card shadow-[0_18px_45px_rgba(26,26,26,0.08)]">
+        <div className="df-dark-card p-5 text-df-card md:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-df-yellow">
+                <FileText className="h-4 w-4" />
+                Földbérleti szerződés
+              </div>
+              <h1 className="mt-3 font-brand text-3xl font-bold leading-tight md:text-4xl">
+                Szerződés-előkészítés rendben, lépésről lépésre.
+              </h1>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-df-cream">
+                Add meg a feleket, a föld adatait, a díjat és a feltételeket. A Dr Föld segít rendezett szerződés-előkészítő dokumentumot összerakni.
+              </p>
+            </div>
+            <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${saving ? "border-df-yellow bg-df-yellow/15 text-df-yellow" : "border-df-cream/40 bg-df-card/10 text-df-cream"}`}>
+              <Save className="h-3.5 w-3.5" />
+              {saving ? "Mentés folyamatban" : "Automatikus mentés aktív"}
+            </div>
+          </div>
+        </div>
+        <div className="space-y-5 p-5 md:p-6">
+          <WizardStepper steps={STEPS} current={0} />
+          <div className="max-w-xl rounded-md border border-df-border bg-white/70 p-4">
+            <Label htmlFor="title" className="text-xs font-bold uppercase tracking-[0.14em] text-df-gray">Szerződés címe belső használatra</Label>
+            <Input id="title" className="mt-2 border-df-border bg-white font-semibold text-df-ink" value={state.title} onChange={(e) => set("title", e.target.value)} />
+          </div>
+        </div>
+      </Card>
 
       {/* Step 1: Felek */}
       <Card className="p-6">
@@ -476,14 +496,22 @@ export function ContractEditor({ draft }: { draft: Draft }) {
         </div>
       </Card>
 
-      <Separator />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-muted-foreground max-w-md">
-          A végleges dokumentum csak fizetés után érhető el. A szerződés a megadott felekhez és helyrajzi számokhoz kötött.
-        </p>
-        <div className="flex gap-2">
-          <Button asChild variant="ghost"><Link to="/dashboard">Mentés és bezárás</Link></Button>
-          <Button onClick={onCheck}>Tovább a jogi kockázati ellenőrzéshez</Button>
+      <Separator className="bg-df-border" />
+      <div className="rounded-lg border border-df-border bg-df-card p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex max-w-2xl gap-3 text-sm leading-6 text-df-gray">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-df-green" />
+            <p>
+              A végleges dokumentum fizetés után érhető el, és a megadott felekhez, helyrajzi számokhoz kötött. A Dr Föld szerződés-előkészítő dokumentumot készít; egyedi, vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.
+            </p>
+          </div>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button asChild variant="outline" className="border-df-green text-df-green"><Link to="/dashboard">Mentés és bezárás</Link></Button>
+            <Button onClick={onCheck} className="bg-df-green text-white hover:bg-[#173B2A]">
+              Tovább az ellenőrzéshez
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
