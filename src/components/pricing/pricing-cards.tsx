@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatHuf } from "@/lib/format";
@@ -40,27 +40,53 @@ export function PricingCards({ plans }: { plans: Plan[] }) {
       {plans.map((p) => {
         const isPopular = p.slug === "gazda";
         return (
-          <Card key={p.id} className={`p-6 flex flex-col ${isPopular ? "border-primary border-2 shadow-lg" : ""}`}>
+          <Card
+            key={p.id}
+            className={`flex flex-col border-df-border bg-df-card p-6 shadow-sm ${
+              isPopular ? "border-df-green shadow-[0_18px_45px_rgba(31,77,55,0.16)]" : ""
+            }`}
+          >
             {isPopular && (
-              <div className="text-xs font-medium text-primary mb-2">★ Legnépszerűbb</div>
+              <div className="mb-3 w-fit rounded-full border border-df-yellow bg-df-yellow/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-df-green">
+                Legnépszerűbb
+              </div>
             )}
-            <h3 className="font-serif text-2xl">{p.name}</h3>
+            <h3 className="font-brand text-2xl font-bold text-df-green">{p.name}</h3>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-3xl font-semibold">{formatHuf(p.monthly_price_huf)}</span>
-              {p.slug !== "single" && <span className="text-sm text-muted-foreground">/ hó</span>}
+              <span className="font-brand text-4xl font-bold text-df-ink">
+                {formatHuf(p.monthly_price_huf)}
+              </span>
+              {p.slug !== "single" && <span className="text-sm text-df-gray">/ hó</span>}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{p.price_label}</p>
-            <p className="mt-3 text-sm text-muted-foreground">{p.description}</p>
-            <ul className="mt-4 space-y-2 text-sm flex-1">
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-df-gray">
+              {p.price_label}
+            </p>
+            <p className="mt-3 text-sm leading-6 text-df-gray">{p.description}</p>
+            <div className="mt-4 rounded-md border border-df-border bg-df-cream/60 p-3 text-sm text-df-ink">
+              {p.annual_quota === 1
+                ? "1 dokumentumcsomag"
+                : `${p.annual_quota} dokumentum / év keret`}
+            </div>
+            <ul className="mt-4 flex-1 space-y-2 text-sm text-df-ink">
               {(featuresBySlug[p.slug] ?? []).map((f) => (
                 <li key={f} className="flex gap-2">
-                  <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-df-green" />
                   <span>{f}</span>
                 </li>
               ))}
             </ul>
-            <Button asChild className="mt-6" variant={isPopular ? "default" : "outline"}>
-              <Link to="/szerzodes/uj">{ctaBySlug[p.slug] ?? "Választom"}</Link>
+            <Button
+              asChild
+              className={
+                isPopular
+                  ? "mt-6 bg-df-green text-white hover:bg-[#173B2A]"
+                  : "mt-6 border-df-green text-df-green"
+              }
+              variant={isPopular ? "default" : "outline"}
+            >
+              <Link to="/szerzodes/uj">
+                {ctaBySlug[p.slug] ?? "Választom"} <ArrowRight className="h-4 w-4" />
+              </Link>
             </Button>
           </Card>
         );
