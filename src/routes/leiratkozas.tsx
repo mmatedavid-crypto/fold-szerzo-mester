@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { unsubscribeByToken } from "@/lib/subscriptions/subscribe.functions";
 
 export const Route = createFileRoute("/leiratkozas")({
-  validateSearch: (s: Record<string, unknown>) => ({ token: typeof s.token === "string" ? s.token : "" }),
-  head: () => ({ meta: [{ title: "Leiratkozás | Földbérleti értesítő" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    token: typeof s.token === "string" ? s.token : "",
+  }),
+  head: () => ({ meta: [{ title: "Leiratkozás | Dr Föld" }] }),
   component: UnsubPage,
 });
 
@@ -47,17 +49,21 @@ function UnsubPage() {
     <PageShell>
       <section className="container mx-auto px-4 py-12 max-w-xl">
         <h1 className="font-serif text-3xl">Leiratkozás</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          A Dr Föld kifüggesztés-értesítőjét itt tudod leállítani.
+        </p>
         <Card className="p-6 mt-6 space-y-4">
           {state === "idle" && token && (
             <>
-              <p>Megerősíted, hogy leiratkozol a heti kifüggesztés értesítőről?</p>
+              <p>Megerősíted, hogy leiratkozol a heti Dr Föld kifüggesztés-értesítőről?</p>
               <Button onClick={confirm}>Igen, leiratkozom</Button>
             </>
           )}
           {state === "loading" && <p>Folyamatban…</p>}
           {state === "done" && (
             <p className="text-sm">
-              Sikeresen leiratkoztál.<br />
+              Sikeresen leiratkoztál.
+              <br />
               {info.email} – {info.settlement}
             </p>
           )}

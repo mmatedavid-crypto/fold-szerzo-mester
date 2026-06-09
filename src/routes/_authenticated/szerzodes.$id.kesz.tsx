@@ -13,7 +13,7 @@ const Search = z.object({ doc: z.string().uuid() });
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/kesz")({
   validateSearch: (s) => Search.parse(s),
-  head: () => ({ meta: [{ title: "Szerződés kész — letöltés" }] }),
+  head: () => ({ meta: [{ title: "Szerződés elkészült | Dr Föld" }] }),
   component: DonePage,
 });
 
@@ -40,15 +40,17 @@ function DonePage() {
         <CheckCircle2 className="h-14 w-14 text-primary mx-auto" />
         <h1 className="font-serif text-3xl mt-3">A szerződésed elkészült</h1>
         <p className="text-muted-foreground mt-2">
-          A végleges PDF a műhelyedben is bármikor elérhető. A dokumentumazonosító megjelenik a PDF lábrészén,
-          és bármikor ellenőrizhető a /dokumentum-ellenorzes oldalon.
+          A végleges PDF a műhelyedben is bármikor elérhető. A dokumentumazonosító megjelenik a PDF
+          lábrészén, és bármikor ellenőrizhető a Dr Föld dokumentumellenőrző oldalán.
         </p>
         <Card className="p-6 mt-6">
           <Button size="lg" onClick={onDownload} disabled={loading}>
             <Download className="h-4 w-4 mr-2" /> {loading ? "Letöltés…" : "PDF letöltése"}
           </Button>
           <div className="mt-4">
-            <Button asChild variant="ghost"><Link to="/dashboard">Vissza a műhelybe</Link></Button>
+            <Button asChild variant="ghost">
+              <Link to="/dashboard">Vissza a műhelybe</Link>
+            </Button>
           </div>
         </Card>
       </section>

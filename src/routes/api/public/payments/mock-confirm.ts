@@ -9,6 +9,18 @@ function mockPaymentsEnabled(): boolean {
   );
 }
 
+function safeReturnPath(requestUrl: string): string {
+  const url = new URL(requestUrl);
+  const ret = url.searchParams.get("return") ?? "/dashboard";
+  try {
+    const target = new URL(ret, url.origin);
+    if (target.origin !== url.origin) return "/dashboard";
+    return `${target.pathname}${target.search}${target.hash}`;
+  } catch {
+    return "/dashboard";
+  }
+}
+
 export const Route = createFileRoute("/api/public/payments/mock-confirm")({
   server: {
     handlers: {
@@ -19,7 +31,7 @@ export const Route = createFileRoute("/api/public/payments/mock-confirm")({
 
         const url = new URL(request.url);
         const paymentId = url.searchParams.get("payment_id");
-        const ret = url.searchParams.get("return") ?? "/dashboard";
+        const ret = safeReturnPath(request.url);
         if (!paymentId) return new Response("Missing payment_id", { status: 400 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
