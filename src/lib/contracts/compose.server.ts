@@ -2,6 +2,7 @@ import type { Draft } from "./types";
 import { preLeaseRank, rentDescription, allLessors } from "./logic";
 import {
   auditLeaseDraftAgainstRuleset,
+  LEASE_CONTRACT_REQUIREMENTS,
   legalAuditText,
   legalSourcesSummary,
   LEGAL_RULESET_VERSION,
@@ -11,6 +12,75 @@ type Clause = { clause_key: string; title: string; text: string; sort_order: num
 
 function substitute(text: string, vars: Record<string, string>): string {
   return text.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? "");
+}
+
+function value(
+  v: string | number | boolean | null | undefined,
+  fallback = "____________________",
+): string {
+  if (typeof v === "boolean") return v ? "igen" : "nem";
+  if (typeof v === "number") return Number.isFinite(v) ? String(v) : fallback;
+  return v?.toString().trim() ? v.toString().trim() : fallback;
+}
+
+function lesseeDeclarationBlock(draft: Draft): string {
+  const E = draft.lessee_data ?? {};
+  return [
+    "Haszonbérlő a Földforgalmi tv. földhasználati jogosultság megszerzésére vonatkozó szabályaira figyelemmel az alábbi nyilatkozatokat teszi:",
+    "",
+    `Földműves nyilvántartási státusz: ${value(E.is_registered_farmer)}.`,
+    `Mezőgazdasági termelőszervezet: ${value(E.is_producer_org)}.`,
+    `Átlátható szervezet, ha termelőszervezetként jár el: ${value(E.is_transparent)}.`,
+    `Földműves / őstermelői / termelőszervezeti azonosító: ${value(E.farmer_registry_number ?? E.ostermelo_number ?? E.company_reg_number)}.`,
+    `Földhasználati díjtartozása nincs: ${value(E.no_land_use_debt)}.`,
+    "",
+    "Haszonbérlő vállalja, hogy a szerződés fennállása alatt a földhasználati jogosultság megszerzésének jogszabályi feltételeinek megfelel, a föld használatát jogszabályban megengedett eset kivételével másnak nem engedi át, azt maga használja, és eleget tesz a földhasznosítási kötelezettségének.",
+    "Ha a haszonbérlő újonnan alapított mezőgazdasági termelőszervezetként vagy más különös jogcímen jár el, az ehhez kapcsolódó többletvállalásokat és igazolásokat külön ellenőrizni kell.",
+  ].join("\n");
+}
+
+function preLeaseProofBlock(pre: ReturnType<typeof preLeaseRank>): string {
+  return [
+    `Megjelölt ranghely: ${pre.rank}`,
+    `Jogalap: ${pre.basis}`,
+    "",
+    "A jogalap igazolásához javasolt okiratok:",
+    ...pre.proofs.map((proof, index) => `${index + 1}. ${proof}`),
+    "",
+    "A szerződő felek tudomásul veszik, hogy előhaszonbérleti jogosult elfogadó jognyilatkozata esetén a jogalap, a törvény szerinti sorrend és az igazoló okiratok vizsgálata a hatósági eljárás része lehet.",
+  ].join("\n");
+}
+
+function proceduralBlock(): string {
+  return [
+    "A felek tudomásul veszik, hogy a haszonbérleti szerződés a Földforgalmi tv. szerinti esetekben hirdetményi közléshez, előhaszonbérleti eljáráshoz és mezőgazdasági igazgatási szerv általi jóváhagyáshoz kötött lehet.",
+    "A haszonbérbeadó köteles a haszonbérleti szerződést az előhaszonbérletre jogosultakkal történő közlés érdekében a jogszabályban meghatározott határidőben a föld fekvése szerint illetékes jegyzőhöz továbbítani.",
+    "A szerződés hatályosulása, az előhaszonbérleti jogosult belépése, illetve a hatósági jóváhagyás megtagadása a jogszabályi eljárás eredményétől függhet.",
+  ].join("\n\n");
+}
+
+function signatureBlock(draft: Draft): string {
+  const lessors = allLessors(draft.lessor_data);
+  return [
+    "A felek kijelentik, hogy a szerződést elolvasták, megértették, és mint akaratukkal mindenben megegyezőt írják alá.",
+    "A dokumentum aláírási és benyújtási formáját az ügy körülményeihez kell igazítani. Teljes bizonyító erejű magánokirati, ügyvédi ellenjegyzett, közokirati vagy hiteles elektronikus forma szükségessége külön ellenőrizendő.",
+    "",
+    "Kelt: ____________________, ____________________",
+    "",
+    ...lessors.flatMap((lessor, index) => [
+      `${lessors.length > 1 ? `${index + 1}. ` : ""}Haszonbérbeadó:`,
+      "________________________________",
+      value(lessor.name, "név"),
+      "",
+    ]),
+    "Haszonbérlő:",
+    "________________________________",
+    value(draft.lessee_data?.name, "név"),
+    "",
+    "Tanúk / ellenjegyzés / hiteles elektronikus aláírás adatai:",
+    "1. tanú neve, lakcíme, aláírása: ____________________",
+    "2. tanú neve, lakcíme, aláírása: ____________________",
+  ].join("\n");
 }
 
 export function composeContract(
@@ -75,6 +145,24 @@ export function composeContract(
 
   const ordered = [...clauses].sort((a, b) => a.sort_order - b.sort_order);
   const sections = ordered.map((c) => ({ title: c.title, text: substitute(c.text, vars) }));
+  sections.push(
+    {
+      title: "Haszonbérlő kötelező földforgalmi nyilatkozatai",
+      text: lesseeDeclarationBlock(draft),
+    },
+    {
+      title: "Előhaszonbérleti jogalap, ranghely és igazolások",
+      text: preLeaseProofBlock(pre),
+    },
+    {
+      title: "Hirdetményi közlés, jegyzői továbbítás és hatósági jóváhagyás",
+      text: proceduralBlock(),
+    },
+    {
+      title: "Keltezés, aláírás és okirati forma",
+      text: signatureBlock(draft),
+    },
+  );
   const legalAudit = auditLeaseDraftAgainstRuleset(draft);
   sections.push({
     title: "Jogszabályi alap és ellenőrzési nyom",
@@ -85,6 +173,9 @@ export function composeContract(
       legalSourcesSummary(),
       "",
       "Dokumentum-ellenőrzési pontok:",
+      ...LEASE_CONTRACT_REQUIREMENTS.map((req) => `- ${req.label}: ${req.legalRefs.join("; ")}`),
+      "",
+      "Draft audit:",
       legalAuditText(legalAudit),
       "",
       "A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás, nem ügyvédi iroda. Egyedi, vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.",

@@ -5,7 +5,11 @@ export const Route = createFileRoute("/api/public/hooks/send-weekly-digest")({
     handlers: {
       POST: async ({ request }) => {
         const apiKey = request.headers.get("apikey");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const expected =
+          process.env.DIGEST_HOOK_SECRET ??
+          process.env.CRON_SECRET ??
+          process.env.SUPABASE_PUBLISHABLE_KEY ??
+          process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
         if (!expected || apiKey !== expected) {
           return new Response("Unauthorized", { status: 401 });
         }

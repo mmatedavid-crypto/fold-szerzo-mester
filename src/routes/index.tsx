@@ -95,9 +95,13 @@ function Index() {
                   Kifüggesztések keresése <ArrowRight className="h-4 w-4" />
                 </Link>
               </BrandButton>
-              <BrandButton asChild variant="secondary">
+              <BrandButton
+                asChild
+                variant="secondary"
+                className="border-df-yellow bg-df-yellow text-df-ink shadow-[0_8px_18px_rgba(201,164,75,0.22)] hover:bg-[#D7B15A]"
+              >
                 <Link to="/berleti-dij-iranytu">
-                  Ár iránytű <ArrowRight className="h-4 w-4" />
+                  Ár iránytű megnyitása <ArrowRight className="h-4 w-4" />
                 </Link>
               </BrandButton>
             </div>

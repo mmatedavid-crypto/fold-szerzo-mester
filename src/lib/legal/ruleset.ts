@@ -1,7 +1,7 @@
 import type { Draft, Parcel, PreLease } from "@/lib/contracts/types";
 
 export const LEGAL_RULESET_VERSION = "HU-DRFOLD-2026-06-09";
-export const LEASE_CLAUSE_VERSION = "lease-2026-06-08";
+export const LEASE_CLAUSE_VERSION = "lease-2026-06-09";
 export const ACCEPTANCE_STATEMENT_VERSION = "acceptance-2026-06-09";
 
 export type LegalSource = {
@@ -85,8 +85,11 @@ export const LEGAL_SOURCES: LegalSource[] = [
 export const LEASE_CONTRACT_REQUIREMENTS: LegalRequirement[] = [
   {
     id: "parties",
-    label: "A felek azonosítása",
-    legalRefs: ["Ptk. szerződéses általános szabályok", "Földforgalmi tv. 42. §"],
+    label: "A felek azonosítása és szerződéses minősége",
+    legalRefs: [
+      "Ptk. szerződéses általános szabályok",
+      "Fétv. földhasználati szerződés részletszabályok",
+    ],
     appliesTo: "lease_contract",
     severity: "required",
   },
@@ -100,37 +103,58 @@ export const LEASE_CONTRACT_REQUIREMENTS: LegalRequirement[] = [
   {
     id: "term",
     label: "Határozott haszonbérleti időtartam és gazdasági év kezelése",
-    legalRefs: ["Földforgalmi tv. 44. §", "Földforgalmi tv. 5. § 8. pont"],
+    legalRefs: [
+      "Földforgalmi tv. 44. §",
+      "Földforgalmi tv. 5. § 8. pont",
+      "Fétv. haszonbérfizetési esedékességi szabályok",
+    ],
     appliesTo: "lease_contract",
     severity: "required",
   },
   {
     id: "rent",
     label: "Haszonbérleti díj, fizetési mód és határidő",
-    legalRefs: ["Ptk. haszonbérleti háttérszabályok", "Földforgalmi tv. jóváhagyási szabályok"],
+    legalRefs: [
+      "Ptk. haszonbérleti háttérszabályok",
+      "Fétv. haszonbérre vonatkozó részletszabályok",
+    ],
     appliesTo: "lease_contract",
     severity: "required",
   },
   {
     id: "lessee_declarations",
     label: "Haszonbérlő kötelező nyilatkozatai",
-    legalRefs: ["Földforgalmi tv. 42. §", "Földforgalmi tv. 51. § (2) b)"],
+    legalRefs: ["Földforgalmi tv. 40–42. §", "Fétv. 94. §"],
     appliesTo: "lease_contract",
     severity: "required",
   },
   {
     id: "prelease_rank",
     label: "Előhaszonbérleti jogalap, ranghely és igazolások",
-    legalRefs: ["Földforgalmi tv. 46–49. §", "Földforgalmi tv. 51. § (2) c)"],
+    legalRefs: ["Földforgalmi tv. 45–49. §", "474/2013. Korm. rendelet 11. §"],
     appliesTo: "both",
     severity: "required",
   },
   {
     id: "authority_approval",
     label: "Hatósági jóváhagyás és hirdetményi közlés tudomásulvétele",
-    legalRefs: ["Földforgalmi tv. 49–55. §", "Fétv. eljárási rendelkezések"],
+    legalRefs: ["Földforgalmi tv. 49–55. §", "474/2013. Korm. rendelet 11. §"],
     appliesTo: "lease_contract",
     severity: "warning",
+  },
+  {
+    id: "submission_deadline",
+    label: "A szerződés jegyzőhöz történő továbbításának eljárási határideje",
+    legalRefs: ["Földforgalmi tv. 49. § (1)", "474/2013. Korm. rendelet 11. §"],
+    appliesTo: "lease_contract",
+    severity: "warning",
+  },
+  {
+    id: "private_document_form",
+    label: "Írásbeli, aláírással lezárt okirati forma",
+    legalRefs: ["Ptk. szerződéses általános szabályok", "Pp. 325. §"],
+    appliesTo: "lease_contract",
+    severity: "manual_review",
   },
   {
     id: "forest_review",
@@ -266,10 +290,13 @@ export function auditLeaseDraftAgainstRuleset(draft: Draft): LegalAuditItem[] {
   const hasTerm = hasValue(draft.term?.start_date) && hasValue(draft.term?.end_date);
   const hasRent =
     hasValue(draft.rent?.model) && hasValue(draft.rent?.deadline) && hasValue(draft.rent?.method);
+  const hasLesseeCapacity =
+    draft.lessee_data?.is_registered_farmer === true || draft.lessee_data?.is_producer_org === true;
+  const hasLesseeDebtDeclaration = draft.lessee_data?.no_land_use_debt === true;
+  const hasProducerOrgTransparency =
+    draft.lessee_data?.is_producer_org !== true || draft.lessee_data?.is_transparent === true;
   const hasLesseeDeclarations =
-    draft.lessee_data?.is_registered_farmer === true ||
-    draft.lessee_data?.is_producer_org === true ||
-    draft.lessee_data?.is_transparent === true;
+    hasLesseeCapacity && hasLesseeDebtDeclaration && hasProducerOrgTransparency;
   const hasPreLease = hasAnyPreLeaseBasis(draft.prelease);
   const outOfScope = hasOutOfScopeParcel(parcels);
   const forest = parcels.some((p) => `${p.cultivation_branch ?? ""}`.toLowerCase().includes("erd"));
@@ -295,7 +322,9 @@ export function auditLeaseDraftAgainstRuleset(draft: Draft): LegalAuditItem[] {
       "lessee_declarations",
       hasLesseeDeclarations,
       "A haszonbérlő nyilatkozati alapadatai szerepelnek.",
-      "A haszonbérlő 42. § szerinti nyilatkozatai külön ellenőrizendők.",
+      hasLesseeCapacity
+        ? "A haszonbérlő 42. § szerinti vállalásai, földhasználati díjtartozásra vonatkozó nyilatkozata vagy termelőszervezeti átláthatósága külön ellenőrizendő."
+        : "A haszonbérlő földműves / mezőgazdasági termelőszervezeti jogosultsága külön ellenőrizendő.",
       hasLesseeDeclarations ? "ok" : "manual_review",
     ),
     mkAudit(
@@ -310,6 +339,20 @@ export function auditLeaseDraftAgainstRuleset(draft: Draft): LegalAuditItem[] {
       "A dokumentum a hatósági jóváhagyási és hirdetményi eljárásra figyelmeztet.",
       "A hatósági jóváhagyási eljárásra figyelmeztetni kell.",
       "warning",
+    ),
+    mkAudit(
+      "submission_deadline",
+      true,
+      "A szerződés tartalmaz eljárási figyelmeztetést a jegyzőhöz továbbításról.",
+      "A jegyzőhöz továbbítás és közlés eljárási rendjét külön rögzíteni kell.",
+      "warning",
+    ),
+    mkAudit(
+      "private_document_form",
+      true,
+      "A dokumentum aláírási és okirati forma ellenőrzést tartalmaz.",
+      "Az aláírási és okirati forma külön ellenőrzendő.",
+      "manual_review",
     ),
     mkAudit(
       "forest_review",

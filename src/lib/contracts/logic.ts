@@ -143,13 +143,30 @@ export function computeRiskReport(
       level: "hianyzo_kotelezo",
       message: "Hiányzik a haszonbérlő címe / székhelye.",
     });
-  if (E.type && !E.is_registered_farmer) {
+  if (E.type && !E.is_registered_farmer && !E.is_producer_org) {
     items.push({
       id: "lessee_farmer",
       category: "felek",
       level: "jogi_ellenorzes",
       message:
-        "A haszonbérlő földműves nyilvántartási státusza nem igazolt — jogszabály általában megköveteli.",
+        "A haszonbérlő földműves vagy mezőgazdasági termelőszervezeti jogosultsága nem igazolt — ezt a földhasználati jogosultság megszerzésénél külön vizsgálni kell.",
+    });
+  }
+  if (!E.no_land_use_debt) {
+    items.push({
+      id: "lessee_no_land_use_debt",
+      category: "felek",
+      level: "jogi_ellenorzes",
+      message: "Hiányzik a haszonbérlő nyilatkozata arról, hogy nincs földhasználati díjtartozása.",
+    });
+  }
+  if (E.is_producer_org && !E.is_transparent) {
+    items.push({
+      id: "lessee_transparency",
+      category: "felek",
+      level: "jogi_ellenorzes",
+      message:
+        "Mezőgazdasági termelőszervezetnél az átláthatósági nyilatkozat külön ellenőrizendő.",
     });
   }
 
@@ -199,6 +216,18 @@ export function computeRiskReport(
         level: "jogi_ellenorzes",
         message: `${tag}: haszonélvezeti jog terheli — haszonélvező hozzájárulása szükséges lehet.`,
       });
+    const cultivation = `${p.cultivation_branch ?? ""} ${p.special_status ?? ""}`.toLowerCase();
+    const isKivett = cultivation.includes("kivett");
+    const hasRiceException = cultivation.includes("rizs") || cultivation.includes("halast");
+    const hasAgriculturalPart = cultivation.includes("szántó") || cultivation.includes("gyep");
+    if (isKivett && !hasRiceException && !hasAgriculturalPart) {
+      items.push({
+        id: `parcel_${i}_out_of_scope`,
+        category: "foldterulet",
+        level: "hianyzo_kotelezo",
+        message: `${tag}: kivett vagy nem termőföldként jelölt terület gyanúja — a Földforgalmi tv. szerinti haszonbérleti szerződés sablon nem alkalmazható automatikusan.`,
+      });
+    }
   });
   if (parcels.length > 1) {
     items.push({
