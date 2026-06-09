@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/layout/page-shell";
+import { company } from "@/lib/company";
 
 export const Route = createFileRoute("/adatkezeles")({
   head: () => ({
@@ -27,9 +28,9 @@ function PrivacyPage() {
 
         <h2>1. Adatkezelő</h2>
         <p>
-          <strong>Precíziós Agrokémia Zrt.</strong> (székhely: 2636 Tésa, Ady Endre utca 11.,
-          cégjegyzékszám: 13-10-042640, adószám: 26558534-2-13, e-mail:{" "}
-          <a href="mailto:hello@drfold.hu">hello@drfold.hu</a>).
+          <strong>{company.legalName}</strong> (székhely: {company.registeredSeat}, cégjegyzékszám:{" "}
+          {company.companyRegistrationNumber}, adószám: {company.taxNumber}, e-mail:{" "}
+          <a href={`mailto:${company.contactEmail}`}>{company.contactEmail}</a>).
         </p>
 
         <h2>2. Kezelt adatok és célok</h2>
@@ -115,7 +116,7 @@ function PrivacyPage() {
         </ul>
         <p>
           Az adatexport és fiók-törlés a bejelentkezett <a href="/dashboard">Műhelyben</a> egy
-          kattintással kezdeményezhető, vagy írhatsz a fenti e-mail címre.
+          kattintással kezdeményezhető, vagy írhatsz a {company.contactEmail} címre.
         </p>
 
         <h2>5. Adatbiztonság</h2>

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { DrFoldLogo } from "@/components/brand/dr-fold-logo";
 import { StampBadge } from "@/components/brand/brand-elements";
+import { company } from "@/lib/company";
 
 export function SiteFooter() {
   return (
@@ -9,7 +10,7 @@ export function SiteFooter() {
         <div>
           <DrFoldLogo />
           <p className="mt-4 font-semibold text-df-green">Dr Föld — Ravasz a gazda.</p>
-          <p className="mt-1 text-df-gray">drfold.hu</p>
+          <p className="mt-1 text-df-gray">{company.domain}</p>
           <p className="mt-2 text-df-gray">Nem vagyok ügyvéd, de tudom, hol állok a sorban.</p>
         </div>
         <div>
@@ -74,7 +75,12 @@ export function SiteFooter() {
                 Dokumentum ellenőrzése
               </Link>
             </li>
-            <li>drfold.hu</li>
+            <li>
+              <a href={`mailto:${company.contactEmail}`} className="hover:text-primary">
+                {company.contactEmail}
+              </a>
+            </li>
+            <li>{company.domain}</li>
           </ul>
           <StampBadge className="mt-4">Jogszerű megoldások</StampBadge>
         </div>

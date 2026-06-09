@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/layout/page-shell";
+import { company } from "@/lib/company";
 
 export const Route = createFileRoute("/aszf")({
   head: () => ({
@@ -25,10 +26,10 @@ function AszfPage() {
 
         <h2>1. A Szolgáltató</h2>
         <p>
-          Üzemeltető: <strong>Precíziós Agrokémia Zrt.</strong> (székhely: 2636 Tésa, Ady Endre utca
-          11., cégjegyzékszám: 13-10-042640, adószám: 26558534-2-13, e-mail:{" "}
-          <a href="mailto:hello@drfold.hu">hello@drfold.hu</a>). A szolgáltatás a{" "}
-          <a href="https://drfold.hu">drfold.hu</a> domain alatt érhető el.
+          Üzemeltető: <strong>{company.legalName}</strong> (székhely: {company.registeredSeat},
+          cégjegyzékszám: {company.companyRegistrationNumber}, adószám: {company.taxNumber}, e-mail:{" "}
+          <a href={`mailto:${company.contactEmail}`}>{company.contactEmail}</a>). A szolgáltatás a{" "}
+          <a href={company.websiteUrl}>{company.domain}</a> domain alatt érhető el.
         </p>
 
         <h2>2. A szolgáltatás tárgya</h2>
@@ -84,9 +85,9 @@ function AszfPage() {
 
         <h2>9. Panaszkezelés és jogviták</h2>
         <p>
-          Panaszait a <a href="mailto:hello@drfold.hu">hello@drfold.hu</a> címen jelentheti be. A
-          jogvitákra a magyar jog az irányadó, az Európai Bizottság online vitarendezési platformja
-          elérhető:{" "}
+          Panaszait a <a href={`mailto:${company.contactEmail}`}>{company.contactEmail}</a> címen
+          jelentheti be. A jogvitákra a magyar jog az irányadó, az Európai Bizottság online
+          vitarendezési platformja elérhető:{" "}
           <a href="https://ec.europa.eu/odr" target="_blank" rel="noreferrer">
             ec.europa.eu/odr
           </a>
