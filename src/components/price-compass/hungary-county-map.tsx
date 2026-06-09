@@ -115,8 +115,8 @@ export function HungaryCountyMap({
 
   const hoveredValue = hovered ? valueByCanonical.get(canonicalName(hovered)) : null;
 
-  const sorted = useMemo(() => {
-    return [...values].sort((a, b) => (b.avg ?? -1) - (a.avg ?? -1));
+  const countyOverview = useMemo(() => {
+    return [...values].sort((a, b) => a.name.localeCompare(b.name, "hu"));
   }, [values]);
   const hasAnyData = values.some((v) => v.avg != null && v.samples > 0);
 
@@ -322,11 +322,11 @@ export function HungaryCountyMap({
           );
         })()}
 
-      {/* Mobile-friendly sorted list (also useful on desktop as scannable view) */}
+      {/* Mobile-friendly county overview. Kept alphabetical so it supports the map instead of becoming a ranking. */}
       <div className="mt-4">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-xs font-semibold uppercase tracking-wide text-df-gray">
-            Vármegyei rangsor
+            Vármegyei adatjegyzék
           </div>
           {!loading && !hasAnyData && (
             <Badge variant="outline" className="border-df-yellow text-df-green">
@@ -334,13 +334,19 @@ export function HungaryCountyMap({
             </Badge>
           )}
         </div>
-        <ul className="divide-y divide-df-border/70 overflow-hidden rounded-xl border border-df-border bg-white">
-          {loading && <li className="p-3 text-sm text-df-gray">Vármegyei lista betöltése…</li>}
-          {!loading && sorted.length === 0 && (
-            <li className="p-3 text-sm text-df-gray">Még nincs megyei áradat.</li>
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {loading && (
+            <li className="rounded-xl border border-df-border bg-white p-3 text-sm text-df-gray sm:col-span-2">
+              Vármegyei adatok betöltése...
+            </li>
+          )}
+          {!loading && countyOverview.length === 0 && (
+            <li className="rounded-xl border border-df-border bg-white p-3 text-sm text-df-gray sm:col-span-2">
+              Még nincs megyei áradat.
+            </li>
           )}
           {!loading &&
-            sorted.map((row) => {
+            countyOverview.map((row) => {
               const t = max > 0 && row.avg ? row.avg / max : 0;
               const low = row.samples > 0 && row.samples < lowSampleThreshold;
               const has = row.avg != null && row.samples > 0;
@@ -348,8 +354,10 @@ export function HungaryCountyMap({
                 <li
                   key={row.name}
                   onClick={() => setSelected((prev) => (prev === row.name ? null : row.name))}
-                  className={`flex cursor-pointer items-center gap-3 px-3 py-2 transition hover:bg-df-cream/60 ${
-                    selected === row.name ? "bg-df-cream/80" : ""
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 transition hover:bg-df-cream/60 ${
+                    selected === row.name
+                      ? "border-df-green bg-df-cream/80"
+                      : "border-df-border bg-white"
                   }`}
                 >
                   <span
