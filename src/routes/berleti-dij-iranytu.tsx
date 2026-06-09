@@ -478,73 +478,26 @@ function PriceCompassPage() {
 function CountyHeatmap({
   stats,
   mode,
-  maxTrimmedAverage,
 }: {
   stats: CountyStat[];
   mode: CompassMode;
   maxTrimmedAverage: number;
 }) {
-  const byCounty = new Map(stats.map((row) => [row.county_name, row]));
-
+  const values: CountyValue[] = stats.map((row) => ({
+    name: row.county_name,
+    avg: row.avg_value,
+    samples: row.sample_count,
+    median: row.median_value,
+    unit: mode === "rent" ? "Ft / ha / év" : "Ft / ha",
+    formatted: formatUnitValue(row.avg_value, mode),
+  }));
   return (
-    <div className="mt-5 overflow-x-auto rounded-md border border-df-border bg-[linear-gradient(135deg,#FAF6EF,#E9DDC9)] p-3 md:p-5">
-      <svg
-        className="min-w-[720px]"
-        viewBox="0 0 840 520"
-        role="img"
-        aria-label="Stilizált Magyarország hőtérkép megyei árstatisztikákkal"
-      >
-        <path
-          d="M28 210 C32 138 84 92 176 88 C270 84 338 48 452 66 C548 80 620 46 720 94 C792 128 836 202 806 276 C782 336 724 344 682 404 C638 466 552 496 464 464 C386 436 324 446 246 422 C164 396 90 350 48 292 C30 268 22 238 28 210 Z"
-          fill="#F4E7CF"
-          stroke="#D8C7A5"
-          strokeWidth="4"
-        />
-        {COUNTY_LAYOUT.map((county) => {
-          const row = byCounty.get(county.name);
-          const intensity =
-            maxTrimmedAverage > 0 && row?.avg_value ? row.avg_value / maxTrimmedAverage : 0;
-          const labelColor = intensity > 0.55 ? "#FFFDF7" : "#1A1A1A";
-          const valueColor = intensity > 0.55 ? "#F4E7CF" : "#6B6F63";
-          return (
-            <g
-              key={county.name}
-              className="transition hover:brightness-95"
-              aria-label={`${county.name}: ${formatUnitValue(row?.avg_value ?? null, mode)}`}
-            >
-              <path
-                d={county.path}
-                fill={heatColor(intensity)}
-                stroke={intensity > 0 ? "#C9A44B" : "#D8C7A5"}
-                strokeWidth="3"
-                strokeLinejoin="round"
-              >
-                <title>{`${county.name}: ${formatUnitValue(row?.avg_value ?? null, mode)}`}</title>
-              </path>
-              <text
-                x={county.label[0]}
-                y={county.label[1]}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={labelColor}
-                className="pointer-events-none select-none text-[13px] font-bold"
-              >
-                {county.name.split("-")[0]}
-              </text>
-              <text
-                x={county.label[0]}
-                y={county.label[1] + 16}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={valueColor}
-                className="pointer-events-none select-none text-[11px] font-semibold"
-              >
-                {row ? formatMapValue(row.avg_value) : "nincs adat"}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+    <div className="mt-5">
+      <HungaryCountyMap
+        values={values}
+        unit={mode === "rent" ? "Ft / ha / év" : "Ft / ha"}
+        formatLegendValue={(v) => formatUnitValue(v, mode)}
+      />
     </div>
   );
 }
