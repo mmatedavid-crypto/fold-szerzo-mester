@@ -22,7 +22,15 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, ExternalLink, Search, Calculator, Mail, Loader2 } from "lucide-react";
+import {
+  AlertTriangle,
+  ExternalLink,
+  Search,
+  Calculator,
+  Mail,
+  Loader2,
+  SearchX,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 import { cleanSettlement } from "@/lib/notices/clean";
@@ -176,8 +184,13 @@ function NoticesPage() {
           </div>
         </Card>
 
-        <div className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-df-gray">
-          {q.isLoading ? "Betöltés..." : `${filtered.length} találat`}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-df-gray">
+          <span>{q.isLoading ? "Kifüggesztések betöltése..." : `${filtered.length} találat`}</span>
+          {!q.isLoading && !q.isError && filtered.length > 0 && (
+            <span className="normal-case tracking-normal text-df-green">
+              Kifüggesztést láttál? Nézd meg, van-e benne lehetőség.
+            </span>
+          )}
         </div>
 
         {q.isError && (
@@ -232,13 +245,18 @@ function NoticesPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
-                    <Button asChild size="sm" variant="ghost">
+                    <Button asChild size="sm" className="bg-df-green text-white hover:bg-[#173B2A]">
                       <Link to="/kifuggesztesek/$noticeId" params={{ noticeId: n.id }}>
                         <Calculator className="h-4 w-4 mr-1" /> Ranghely
                       </Link>
                     </Button>
                     {n.original_detail_url ? (
-                      <Button asChild size="sm" variant="ghost">
+                      <Button
+                        asChild
+                        size="sm"
+                        variant="outline"
+                        className="ml-1 border-df-green text-df-green"
+                      >
                         <a href={n.original_detail_url} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-4 w-4 mr-1" /> Hirdetmény megnyitása
                         </a>
@@ -252,8 +270,24 @@ function NoticesPage() {
               ))}
               {!q.isLoading && filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-10">
-                    {q.isError ? "A lista betöltése most nem sikerült." : "Nincs találat."}
+                  <TableCell colSpan={5} className="py-10">
+                    <div className="mx-auto flex max-w-md flex-col items-center text-center">
+                      <span className="grid h-12 w-12 place-items-center rounded-md border border-df-border bg-df-cream text-df-green">
+                        {q.isError ? (
+                          <AlertTriangle className="h-5 w-5 text-df-red" />
+                        ) : (
+                          <SearchX className="h-5 w-5" />
+                        )}
+                      </span>
+                      <div className="mt-3 font-brand text-xl font-bold text-df-green">
+                        {q.isError ? "A lista most nem töltött be" : "Nincs ilyen kifüggesztés"}
+                      </div>
+                      <p className="mt-1 text-sm leading-6 text-df-gray">
+                        {q.isError
+                          ? "Ez nem jelent üres listát. Próbáld újra, vagy nézz vissza később."
+                          : "Próbálj másik települést, helyrajzi számot vagy hirdetménytípust keresni."}
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
