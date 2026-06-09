@@ -59,7 +59,7 @@ export function PricingCards({ plans }: { plans: Plan[] }) {
               {p.slug !== "single" && <span className="text-sm text-df-gray">/ hó</span>}
             </div>
             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-df-gray">
-              {p.price_label}
+              {p.price_label || priceCadenceLabel(p.slug)}
             </p>
             <p className="mt-3 text-sm leading-6 text-df-gray">{p.description}</p>
             <div className="mt-4 rounded-md border border-df-border bg-df-cream/60 p-3 text-sm text-df-ink">
@@ -93,4 +93,8 @@ export function PricingCards({ plans }: { plans: Plan[] }) {
       })}
     </div>
   );
+}
+
+function priceCadenceLabel(slug: string): string {
+  return slug === "single" ? "egyszeri díj" : "havi díj";
 }
