@@ -1,6 +1,7 @@
 import { useMemo, useState, useRef, useId } from "react";
 import countiesData from "@/data/hungary-counties.json";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type CountyDatum = { name: string; d: string; c: [number, number] };
 type MapData = { width: number; height: number; counties: CountyDatum[] };
@@ -111,6 +112,7 @@ export function HungaryCountyMap({
   const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const patternId = useId();
+  const isMobile = useIsMobile();
 
   const hoveredValue = hovered ? valueByCanonical.get(canonicalName(hovered)) : null;
 
@@ -206,7 +208,8 @@ export function HungaryCountyMap({
                     style={{ pointerEvents: "none" }}
                   />
                 )}
-                {/* Desktop county label, hidden on small viewports via CSS */}
+                {/* Desktop county label only */}
+                {!isMobile && (
                 <text
                   x={county.c[0]}
                   y={county.c[1]}
@@ -215,11 +218,12 @@ export function HungaryCountyMap({
                   fill={t > 0.55 ? "#FFFFFF" : "#1F2A22"}
                   fontSize={isBudapest ? 8 : 9}
                   fontWeight={600}
-                  className="pointer-events-none select-none hidden sm:[display:initial]"
+                  className="pointer-events-none select-none"
                   style={{ paintOrder: "stroke", stroke: t > 0.55 ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.6)", strokeWidth: 0.6 }}
                 >
                   {shortLabel(county.name)}
                 </text>
+                )}
               </g>
             );
           })}
