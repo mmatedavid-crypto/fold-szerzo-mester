@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle2, FileWarning, ShieldAlert, Lock } from "lucide-react";
+import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/ellenorzes")({
   head: () => ({ meta: [{ title: "Jogi kockázati ellenőrzés" }] }),
@@ -38,7 +39,7 @@ function RiskPage() {
         const r = await run({ data: { id } });
         setReport(r);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Hiba");
+        setError(contractFlowErrorMessage(e));
       }
     })();
   }, [id, fetch, run]);
@@ -63,7 +64,20 @@ function RiskPage() {
           Ezen a lépésen csak az ellenőrzést és a tervezett szerződés felépítését látod.
         </p>
 
-        {error && <div className="text-destructive mt-4">{error}</div>}
+        {error && (
+          <Card className="mt-6 p-6">
+            <h2 className="font-serif text-xl text-df-green">Az ellenőrzés most nem futott le.</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+            <Button asChild className="mt-4" variant="outline">
+              <Link to="/dashboard">Vissza a Műhelybe</Link>
+            </Button>
+          </Card>
+        )}
+        {!draft && !report && !error && (
+          <Card className="mt-6 p-6 text-sm text-muted-foreground">
+            Kockázati ellenőrzés előkészítése…
+          </Card>
+        )}
         {draft && report && (
           <>
             <Card className="p-6 mt-6">

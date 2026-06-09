@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { createDraft } from "@/lib/contracts/drafts.functions";
 import { PageShell } from "@/components/layout/page-shell";
 import { toast } from "sonner";
+import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/uj")({
   head: () => ({ meta: [{ title: "Új szerződés | Dr Föld" }] }),
@@ -21,7 +22,7 @@ function NewContract() {
           navigate({ to: "/szerzodes/$id/szerkesztes", params: { id: d.id }, replace: true });
       })
       .catch((err) => {
-        toast.error(err instanceof Error ? err.message : "Hiba a vázlat létrehozásakor");
+        toast.error(contractFlowErrorMessage(err));
       });
     return () => {
       cancelled = true;
@@ -31,7 +32,7 @@ function NewContract() {
   return (
     <PageShell>
       <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">
-        Új vázlat előkészítése…
+        Új szerződésvázlat előkészítése…
       </div>
     </PageShell>
   );

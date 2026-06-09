@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getDownloadUrl } from "@/lib/contracts/finalize.functions";
 import { CheckCircle2, Download } from "lucide-react";
 import { toast } from "sonner";
+import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
 
 const Search = z.object({ doc: z.string().uuid() });
 
@@ -28,7 +29,7 @@ function DonePage() {
       const r = await dl({ data: { document_id: doc } });
       window.open(r.url, "_blank");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Hiba");
+      toast.error(contractFlowErrorMessage(err));
     } finally {
       setLoading(false);
     }

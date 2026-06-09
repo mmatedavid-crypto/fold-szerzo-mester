@@ -41,3 +41,26 @@ export function paymentErrorMessage(error: unknown): string {
 
   return "A fizetési vagy véglegesítési lépés most nem sikerült. Kérjük, próbáld újra később.";
 }
+
+export function contractFlowErrorMessage(error: unknown): string {
+  const message = messageOf(error);
+  const lower = message.toLowerCase();
+
+  if (lower.includes("not found") || lower.includes("nincs")) {
+    return "Ezt a szerződésvázlatot vagy dokumentumot most nem találjuk. Lehet, hogy már törölted, vagy nem ehhez a fiókhoz tartozik.";
+  }
+
+  if (lower.includes("credit") || lower.includes("kredit") || lower.includes("előfizetési")) {
+    return message;
+  }
+
+  if (
+    lower.includes("permission") ||
+    lower.includes("row-level") ||
+    lower.includes("unauthorized")
+  ) {
+    return "Ehhez a dokumentumhoz nincs hozzáférésed ezzel a fiókkal.";
+  }
+
+  return "Most nem sikerült betölteni vagy véglegesíteni ezt a szerződéslépést. Kérjük, próbáld újra később.";
+}

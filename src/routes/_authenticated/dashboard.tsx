@@ -19,6 +19,7 @@ import { Download, FilePlus2, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GdprSection } from "@/components/dashboard/gdpr-section";
+import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Műhely | Dr Föld" }] }),
@@ -37,7 +38,7 @@ function Dashboard() {
       const r = await dl({ data: { document_id: id } });
       window.open(r.url, "_blank");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Hiba történt");
+      toast.error(contractFlowErrorMessage(err));
     }
   }
 
@@ -100,6 +101,9 @@ function Dashboard() {
             <div className="text-3xl font-semibold mt-1">
               {drafts.data?.filter((d) => d.status !== "finalized").length ?? "—"}
             </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Nyitott szerződés-előkészítések
+            </div>
           </Card>
         </div>
 
@@ -140,7 +144,14 @@ function Dashboard() {
               {(!docs.data || docs.data.length === 0) && (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
-                    Még nincs generált dokumentum.
+                    <div className="mx-auto max-w-md">
+                      <div className="font-medium text-foreground">
+                        Még nincs generált dokumentum.
+                      </div>
+                      <p className="mt-1 text-sm">
+                        Ha elkészül az első végleges PDF, itt tudod újra letölteni és ellenőrizni.
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -180,7 +191,19 @@ function Dashboard() {
                 drafts.data.filter((d) => d.status !== "finalized").length === 0) && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                    Nincs nyitott vázlat.
+                    <div className="mx-auto max-w-md">
+                      <div className="font-medium text-foreground">Nincs nyitott vázlat.</div>
+                      <p className="mt-1 text-sm">
+                        Indíts egy földbérleti szerződést, és a Műhely automatikusan menti a
+                        vázlatot.
+                      </p>
+                      <Button asChild className="mt-4" size="sm">
+                        <Link to="/szerzodes/uj">
+                          <FilePlus2 className="mr-1 h-4 w-4" />
+                          Új szerződés indítása
+                        </Link>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
