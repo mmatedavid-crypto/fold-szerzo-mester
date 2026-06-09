@@ -1,8 +1,8 @@
 import type { Draft, Parcel, PreLease } from "@/lib/contracts/types";
 
-export const LEGAL_RULESET_VERSION = "HU-DRFOLD-2026-06-08";
+export const LEGAL_RULESET_VERSION = "HU-DRFOLD-2026-06-09";
 export const LEASE_CLAUSE_VERSION = "lease-2026-06-08";
-export const ACCEPTANCE_STATEMENT_VERSION = "acceptance-2026-06-08";
+export const ACCEPTANCE_STATEMENT_VERSION = "acceptance-2026-06-09";
 
 export type LegalSource = {
   id: string;
@@ -54,6 +54,23 @@ export const LEGAL_SOURCES: LegalSource[] = [
     url: "https://njt.jog.gov.hu/jogszabaly/2013-5-00-00",
     refs: ["kötelmi jog", "szerződések általános szabályai", "bérlet/haszonbérlet háttérszabályai"],
     note: "A szerződéses háttérszabályok forrása, ha földforgalmi különös szabály nem tér el.",
+  },
+  {
+    id: "korm-474-2013",
+    title:
+      "474/2013. (XII. 12.) Korm. rendelet az elővásárlási és előhaszonbérleti jog gyakorlása érdekében az adás-vételi és a haszonbérleti szerződés hirdetményi úton történő közlésére vonatkozó eljárási szabályokról",
+    shortTitle: "474/2013. Korm. rendelet",
+    url: "https://njt.jog.gov.hu/jogszabaly/2013-474-20-22",
+    refs: ["11. §", "13. §", "2. melléklet"],
+    note: "A hirdetményi közzététel, az elektronikus tájékoztató, a határidő és az iratjegyzék részletszabályai.",
+  },
+  {
+    id: "pp-2016-cxxx",
+    title: "2016. évi CXXX. törvény a polgári perrendtartásról",
+    shortTitle: "Pp.",
+    url: "https://njt.jog.gov.hu/jogszabaly/2016-130-00-00",
+    refs: ["325. §"],
+    note: "A teljes bizonyító erejű magánokirat alaki megoldásainak általános szabálya.",
   },
   {
     id: "erdotv-2009-xxxvii",
@@ -127,36 +144,50 @@ export const LEASE_CONTRACT_REQUIREMENTS: LegalRequirement[] = [
 export const ACCEPTANCE_STATEMENT_REQUIREMENTS: LegalRequirement[] = [
   {
     id: "accepted_contract",
-    label: "A kifüggesztett szerződés egyértelmű azonosítása",
-    legalRefs: ["Földforgalmi tv. 49–55. §"],
+    label: "A kifüggesztett haszonbérleti szerződés és a közlési határidő azonosítása",
+    legalRefs: ["Földforgalmi tv. 49. § (1)–(3)", "474/2013. Korm. rendelet 11. §"],
     appliesTo: "acceptance_statement",
     severity: "required",
   },
   {
     id: "acceptance_identity",
     label: "Az előhaszonbérletre jogosult azonosítása",
-    legalRefs: ["Földforgalmi tv. 51. § (4)–(6)", "Földforgalmi tv. 55. §"],
+    legalRefs: ["474/2013. Korm. rendelet 11. § (5)", "Pp. 325. §"],
     appliesTo: "acceptance_statement",
     severity: "required",
   },
   {
     id: "acceptance_rank_basis",
     label: "Az előhaszonbérleti jog törvényi jogalapjának és ranghelyének megjelölése",
-    legalRefs: ["Földforgalmi tv. 46–49. §", "Földforgalmi tv. 51. § (5) c)"],
+    legalRefs: ["Földforgalmi tv. 45–47. §", "Földforgalmi tv. 49. § (4)"],
     appliesTo: "acceptance_statement",
     severity: "required",
   },
   {
     id: "acceptance_proofs",
     label: "A jogalapot bizonyító okiratok csatolása",
-    legalRefs: ["Földforgalmi tv. 51. § (5) c)"],
+    legalRefs: ["Földforgalmi tv. 49. § (4)", "474/2013. Korm. rendelet 6. § j)"],
     appliesTo: "acceptance_statement",
     severity: "required",
   },
   {
     id: "acceptance_deadline",
-    label: "Határidőben tett elfogadó jognyilatkozat",
-    legalRefs: ["Földforgalmi tv. 51. §", "Fétv. közzétételi eljárási szabályok"],
+    label: "A közlés kezdő napjától számított 15 napos jogvesztő határidő betartása",
+    legalRefs: ["Földforgalmi tv. 49. § (3)", "474/2013. Korm. rendelet 11. § (1), (2a)"],
+    appliesTo: "acceptance_statement",
+    severity: "required",
+  },
+  {
+    id: "acceptance_full_acceptance",
+    label: "A haszonbérleti szerződés teljes körű elfogadása",
+    legalRefs: ["Földforgalmi tv. 49. § (5)"],
+    appliesTo: "acceptance_statement",
+    severity: "required",
+  },
+  {
+    id: "acceptance_private_document_form",
+    label: "Legalább teljes bizonyító erejű magánokirati forma",
+    legalRefs: ["Földforgalmi tv. 49. § (4)", "Pp. 325. §"],
     appliesTo: "acceptance_statement",
     severity: "required",
   },

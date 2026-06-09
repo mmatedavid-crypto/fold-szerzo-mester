@@ -58,7 +58,7 @@ const services = [
   {
     icon: "acceptance" as const,
     title: "Elfogadó nyilatkozat",
-    text: "Készíts jogszerű elfogadó nyilatkozatot gyorsan, hibamentesen.",
+    text: "Készíts elő elfogadó nyilatkozatot a jogalap, ranghely és igazolások ellenőrzésével.",
     to: "/elfogado-nyilatkozat",
     cta: "Nyilatkozatot készítek",
   },
