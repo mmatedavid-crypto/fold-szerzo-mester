@@ -17,27 +17,27 @@ export function SiteFooter() {
           <div className="mb-3 font-semibold text-df-ink">Szolgáltatás</div>
           <ul className="space-y-1 text-df-gray">
             <li>
-              <Link to="/kifuggesztesek" className="hover:text-primary">
+              <Link to="/kifuggesztesek" className="hover:text-df-green">
                 Kifüggesztések
               </Link>
             </li>
             <li>
-              <Link to="/ranghely-kalkulator" className="hover:text-primary">
+              <Link to="/ranghely-kalkulator" className="hover:text-df-green">
                 Ranghely kalkulátor
               </Link>
             </li>
             <li>
-              <Link to="/berleti-dij-iranytu" className="hover:text-primary">
+              <Link to="/berleti-dij-iranytu" className="hover:text-df-green">
                 Ár iránytű
               </Link>
             </li>
             <li>
-              <Link to="/foldberleti-szerzodes" className="hover:text-primary">
+              <Link to="/foldberleti-szerzodes" className="hover:text-df-green">
                 Bérleti szerződés
               </Link>
             </li>
             <li>
-              <Link to="/elfogado-nyilatkozat" className="hover:text-primary">
+              <Link to="/elfogado-nyilatkozat" className="hover:text-df-green">
                 Elfogadó nyilatkozat
               </Link>
             </li>
@@ -49,17 +49,17 @@ export function SiteFooter() {
           <p className="mt-3 text-xs text-df-gray">{companyLegalLine}</p>
           <ul className="mt-3 space-y-1 text-df-gray">
             <li>
-              <Link to="/aszf" className="hover:text-primary">
+              <Link to="/aszf" className="hover:text-df-green">
                 ÁSZF
               </Link>
             </li>
             <li>
-              <Link to="/adatkezeles" className="hover:text-primary">
+              <Link to="/adatkezeles" className="hover:text-df-green">
                 Adatkezelés
               </Link>
             </li>
             <li>
-              <Link to="/cookie-szabalyzat" className="hover:text-primary">
+              <Link to="/cookie-szabalyzat" className="hover:text-df-green">
                 Süti tájékoztató
               </Link>
             </li>
@@ -69,12 +69,12 @@ export function SiteFooter() {
           <div className="mb-3 font-semibold text-df-ink">Kapcsolat</div>
           <ul className="space-y-1 text-df-gray">
             <li>
-              <Link to="/dokumentum-ellenorzes" className="hover:text-primary">
+              <Link to="/dokumentum-ellenorzes" className="hover:text-df-green">
                 Dokumentum ellenőrzése
               </Link>
             </li>
             <li>
-              <a href={`mailto:${company.contactEmail}`} className="hover:text-primary">
+              <a href={`mailto:${company.contactEmail}`} className="hover:text-df-green">
                 {company.contactEmail}
               </a>
             </li>

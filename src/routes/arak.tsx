@@ -73,7 +73,7 @@ function PricingError() {
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-df-red">
             Árak betöltése
           </p>
-          <h1 className="mt-3 font-serif text-3xl text-df-green">
+          <h1 className="mt-3 font-brand text-3xl font-bold text-df-green">
             Most nem látjuk biztosan az árlistát.
           </h1>
           <p className="mt-3 text-df-gray">
@@ -81,10 +81,10 @@ function PricingError() {
             díjat fizetés előtt mindig külön megerősítjük.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Button asChild>
+            <Button asChild className="bg-df-green text-white hover:bg-[#173B2A]">
               <Link to="/foldberleti-szerzodes">Bérleti szerződés indítása</Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="border-df-green text-df-green">
               <Link to="/">Vissza a főoldalra</Link>
             </Button>
           </div>
@@ -108,16 +108,18 @@ function PricingNotFound() {
     <PageShell>
       <section className="container mx-auto max-w-2xl px-4 py-16">
         <Card className="border-df-border bg-df-card p-6">
-          <h1 className="font-serif text-3xl text-df-green">Ez az árlista nem található.</h1>
+          <h1 className="font-brand text-3xl font-bold text-df-green">
+            Ez az árlista nem található.
+          </h1>
           <p className="mt-3 text-df-gray">
             Nézd meg a Dr Föld fő szolgáltatásait, vagy indítsd el közvetlenül a földbérleti
             szerződés előkészítését.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Button asChild>
+            <Button asChild className="bg-df-green text-white hover:bg-[#173B2A]">
               <Link to="/">Dr Föld szolgáltatások</Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="border-df-green text-df-green">
               <Link to="/foldberleti-szerzodes">Szerződés indítása</Link>
             </Button>
           </div>
