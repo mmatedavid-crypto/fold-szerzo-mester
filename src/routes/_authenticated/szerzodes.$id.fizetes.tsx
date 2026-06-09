@@ -61,6 +61,7 @@ function PayPage() {
 
   const hasAny = hasCredit || hasSubQuota;
   const checkoutEnabled = checkoutAvailability.data?.enabled ?? false;
+  const mockCheckoutActive = checkoutAvailability.data?.provider === "mock";
 
   return (
     <PageShell>
@@ -103,6 +104,12 @@ function PayPage() {
             <div className="mt-4 rounded-md border border-df-yellow bg-df-yellow/10 p-3 text-sm text-df-ink">
               Az online fizetés még nincs megnyitva ezen a környezeten. Ha már van elérhető kredited
               vagy előfizetési kereted, fent tudod véglegesíteni a dokumentumot.
+            </div>
+          )}
+          {mockCheckoutActive && (
+            <div className="mt-4 rounded-md border border-df-red bg-df-red/10 p-3 text-sm text-df-ink">
+              Teszt fizetés aktív ezen a környezeten. Éles használat előtt kapcsold ki a mock
+              fizetést, vagy állíts be valódi fizetési szolgáltatót.
             </div>
           )}
           <div className="grid gap-3 md:grid-cols-3 mt-4">

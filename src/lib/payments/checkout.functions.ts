@@ -1,21 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-function mockPaymentsEnabled(): boolean {
-  return (
-    process.env.MOCK_PAYMENTS_ENABLED === "true" ||
-    process.env.NODE_ENV === "development" ||
-    process.env.NODE_ENV === "test"
-  );
-}
+import { mockPaymentsEnabled } from "@/lib/payments/mock";
 
 export const getCheckoutAvailability = createServerFn({ method: "GET" }).handler(async () => {
   const enabled = mockPaymentsEnabled();
   return {
     enabled,
     provider: enabled ? "mock" : null,
-    label: enabled ? "Teszt fizetés" : "Online fizetés előkészítés alatt",
+    label: enabled ? "Teszt fizetés aktív" : "Online fizetés előkészítés alatt",
   };
 });
 

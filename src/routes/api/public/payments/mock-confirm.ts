@@ -1,13 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import process from "node:process";
-
-function mockPaymentsEnabled(): boolean {
-  return (
-    process.env.MOCK_PAYMENTS_ENABLED === "true" ||
-    process.env.NODE_ENV === "development" ||
-    process.env.NODE_ENV === "test"
-  );
-}
+import { mockPaymentsEnabled } from "@/lib/payments/mock";
 
 function safeReturnPath(requestUrl: string): string {
   const url = new URL(requestUrl);
