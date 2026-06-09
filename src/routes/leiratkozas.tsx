@@ -5,6 +5,8 @@ import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { unsubscribeByToken } from "@/lib/subscriptions/subscribe.functions";
+import { subscriptionErrorMessage } from "@/lib/user-facing-errors";
+import { CheckCircle2, MailX } from "lucide-react";
 
 export const Route = createFileRoute("/leiratkozas")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -37,11 +39,11 @@ function UnsubPage() {
         setInfo({ email: res.email, settlement: res.settlement });
       } else {
         setState("error");
-        setMessage(res.error ?? "Ismeretlen hiba.");
+        setMessage(subscriptionErrorMessage(res.error));
       }
     } catch (e) {
       setState("error");
-      setMessage(e instanceof Error ? e.message : "Ismeretlen hiba.");
+      setMessage(subscriptionErrorMessage(e));
     }
   }
 
@@ -55,19 +57,43 @@ function UnsubPage() {
         <Card className="p-6 mt-6 space-y-4">
           {state === "idle" && token && (
             <>
-              <p>Megerősíted, hogy leiratkozol a heti Dr Föld kifüggesztés-értesítőről?</p>
+              <MailX className="h-10 w-10 text-df-red" />
+              <div>
+                <h2 className="font-serif text-xl text-df-green">Leállítod a heti értesítőt?</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Ha megerősíted, erre a feliratkozásra nem küldünk több heti kifüggesztés
+                  összefoglalót.
+                </p>
+              </div>
               <Button onClick={confirm}>Igen, leiratkozom</Button>
             </>
           )}
-          {state === "loading" && <p>Folyamatban…</p>}
-          {state === "done" && (
-            <p className="text-sm">
-              Sikeresen leiratkoztál.
-              <br />
-              {info.email} – {info.settlement}
-            </p>
+          {state === "loading" && (
+            <p className="text-sm text-muted-foreground">Leiratkozás rögzítése…</p>
           )}
-          {state === "error" && <p className="text-sm text-destructive">{message}</p>}
+          {state === "done" && (
+            <div className="text-sm">
+              <CheckCircle2 className="mb-3 h-10 w-10 text-df-green" />
+              <h2 className="font-serif text-xl text-df-green">Sikeresen leiratkoztál.</h2>
+              <p className="mt-2 text-muted-foreground">
+                Erre az értesítőre nem küldünk több heti összefoglalót.
+              </p>
+              {(info.email || info.settlement) && (
+                <p className="mt-3 rounded-md border border-df-border bg-df-card p-3 text-xs text-muted-foreground">
+                  {info.email ?? "—"} · {info.settlement ?? "—"}
+                </p>
+              )}
+            </div>
+          )}
+          {state === "error" && (
+            <div>
+              <h2 className="font-serif text-xl text-df-green">Nem sikerült a leiratkozás.</h2>
+              <p className="mt-2 text-sm text-destructive">{message}</p>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Ha továbbra is gond van, írj a hello@drfold.hu címre.
+              </p>
+            </div>
+          )}
         </Card>
       </section>
     </PageShell>

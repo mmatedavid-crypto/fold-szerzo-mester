@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 import { cleanSettlement } from "@/lib/notices/clean";
 import { subscribeToSettlement } from "@/lib/subscriptions/subscribe.functions";
+import { subscriptionErrorMessage } from "@/lib/user-facing-errors";
 import {
   Dialog,
   DialogContent,
@@ -257,10 +258,10 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
         setEmail("");
         setSettlement("");
       } else {
-        toast.error(res.error ?? "Hiba történt.");
+        toast.error(subscriptionErrorMessage(res.error));
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Hiba történt.");
+      toast.error(subscriptionErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -272,10 +273,10 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <Mail className="h-4 w-4 text-primary" />
-            <h2 className="font-serif text-lg">Heti értesítő emailben</h2>
+            <h2 className="font-serif text-lg">Heti értesítő e-mailben</h2>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Válassz települést és minden héten elküldjük az aktuális kifüggesztéseket. 52 hét.{" "}
+            Válassz települést, és hetente küldjük az aktuális kifüggesztéseket. 52 hét.{" "}
             <strong>9.990 Ft / év.</strong>
           </p>
         </div>
@@ -287,23 +288,30 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
             <DialogHeader>
               <DialogTitle>Heti kifüggesztés értesítő</DialogTitle>
               <DialogDescription>
-                52 héten át minden héten emailben megkapod az adott település aktuális termőföld
+                52 héten át minden héten e-mailben megkapod az adott település aktuális termőföld
                 kifüggesztéseit.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-muted-foreground">Email cím</label>
+                <label className="text-xs text-muted-foreground" htmlFor="notice-email">
+                  E-mail cím
+                </label>
                 <Input
+                  id="notice-email"
                   type="email"
+                  autoComplete="email"
                   placeholder="te@email.hu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">Település</label>
+                <label className="text-xs text-muted-foreground" htmlFor="settlement-filter">
+                  Település
+                </label>
                 <Input
+                  id="settlement-filter"
                   placeholder="Keresés..."
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
@@ -327,7 +335,7 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
               </div>
               <p className="text-xs text-muted-foreground">
                 A feliratkozással elfogadod a heti értesítő küldését. Bármikor leiratkozhatsz az
-                emailben található linkkel.
+                e-mailben található linkkel.
               </p>
             </div>
             <DialogFooter>

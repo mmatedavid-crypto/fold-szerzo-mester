@@ -64,3 +64,22 @@ export function contractFlowErrorMessage(error: unknown): string {
 
   return "Most nem sikerült betölteni vagy véglegesíteni ezt a szerződéslépést. Kérjük, próbáld újra később.";
 }
+
+export function subscriptionErrorMessage(error: unknown): string {
+  const message = messageOf(error);
+  const lower = message.toLowerCase();
+
+  if (lower.includes("érvénytelen") || lower.includes("invalid")) {
+    return "A megadott adat nem ellenőrizhető. Nézd át az e-mail címet vagy a linket.";
+  }
+
+  if (lower.includes("duplicate") || lower.includes("already")) {
+    return "Ehhez az e-mail címhez és településhez már van értesítő. Meghosszabbítjuk, ha újra feliratkozol.";
+  }
+
+  if (lower.includes("rate limit") || lower.includes("too many")) {
+    return "Túl sok próbálkozás történt rövid idő alatt. Várj egy kicsit, majd próbáld újra.";
+  }
+
+  return "Az értesítő beállítása most nem sikerült. Kérjük, próbáld újra később.";
+}
