@@ -17,6 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate, formatHuf } from "@/lib/format";
 import { ArrowRight, BarChart3, Database, MapPinned, Search, TrendingUp } from "lucide-react";
+import { company } from "@/lib/company";
 
 export const Route = createFileRoute("/berleti-dij-iranytu")({
   head: () => ({
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/berleti-dij-iranytu")({
           "Haszonbérleti díjak és földárak megyei hőtérképen, nyilvános hirdetményekből gyűjtve.",
       },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/berleti-dij-iranytu` }],
   }),
   component: PriceCompassPage,
 });
@@ -354,7 +356,7 @@ function PriceCompassPage() {
 
   return (
     <PageShell>
-      <main className="bg-df-cream">
+      <div className="bg-df-cream">
         <section className="container mx-auto max-w-7xl px-4 py-10 md:py-14">
           <div className="grid gap-8 lg:grid-cols-[1fr,380px] lg:items-end">
             <div>
@@ -549,7 +551,7 @@ function PriceCompassPage() {
             </div>
           </Card>
         </section>
-      </main>
+      </div>
     </PageShell>
   );
 }
