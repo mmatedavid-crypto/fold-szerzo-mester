@@ -27,7 +27,8 @@ function PrivacyPage() {
 
         <h2>1. Adatkezelő</h2>
         <p>
-          <strong>[Cégnév Kft.]</strong> (székhely: [cím], adószám: [szám], e-mail:{" "}
+          <strong>Precíziós Agrokémia Zrt.</strong> (székhely: 2636 Tésa, Ady Endre utca 11.,
+          cégjegyzékszám: 13-10-042640, adószám: 26558534-2-13, e-mail:{" "}
           <a href="mailto:hello@drfold.hu">hello@drfold.hu</a>).
         </p>
 

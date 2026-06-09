@@ -25,9 +25,10 @@ function AszfPage() {
 
         <h2>1. A Szolgáltató</h2>
         <p>
-          Üzemeltető: <strong>[Cégnév Kft.]</strong> (székhely: [cím], cégjegyzékszám: [szám],
-          adószám: [szám], e-mail: <a href="mailto:hello@drfold.hu">hello@drfold.hu</a>). A
-          szolgáltatás a <a href="https://drfold.hu">drfold.hu</a> domain alatt érhető el.
+          Üzemeltető: <strong>Precíziós Agrokémia Zrt.</strong> (székhely: 2636 Tésa, Ady Endre utca
+          11., cégjegyzékszám: 13-10-042640, adószám: 26558534-2-13, e-mail:{" "}
+          <a href="mailto:hello@drfold.hu">hello@drfold.hu</a>). A szolgáltatás a{" "}
+          <a href="https://drfold.hu">drfold.hu</a> domain alatt érhető el.
         </p>
 
         <h2>2. A szolgáltatás tárgya</h2>
