@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { OAuthButton } from "@/components/auth/apple-button";
+import { authErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/regisztracio")({
   head: () => ({
@@ -40,10 +41,10 @@ function RegPage() {
     });
     setLoading(false);
     if (error) {
-      toast.error("Sikertelen regisztráció: " + error.message);
+      toast.error(authErrorMessage(error));
       return;
     }
-    toast.success("Sikeres regisztráció. Bejelentkeztetünk.");
+    toast.success("Fiók létrehozva. Indulhat a Dr Föld Műhely.");
     navigate({ to: "/dashboard" });
   }
 
@@ -52,10 +53,19 @@ function RegPage() {
       <section className="container mx-auto px-4 py-16 max-w-md">
         <Card className="p-6">
           <h1 className="font-serif text-2xl">Regisztráció</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Hozz létre fiókot, hogy a vázlataid, dokumentumaid és figyeléseid megmaradjanak.
+          </p>
           <form onSubmit={onSubmit} className="mt-5 space-y-4">
             <div>
               <Label htmlFor="name">Név</Label>
-              <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
+              <Input
+                id="name"
+                required
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="email">E-mail</Label>
@@ -63,6 +73,7 @@ function RegPage() {
                 id="email"
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -74,9 +85,13 @@ function RegPage() {
                 type="password"
                 required
                 minLength={6}
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Legalább 6 karakter. A földügyekhez nem kell bonyolítani, csak legyen biztonságos.
+              </p>
             </div>
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Regisztráció..." : "Regisztrálok"}

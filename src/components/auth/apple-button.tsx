@@ -2,6 +2,7 @@ import { useState } from "react";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { authErrorMessage } from "@/lib/user-facing-errors";
 
 type Provider = "apple" | "google";
 
@@ -13,8 +14,15 @@ const APPLE_ICON = (
 
 const GOOGLE_ICON = (
   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
-    <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.24 1.4-1.7 4.1-5.5 4.1-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.7 3.4 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12S6.7 21.6 12 21.6c6.9 0 9.5-4.8 9.5-9.3 0-.6-.1-1.1-.2-1.6H12z"/>
-    <path fill="#34A853" d="M3.9 7.6l3.2 2.3C8 7.9 9.8 6.5 12 6.5c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.7 3.9 14.6 2.9 12 2.9 8.2 2.9 5 5.1 3.9 7.6z" opacity="0"/>
+    <path
+      fill="#EA4335"
+      d="M12 10.2v3.9h5.5c-.24 1.4-1.7 4.1-5.5 4.1-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.7 3.4 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12S6.7 21.6 12 21.6c6.9 0 9.5-4.8 9.5-9.3 0-.6-.1-1.1-.2-1.6H12z"
+    />
+    <path
+      fill="#34A853"
+      d="M3.9 7.6l3.2 2.3C8 7.9 9.8 6.5 12 6.5c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.7 3.9 14.6 2.9 12 2.9 8.2 2.9 5 5.1 3.9 7.6z"
+      opacity="0"
+    />
   </svg>
 );
 
@@ -23,13 +31,7 @@ const LABELS: Record<Provider, string> = {
   google: "Folytatás Google-lel",
 };
 
-export function OAuthButton({
-  provider,
-  label,
-}: {
-  provider: Provider;
-  label?: string;
-}) {
+export function OAuthButton({ provider, label }: { provider: Provider; label?: string }) {
   const [loading, setLoading] = useState(false);
 
   async function onClick() {
@@ -39,14 +41,14 @@ export function OAuthButton({
         redirect_uri: window.location.origin + "/dashboard",
       });
       if (result.error) {
-        toast.error("Sikertelen bejelentkezés: " + result.error.message);
+        toast.error(authErrorMessage(result.error));
         setLoading(false);
         return;
       }
       if (result.redirected) return;
       window.location.href = "/dashboard";
     } catch {
-      toast.error("Hiba történt a bejelentkezés során.");
+      toast.error("Most nem sikerült az átirányításos belépés. Próbáld újra pár perc múlva.");
       setLoading(false);
     }
   }
@@ -54,7 +56,7 @@ export function OAuthButton({
   return (
     <Button type="button" variant="outline" className="w-full" onClick={onClick} disabled={loading}>
       {provider === "apple" ? APPLE_ICON : GOOGLE_ICON}
-      {loading ? "Átirányítás..." : label ?? LABELS[provider]}
+      {loading ? "Átirányítás..." : (label ?? LABELS[provider])}
     </Button>
   );
 }

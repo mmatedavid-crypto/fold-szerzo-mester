@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { OAuthButton } from "@/components/auth/apple-button";
+import { authErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/belepes")({
   head: () => ({
@@ -31,10 +32,10 @@ function BelepesPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      toast.error("Sikertelen belépés: " + error.message);
+      toast.error(authErrorMessage(error));
       return;
     }
-    toast.success("Sikeres belépés");
+    toast.success("Beléptél. Folytathatod a földügyet.");
     navigate({ to: "/dashboard" });
   }
 
@@ -43,6 +44,9 @@ function BelepesPage() {
       <section className="container mx-auto px-4 py-16 max-w-md">
         <Card className="p-6">
           <h1 className="font-serif text-2xl">Belépés</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Lépj be a Műhelybe, ahol a vázlatok, dokumentumok és figyelések várnak.
+          </p>
           <form onSubmit={onSubmit} className="mt-5 space-y-4">
             <div>
               <Label htmlFor="email">E-mail</Label>
@@ -50,6 +54,7 @@ function BelepesPage() {
                 id="email"
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -60,12 +65,13 @@ function BelepesPage() {
                 id="password"
                 type="password"
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Belépés..." : "Belépés"}
+              {loading ? "Belépés..." : "Belépek"}
             </Button>
           </form>
           <div className="mt-5 flex items-center gap-3">

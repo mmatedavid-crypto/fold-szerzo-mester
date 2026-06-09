@@ -10,6 +10,7 @@ import { getMyQuota, finalizeContract } from "@/lib/contracts/finalize.functions
 import { getCheckoutAvailability, startCheckout } from "@/lib/payments/checkout.functions";
 import { formatHuf } from "@/lib/format";
 import { toast } from "sonner";
+import { paymentErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/fizetes")({
   head: () => ({ meta: [{ title: "Fizetés és véglegesítés | Dr Föld" }] }),
@@ -39,7 +40,7 @@ function PayPage() {
       const r = await finalize({ data: { draft_id: id } });
       navigate({ to: "/szerzodes/$id/kesz", params: { id }, search: { doc: r.document_id } });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Hiba");
+      toast.error(paymentErrorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -52,7 +53,7 @@ function PayPage() {
       const r = await checkout({ data: { plan_slug: slug, draft_id: id, return_url: returnUrl } });
       window.location.href = r.redirect_url;
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Hiba");
+      toast.error(paymentErrorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -100,8 +101,8 @@ function PayPage() {
           </p>
           {!checkoutEnabled && (
             <div className="mt-4 rounded-md border border-df-yellow bg-df-yellow/10 p-3 text-sm text-df-ink">
-              Az online fizetés bekötése folyamatban van. Ha már van elérhető kredited vagy
-              előfizetési kereted, fent tudod véglegesíteni a dokumentumot.
+              Az online fizetés még nincs megnyitva ezen a környezeten. Ha már van elérhető kredited
+              vagy előfizetési kereted, fent tudod véglegesíteni a dokumentumot.
             </div>
           )}
           <div className="grid gap-3 md:grid-cols-3 mt-4">
