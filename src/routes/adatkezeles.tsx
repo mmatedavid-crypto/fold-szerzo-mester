@@ -12,7 +12,14 @@ export const Route = createFileRoute("/adatkezeles")({
         content:
           "GDPR alapú adatkezelési tájékoztató a Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatáshoz.",
       },
+      { property: "og:title", content: "Adatkezelési tájékoztató | Dr Föld" },
+      {
+        property: "og:description",
+        content:
+          "GDPR alapú adatkezelési tájékoztató a Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatáshoz.",
+      },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/adatkezeles` }],
   }),
   component: PrivacyPage,
 });

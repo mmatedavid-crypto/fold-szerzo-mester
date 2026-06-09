@@ -11,7 +11,13 @@ export const Route = createFileRoute("/aszf")({
         name: "description",
         content: "A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás ÁSZF-je.",
       },
+      { property: "og:title", content: "Általános Szerződési Feltételek | Dr Föld" },
+      {
+        property: "og:description",
+        content: "A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás ÁSZF-je.",
+      },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/aszf` }],
   }),
   component: AszfPage,
 });

@@ -6,6 +6,7 @@ import {
   COOKIE_CONSENT_STORAGE_KEY,
   LEGACY_COOKIE_CONSENT_STORAGE_KEY,
 } from "@/lib/cookie-consent";
+import { company } from "@/lib/company";
 
 export const Route = createFileRoute("/cookie-szabalyzat")({
   head: () => ({
@@ -15,7 +16,13 @@ export const Route = createFileRoute("/cookie-szabalyzat")({
         name: "description",
         content: "A Dr Föld süti (cookie) használatáról szóló tájékoztató.",
       },
+      { property: "og:title", content: "Süti tájékoztató | Dr Föld" },
+      {
+        property: "og:description",
+        content: "A Dr Föld süti (cookie) használatáról szóló tájékoztató.",
+      },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/cookie-szabalyzat` }],
   }),
   component: CookiePage,
 });

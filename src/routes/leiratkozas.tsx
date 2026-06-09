@@ -14,7 +14,21 @@ export const Route = createFileRoute("/leiratkozas")({
   validateSearch: (s: Record<string, unknown>) => ({
     token: typeof s.token === "string" ? s.token : "",
   }),
-  head: () => ({ meta: [{ title: "Leiratkozás | Dr Föld" }] }),
+  head: () => ({
+    meta: [
+      { title: "Leiratkozás | Dr Föld" },
+      {
+        name: "description",
+        content: "Leiratkozás a Dr Föld heti kifüggesztés értesítőjéről.",
+      },
+      { property: "og:title", content: "Leiratkozás | Dr Föld" },
+      {
+        property: "og:description",
+        content: "Leiratkozás a Dr Föld heti kifüggesztés értesítőjéről.",
+      },
+    ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/leiratkozas` }],
+  }),
   component: UnsubPage,
 });
 
