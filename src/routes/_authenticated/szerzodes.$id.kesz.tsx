@@ -64,6 +64,12 @@ function DonePage() {
           </div>
 
           <div className="space-y-5 p-6">
+            <div className="rounded-md border border-df-yellow/60 bg-df-yellow/10 p-4 text-sm leading-6 text-df-ink">
+              <span className="font-semibold text-df-green">Ravasz ellenőrzési pont:</span> a PDF
+              lábrészében szereplő dokumentumazonosítóval később is ellenőrizheted, hogy a Dr Föld
+              nyilvántartásában szereplő iratról van szó.
+            </div>
+
             <div className="grid gap-3 md:grid-cols-2">
               <InfoRow
                 icon={<FileCheck2 className="h-5 w-5" />}
