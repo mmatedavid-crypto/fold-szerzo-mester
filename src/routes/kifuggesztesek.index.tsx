@@ -307,33 +307,40 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
   }
 
   return (
-    <Card className="mt-5 border-df-border bg-[linear-gradient(135deg,#FFFDF7,#F4E7CF)] p-4 shadow-sm md:p-5">
+    <Card className="mt-5 border-df-border bg-[linear-gradient(135deg,#FFFDF7,#F4E7CF)] p-4 shadow-[0_12px_34px_rgba(26,26,26,0.07)] md:p-5">
       <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <Mail className="h-4 w-4 text-df-green" />
+            <span className="grid h-8 w-8 place-items-center rounded-md border border-df-border bg-df-card text-df-green">
+              <Mail className="h-4 w-4" />
+            </span>
             <h2 className="font-brand text-lg font-bold text-df-green">Heti értesítő e-mailben</h2>
           </div>
           <p className="mt-1 text-sm text-df-gray">
-            Válassz települést, és hetente küldjük az aktuális kifüggesztéseket. 52 hét.{" "}
-            <strong>9.990 Ft / év.</strong>
+            Válassz települést, és hetente küldjük az aktuális kifüggesztéseket. Kifüggesztésből
+            lehetőség. 52 hét. <strong>9.990 Ft / év.</strong>
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="bg-df-green text-white hover:bg-[#173B2A]">Feliratkozás</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="border-df-border bg-df-card">
             <DialogHeader>
-              <DialogTitle>Heti kifüggesztés értesítő</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="font-brand text-2xl text-df-green">
+                Heti kifüggesztés értesítő
+              </DialogTitle>
+              <DialogDescription className="leading-6 text-df-gray">
                 52 héten át minden héten e-mailben megkapod az adott település aktuális termőföld
                 kifüggesztéseit.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-muted-foreground" htmlFor="notice-email">
+                <label
+                  className="text-xs font-semibold uppercase tracking-[0.12em] text-df-gray"
+                  htmlFor="notice-email"
+                >
                   E-mail cím
                 </label>
                 <Input
@@ -346,7 +353,10 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground" htmlFor="settlement-filter">
+                <label
+                  className="text-xs font-semibold uppercase tracking-[0.12em] text-df-gray"
+                  htmlFor="settlement-filter"
+                >
                   Település
                 </label>
                 <Input
@@ -362,7 +372,7 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
                   </SelectTrigger>
                   <SelectContent>
                     {options.length === 0 && (
-                      <div className="p-2 text-xs text-muted-foreground">Nincs találat</div>
+                      <div className="p-2 text-xs text-df-gray">Nincs találat</div>
                     )}
                     {options.map((s) => (
                       <SelectItem key={s} value={s}>
@@ -372,16 +382,24 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
                   </SelectContent>
                 </Select>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="rounded-md border border-df-border bg-df-cream/60 p-3 text-xs leading-5 text-df-gray">
                 A feliratkozással elfogadod a heti értesítő küldését. Bármikor leiratkozhatsz az
                 e-mailben található linkkel.
               </p>
             </div>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setOpen(false)}>
+              <Button
+                variant="outline"
+                className="border-df-green text-df-green"
+                onClick={() => setOpen(false)}
+              >
                 Mégse
               </Button>
-              <Button onClick={submit} disabled={loading}>
+              <Button
+                className="bg-df-green text-white hover:bg-[#173B2A]"
+                onClick={submit}
+                disabled={loading}
+              >
                 {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Feliratkozom
               </Button>

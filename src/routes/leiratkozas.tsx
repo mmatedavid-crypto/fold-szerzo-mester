@@ -4,10 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BrandBadge } from "@/components/brand/brand-elements";
 import { unsubscribeByToken } from "@/lib/subscriptions/subscribe.functions";
 import { subscriptionErrorMessage } from "@/lib/user-facing-errors";
 import { company } from "@/lib/company";
-import { CheckCircle2, MailX } from "lucide-react";
+import { CheckCircle2, Loader2, MailX, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/leiratkozas")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -50,37 +51,56 @@ function UnsubPage() {
 
   return (
     <PageShell>
-      <section className="container mx-auto px-4 py-12 max-w-xl">
-        <h1 className="font-serif text-3xl">Leiratkozás</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          A Dr Föld kifüggesztés-értesítőjét itt tudod leállítani.
-        </p>
-        <Card className="p-6 mt-6 space-y-4">
+      <section className="container mx-auto max-w-xl px-4 py-12">
+        <div className="rounded-lg border border-df-border bg-df-card p-6 shadow-[0_18px_45px_rgba(26,26,26,0.08)]">
+          <BrandBadge>Heti kifüggesztés értesítő</BrandBadge>
+          <h1 className="mt-4 font-brand text-4xl font-bold leading-tight text-df-green">
+            Leiratkozás
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-df-gray">
+            A Dr Föld kifüggesztés-értesítőjét itt tudod leállítani. Ha később újra szükséged lesz
+            rá, bármikor feliratkozhatsz egy településre.
+          </p>
+        </div>
+        <Card className="mt-6 space-y-4 border-df-border bg-df-card p-6 shadow-sm">
           {state === "idle" && token && (
             <>
-              <MailX className="h-10 w-10 text-df-red" />
-              <div>
-                <h2 className="font-serif text-xl text-df-green">Leállítod a heti értesítőt?</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Ha megerősíted, erre a feliratkozásra nem küldünk több heti kifüggesztés
-                  összefoglalót.
-                </p>
+              <div className="flex gap-3">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md border border-df-red/40 bg-df-red/10 text-df-red">
+                  <MailX className="h-5 w-5" />
+                </span>
+                <div>
+                  <h2 className="font-brand text-2xl font-bold text-df-green">
+                    Leállítod a heti értesítőt?
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-df-gray">
+                    Ha megerősíted, erre a feliratkozásra nem küldünk több heti kifüggesztés
+                    összefoglalót.
+                  </p>
+                </div>
               </div>
-              <Button onClick={confirm}>Igen, leiratkozom</Button>
+              <Button className="bg-df-red text-white hover:bg-[#8F2F26]" onClick={confirm}>
+                Igen, leiratkozom
+              </Button>
             </>
           )}
           {state === "loading" && (
-            <p className="text-sm text-muted-foreground">Leiratkozás rögzítése…</p>
+            <div className="flex items-center gap-2 text-sm text-df-gray">
+              <Loader2 className="h-4 w-4 animate-spin text-df-green" />
+              Leiratkozás rögzítése…
+            </div>
           )}
           {state === "done" && (
             <div className="text-sm">
               <CheckCircle2 className="mb-3 h-10 w-10 text-df-green" />
-              <h2 className="font-serif text-xl text-df-green">Sikeresen leiratkoztál.</h2>
-              <p className="mt-2 text-muted-foreground">
+              <h2 className="font-brand text-2xl font-bold text-df-green">
+                Sikeresen leiratkoztál.
+              </h2>
+              <p className="mt-2 leading-6 text-df-gray">
                 Erre az értesítőre nem küldünk több heti összefoglalót.
               </p>
               {(info.email || info.settlement) && (
-                <p className="mt-3 rounded-md border border-df-border bg-df-card p-3 text-xs text-muted-foreground">
+                <p className="mt-3 rounded-md border border-df-border bg-df-cream/60 p-3 text-xs text-df-gray">
                   {info.email ?? "—"} · {info.settlement ?? "—"}
                 </p>
               )}
@@ -88,9 +108,12 @@ function UnsubPage() {
           )}
           {state === "error" && (
             <div>
-              <h2 className="font-serif text-xl text-df-green">Nem sikerült a leiratkozás.</h2>
-              <p className="mt-2 text-sm text-destructive">{message}</p>
-              <p className="mt-3 text-xs text-muted-foreground">
+              <ShieldCheck className="mb-3 h-10 w-10 text-df-red" />
+              <h2 className="font-brand text-2xl font-bold text-df-green">
+                Nem sikerült a leiratkozás.
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-df-red">{message}</p>
+              <p className="mt-3 rounded-md border border-df-border bg-df-cream/60 p-3 text-xs leading-5 text-df-gray">
                 Ha továbbra is gond van, írj a{" "}
                 <a
                   className="font-semibold text-df-green underline"
