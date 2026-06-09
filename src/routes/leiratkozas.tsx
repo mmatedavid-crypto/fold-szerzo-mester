@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { unsubscribeByToken } from "@/lib/subscriptions/subscribe.functions";
 import { subscriptionErrorMessage } from "@/lib/user-facing-errors";
+import { company } from "@/lib/company";
 import { CheckCircle2, MailX } from "lucide-react";
 
 export const Route = createFileRoute("/leiratkozas")({
@@ -90,7 +91,14 @@ function UnsubPage() {
               <h2 className="font-serif text-xl text-df-green">Nem sikerült a leiratkozás.</h2>
               <p className="mt-2 text-sm text-destructive">{message}</p>
               <p className="mt-3 text-xs text-muted-foreground">
-                Ha továbbra is gond van, írj a hello@drfold.hu címre.
+                Ha továbbra is gond van, írj a{" "}
+                <a
+                  className="font-semibold text-df-green underline"
+                  href={`mailto:${company.contactEmail}`}
+                >
+                  {company.contactEmail}
+                </a>{" "}
+                címre.
               </p>
             </div>
           )}

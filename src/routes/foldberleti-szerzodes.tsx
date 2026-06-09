@@ -5,6 +5,7 @@ import { PageShell } from "@/components/layout/page-shell";
 import { BrandButton } from "@/components/brand/brand-buttons";
 import { BrandBadge, StampBadge } from "@/components/brand/brand-elements";
 import { DrFoldLogo } from "@/components/brand/dr-fold-logo";
+import { company } from "@/lib/company";
 
 export const Route = createFileRoute("/foldberleti-szerzodes")({
   head: () => ({
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/foldberleti-szerzodes")({
           "Add meg a föld, a felek és a bérlet adatait. A Dr Föld segít rendezett szerződés-előkészítő dokumentumot készíteni.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://drfold.hu/foldberleti-szerzodes" }],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/foldberleti-szerzodes` }],
   }),
   component: FoldberletiSzerzodesLanding,
 });

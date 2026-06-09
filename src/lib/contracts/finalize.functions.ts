@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { computeRiskReport, coreFieldsFingerprint, joinLessorNames } from "./logic";
 import type { Draft } from "./types";
+import { company } from "@/lib/company";
 import { LEGAL_RULESET_VERSION, LEASE_CLAUSE_VERSION } from "@/lib/legal/ruleset";
 
 function makeDocNumber(seqHint: string): string {
@@ -73,7 +74,7 @@ export const finalizeContract = createServerFn({ method: "POST" })
 
     // Pre-generate doc number from draft id; finalize_document RPC consumes credit atomically.
     const documentNumber = makeDocNumber(draft.id);
-    const verificationUrl = `https://drfold.hu/dokumentum-ellenorzes?id=${documentNumber}`;
+    const verificationUrl = `${company.websiteUrl}/dokumentum-ellenorzes?id=${documentNumber}`;
     const core_hash = coreFieldsFingerprint(draft);
 
     // Render PDF

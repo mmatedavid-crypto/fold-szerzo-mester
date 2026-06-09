@@ -8,6 +8,7 @@ import {
   ServiceCard,
   TrustStrip,
 } from "@/components/brand/brand-elements";
+import { company } from "@/lib/company";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,12 +27,12 @@ export const Route = createFileRoute("/")({
         content:
           "Kifüggesztések, ranghely kalkulátor, elfogadó nyilatkozat és földbérleti szerződés gazdáknak. Nézd meg, hol állsz a sorban.",
       },
-      { property: "og:image", content: "https://drfold.hu/og/drfold-og.svg" },
+      { property: "og:image", content: `${company.websiteUrl}/og/drfold-og.svg` },
       { property: "og:image:alt", content: "Dr Föld — Ravasz a gazda" },
-      { name: "twitter:image", content: "https://drfold.hu/og/drfold-og.svg" },
+      { name: "twitter:image", content: `${company.websiteUrl}/og/drfold-og.svg` },
       { name: "twitter:image:alt", content: "Dr Föld — Ravasz a gazda" },
     ],
-    links: [{ rel: "canonical", href: "https://drfold.hu/" }],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/` }],
   }),
   component: Index,
 });
