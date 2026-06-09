@@ -33,6 +33,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 import { Route as ApiPublicHooksSyncNoticesRouteImport } from './routes/api/public/hooks/sync-notices'
 import { Route as ApiPublicHooksSendWeeklyDigestRouteImport } from './routes/api/public/hooks/send-weekly-digest'
+import { Route as ApiPublicHooksExtractPricesRouteImport } from './routes/api/public/hooks/extract-prices'
 import { Route as AuthenticatedSzerzodesIdSzerkesztesRouteImport } from './routes/_authenticated/szerzodes.$id.szerkesztes'
 import { Route as AuthenticatedSzerzodesIdKeszRouteImport } from './routes/_authenticated/szerzodes.$id.kesz'
 import { Route as AuthenticatedSzerzodesIdFizetesRouteImport } from './routes/_authenticated/szerzodes.$id.fizetes'
@@ -162,6 +163,12 @@ const ApiPublicHooksSendWeeklyDigestRoute =
     path: '/api/public/hooks/send-weekly-digest',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksExtractPricesRoute =
+  ApiPublicHooksExtractPricesRouteImport.update({
+    id: '/api/public/hooks/extract-prices',
+    path: '/api/public/hooks/extract-prices',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedSzerzodesIdSzerkesztesRoute =
   AuthenticatedSzerzodesIdSzerkesztesRouteImport.update({
     id: '/szerzodes/$id/szerkesztes',
@@ -211,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -240,6 +248,7 @@ export interface FileRoutesByTo {
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -271,6 +280,7 @@ export interface FileRoutesById {
   '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/_authenticated/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/_authenticated/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
+    | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
+    | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
@@ -361,6 +373,7 @@ export interface FileRouteTypes {
     | '/_authenticated/szerzodes/$id/fizetes'
     | '/_authenticated/szerzodes/$id/kesz'
     | '/_authenticated/szerzodes/$id/szerkesztes'
+    | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
@@ -385,6 +398,7 @@ export interface RootRouteChildren {
   RegisztracioRoute: typeof RegisztracioRoute
   KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
   KifuggesztesekIndexRoute: typeof KifuggesztesekIndexRoute
+  ApiPublicHooksExtractPricesRoute: typeof ApiPublicHooksExtractPricesRoute
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
   ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
@@ -561,6 +575,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSendWeeklyDigestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/extract-prices': {
+      id: '/api/public/hooks/extract-prices'
+      path: '/api/public/hooks/extract-prices'
+      fullPath: '/api/public/hooks/extract-prices'
+      preLoaderRoute: typeof ApiPublicHooksExtractPricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/szerzodes/$id/szerkesztes': {
       id: '/_authenticated/szerzodes/$id/szerkesztes'
       path: '/szerzodes/$id/szerkesztes'
@@ -635,6 +656,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisztracioRoute: RegisztracioRoute,
   KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
   KifuggesztesekIndexRoute: KifuggesztesekIndexRoute,
+  ApiPublicHooksExtractPricesRoute: ApiPublicHooksExtractPricesRoute,
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
   ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
