@@ -50,15 +50,19 @@ export const Route = createFileRoute("/elfogado-nyilatkozat")({
 
 function AcceptancePage() {
   const search = Route.useSearch();
-  const [input, setInput] = useState<AcceptanceInput>(() => ({
-    noticeId: search.noticeId,
-    noticePublicationDate: search.noticePublicationDate,
-    deadlineDate: search.deadlineDate,
-    contractSubject: search.contractSubject,
-    submittedAt: today(),
-    signatureDate: today(),
-    witnesses: [{}, {}],
-  }));
+  const [input, setInput] = useState<AcceptanceInput>(() => {
+    const rankPrefill = readRankSnapshotPrefill();
+    return {
+      noticeId: search.noticeId,
+      noticePublicationDate: search.noticePublicationDate,
+      deadlineDate: search.deadlineDate,
+      contractSubject: search.contractSubject,
+      ...rankPrefill,
+      submittedAt: today(),
+      signatureDate: today(),
+      witnesses: [{}, {}],
+    };
+  });
 
   const composition = useMemo(() => composeAcceptanceStatement(input), [input]);
   const documentText = useMemo(() => renderComposition(composition), [composition]);
@@ -407,6 +411,34 @@ function today(): string {
 
 function stringSearch(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function readRankSnapshotPrefill(): Partial<AcceptanceInput> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.sessionStorage.getItem("rank_calculation_snapshot");
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const rank = objectOrNull(parsed.userStrongestRank);
+    const proofs = Array.isArray(parsed.requiredProofs)
+      ? parsed.requiredProofs
+          .map((item) => objectOrNull(item)?.label)
+          .filter((label): label is string => typeof label === "string" && label.trim().length > 0)
+      : [];
+    const rankGroup = typeof rank?.group === "number" ? `${rank.group}. ranghely` : undefined;
+    return {
+      rankBasis: stringSearch(rank?.humanName),
+      rankOrder: rankGroup,
+      rankLegalRef: stringSearch(rank?.legalRef),
+      attachedProofs: proofs.length ? proofs : undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
+function objectOrNull(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" ? (value as Record<string, unknown>) : null;
 }
 
 function renderComposition(composition: ReturnType<typeof composeAcceptanceStatement>): string {
