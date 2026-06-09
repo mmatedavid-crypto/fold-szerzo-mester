@@ -128,7 +128,7 @@ export function ContractEditor({ draft }: { draft: Draft }) {
   const completedSteps = stepCompletion.filter(Boolean).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 [&_button[role=combobox]]:border-df-border [&_button[role=combobox]]:bg-white [&_button[role=combobox]]:text-df-ink [&_button[role=combobox]]:focus:ring-df-green/40 [&_input]:border-df-border [&_input]:bg-white [&_input]:text-df-ink [&_input]:focus-visible:ring-df-green/40">
       <Card className="overflow-hidden border-df-border bg-df-card shadow-[0_18px_45px_rgba(26,26,26,0.08)]">
         <div className="df-dark-card p-5 text-df-card md:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
