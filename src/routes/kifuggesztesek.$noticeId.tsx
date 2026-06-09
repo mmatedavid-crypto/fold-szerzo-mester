@@ -141,8 +141,20 @@ function NoticeDetailPage() {
   if (q.isLoading) {
     return (
       <PageShell>
-        <div className="container mx-auto px-4 py-16 max-w-3xl flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Betöltés…
+        <div className="container mx-auto max-w-3xl px-4 py-16">
+          <Card className="border-df-border bg-df-card p-6 shadow-sm">
+            <div className="flex items-center gap-3 text-df-green">
+              <span className="grid h-10 w-10 place-items-center rounded-md border border-df-border bg-df-cream">
+                <Loader2 className="h-5 w-5 animate-spin" />
+              </span>
+              <div>
+                <div className="font-brand text-xl font-bold">Kifüggesztés betöltése</div>
+                <p className="text-sm text-df-gray">
+                  Előkészítjük a hirdetmény ranghely-ellenőrzését.
+                </p>
+              </div>
+            </div>
+          </Card>
         </div>
       </PageShell>
     );
@@ -151,13 +163,22 @@ function NoticeDetailPage() {
   if (!q.data) {
     return (
       <PageShell>
-        <div className="container mx-auto px-4 py-16 max-w-3xl">
-          <h1 className="font-serif text-2xl">A hirdetmény nem található</h1>
-          <Button asChild className="mt-4" variant="outline">
-            <Link to="/kifuggesztesek">
-              <ArrowLeft className="h-4 w-4 mr-1" /> Vissza a listához
-            </Link>
-          </Button>
+        <div className="container mx-auto max-w-3xl px-4 py-16">
+          <Card className="border-df-border bg-df-card p-6 shadow-sm">
+            <BrandBadge>Nem található</BrandBadge>
+            <h1 className="mt-4 font-brand text-3xl font-bold text-df-green">
+              Ezt a hirdetményt most nem találjuk.
+            </h1>
+            <p className="mt-3 text-sm leading-6 text-df-gray">
+              Lehet, hogy a kifüggesztés már lekerült, vagy más azonosítóval szerepel a listában.
+              Érdemes visszalépni és újra keresni településre, helyrajzi számra vagy ügyiratszámra.
+            </p>
+            <Button asChild className="mt-5 border-df-green text-df-green" variant="outline">
+              <Link to="/kifuggesztesek">
+                <ArrowLeft className="h-4 w-4 mr-1" /> Vissza a kifüggesztésekhez
+              </Link>
+            </Button>
+          </Card>
         </div>
       </PageShell>
     );
