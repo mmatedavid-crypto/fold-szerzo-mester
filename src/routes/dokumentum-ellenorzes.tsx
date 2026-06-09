@@ -128,6 +128,9 @@ function VerifyPage() {
                 )}
                 <div>
                   <div className={`font-semibold ${result.ok ? "text-df-green" : "text-df-red"}`}>
+                    {result.ok ? "Azonosító rendben" : "Nem igazolható biztosan"}
+                  </div>
+                  <div className={`mt-1 text-sm ${result.ok ? "text-df-ink" : "text-df-red"}`}>
                     {result.message}
                   </div>
                   <p className="mt-1 text-xs text-df-gray">
