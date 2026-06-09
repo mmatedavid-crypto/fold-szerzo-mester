@@ -124,7 +124,7 @@ function NoticesPage() {
         <h1 className="font-serif text-3xl">Kifüggesztések</h1>
         <p className="mt-2 text-muted-foreground text-sm max-w-2xl">
           Aktuális termőföld kifüggesztések. A részletekért (terület, díj, határidő, csatolmány)
-          nyisd meg a hivatalos oldalt.
+          nyisd meg a hivatalos hirdetményi oldalt.
         </p>
 
         <SubscribeBanner settlements={settlements} />
@@ -201,7 +201,7 @@ function NoticesPage() {
                     {n.original_detail_url ? (
                       <Button asChild size="sm" variant="ghost">
                         <a href={n.original_detail_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-1" /> Szerződés megtekintése
+                          <ExternalLink className="h-4 w-4 mr-1" /> Hirdetmény megnyitása
                         </a>
                       </Button>
                     ) : null}
