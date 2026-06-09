@@ -101,7 +101,7 @@ export async function extractPriceBatch(limit = 15): Promise<ExtractBatchResult>
         notice.normalized_notice_category || notice.notice_type || ""
       ).toLowerCase();
 
-      const patch: Record<string, unknown> = { last_fetched_at: new Date().toISOString() };
+      const patch: Record<string, any> = { last_fetched_at: new Date().toISOString() };
       if (!notice.area_ha && chosenAreaHa) patch.area_ha = chosenAreaHa;
       if (settlement && !notice.settlement) patch.settlement = settlement;
       if (cultivationBranch && !notice.cultivation_branch) patch.cultivation_branch = cultivationBranch;
@@ -124,7 +124,7 @@ export async function extractPriceBatch(limit = 15): Promise<ExtractBatchResult>
 
       const { error: updErr } = await supabaseAdmin
         .from("notices")
-        .update(patch)
+        .update(patch as any)
         .eq("id", notice.id);
       if (updErr) throw new Error(updErr.message);
       if (wantRent || wantSale) summary.updatedNotices += 1;
