@@ -301,10 +301,14 @@ function NoticeDetailPage() {
                 role="party"
               />
               <Separator />
-              <p className="text-xs text-muted-foreground">
-                Számított ranghely:{" "}
-                <strong className="text-df-green">{formatRank(partyRank)}</strong>
-              </p>
+              <div className="rounded-md border border-df-border bg-df-cream/60 p-3 text-xs leading-5 text-df-gray">
+                <span className="font-semibold uppercase tracking-[0.12em] text-df-green">
+                  Kifüggesztett fél számított ranghelye
+                </span>
+                <div className="mt-1 font-brand text-xl font-bold text-df-ink">
+                  {formatRank(partyRank)}
+                </div>
+              </div>
             </div>
           )}
 
