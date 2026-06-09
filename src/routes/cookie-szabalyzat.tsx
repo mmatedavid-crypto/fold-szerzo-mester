@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
+import {
+  COOKIE_CONSENT_STORAGE_KEY,
+  LEGACY_COOKIE_CONSENT_STORAGE_KEY,
+} from "@/lib/cookie-consent";
 
 export const Route = createFileRoute("/cookie-szabalyzat")({
   head: () => ({
@@ -17,7 +21,8 @@ export const Route = createFileRoute("/cookie-szabalyzat")({
 
 function resetConsent() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem("fbsz_cookie_consent_v1");
+  window.localStorage.removeItem(COOKIE_CONSENT_STORAGE_KEY);
+  window.localStorage.removeItem(LEGACY_COOKIE_CONSENT_STORAGE_KEY);
   window.location.reload();
 }
 
@@ -39,7 +44,7 @@ function CookiePage() {
             <code>sb-*</code> — bejelentkezési session (Supabase Auth). Élettartam: max. 1 hét.
           </li>
           <li>
-            <code>fbsz_cookie_consent_v1</code> — süti-hozzájárulás emlékezése. Élettartam: 12
+            <code>{COOKIE_CONSENT_STORAGE_KEY}</code> — süti-hozzájárulás emlékezése. Élettartam: 12
             hónap.
           </li>
         </ul>

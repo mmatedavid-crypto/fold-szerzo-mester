@@ -45,7 +45,7 @@ function PrivacyPage() {
           </thead>
           <tbody>
             <tr>
-              <td>Név, e-mail, jelszó-hash (OAuth esetén külső azonosító)</td>
+              <td>Név, e-mail, bejelentkezési azonosítók</td>
               <td>Fiók létrehozása, bejelentkezés</td>
               <td>Szerződés teljesítése (GDPR 6(1)(b))</td>
               <td>Fiók törléséig</td>
@@ -57,7 +57,7 @@ function PrivacyPage() {
               <td>Fiók törléséig vagy 5 év</td>
             </tr>
             <tr>
-              <td>Generált PDF, dokumentum-hash, kibocsátási napló</td>
+              <td>Generált PDF, dokumentum-ellenőrző lenyomat, kibocsátási napló</td>
               <td>Dokumentum hitelességének ellenőrzése</td>
               <td>Szerződés + jogi kötelezettség (GDPR 6(1)(b)+(c))</td>
               <td>8 év (számviteli)</td>
@@ -83,14 +83,15 @@ function PrivacyPage() {
             <strong>Supabase</strong> (adatbázis, fájltárolás, auth) — EU régió.
           </li>
           <li>
-            <strong>Cloudflare</strong> (hosting, CDN) — EU adatközpontok.
+            <strong>Tárhely- és CDN szolgáltató</strong> — az éles környezetben használt hosting és
+            tartalomszolgáltatási infrastruktúra.
           </li>
           <li>
             <strong>Apple, Google</strong> — OAuth bejelentkezés (csak ha a Felhasználó választja).
           </li>
           <li>
-            Fizetési szolgáltató — a megrendeléstől függően (pl. SimplePay), részleteit a fizetés
-            előtt megjelenítjük.
+            Fizetési szolgáltató — a megrendeléstől és az éles fizetési integrációtól függően,
+            részleteit a fizetés előtt megjelenítjük.
           </li>
         </ul>
 
@@ -121,10 +122,10 @@ function PrivacyPage() {
 
         <h2>5. Adatbiztonság</h2>
         <p>
-          Az adatok titkosított csatornán (TLS) közlekednek. A jelszavak egyirányú hash-eléssel
-          kerülnek tárolásra. A szerződés-fájlok privát storage bucketben, aláírt URL-en keresztül
-          érhetők el. Sor-szintű biztonsági szabályok (RLS) garantálják, hogy minden felhasználó
-          csak a saját adataihoz fér hozzá.
+          Az adatok titkosított csatornán (TLS) közlekednek. A jelszavakat nem visszafejthető
+          formában kezeljük. A szerződés-fájlok védett tárhelyen, időkorlátos elérési linken
+          keresztül érhetők el. Jogosultsági szabályok biztosítják, hogy minden felhasználó csak a
+          saját adataihoz férjen hozzá.
         </p>
 
         <h2>6. Adatvédelmi hatóság</h2>

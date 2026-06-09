@@ -1,30 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-
-const STORAGE_KEY = "fbsz_cookie_consent_v1";
-
-type Consent = {
-  necessary: true;
-  analytics: boolean;
-  decided_at: string;
-};
-
-export function getStoredConsent(): Consent | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as Consent;
-  } catch {
-    return null;
-  }
-}
-
-function save(consent: Consent) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
-  window.dispatchEvent(new CustomEvent("fbsz:cookie-consent", { detail: consent }));
-}
+import { getStoredConsent, saveConsent } from "@/lib/cookie-consent";
 
 export function CookieBanner() {
   const [open, setOpen] = useState(false);
@@ -36,7 +13,7 @@ export function CookieBanner() {
   if (!open) return null;
 
   const accept = (analytics: boolean) => {
-    save({ necessary: true, analytics, decided_at: new Date().toISOString() });
+    saveConsent({ necessary: true, analytics, decided_at: new Date().toISOString() });
     setOpen(false);
   };
 
@@ -48,8 +25,8 @@ export function CookieBanner() {
     >
       <div className="font-medium text-foreground">Sütikről röviden</div>
       <p className="mt-1 text-muted-foreground text-xs leading-relaxed">
-        Csak a működéshez szükséges sütiket használjuk alapból (bejelentkezés, session).
-        Anonim statisztikai sütiket csak a hozzájárulásoddal töltünk be. Részletek a{" "}
+        Csak a működéshez szükséges sütiket használjuk alapból (bejelentkezés, session). Anonim
+        statisztikai sütiket csak a hozzájárulásoddal töltünk be. Részletek a{" "}
         <Link to="/cookie-szabalyzat" className="underline text-primary">
           süti tájékoztatóban
         </Link>
