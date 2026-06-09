@@ -14,21 +14,29 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { CookieBanner } from "@/components/legal/cookie-banner";
 import { company } from "@/lib/company";
+import { DrFoldLogo } from "@/components/brand/dr-fold-logo";
+import { BrandBadge } from "@/components/brand/brand-elements";
+import { AlertTriangle, ArrowLeft, RotateCw } from "lucide-react";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Az oldal nem található</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+    <div className="flex min-h-screen items-center justify-center bg-df-cream px-4 py-10">
+      <div className="w-full max-w-lg rounded-lg border border-df-border bg-df-card p-6 text-center shadow-[0_18px_55px_rgba(26,26,26,0.12)]">
+        <div className="flex justify-center">
+          <DrFoldLogo variant="full" />
+        </div>
+        <BrandBadge className="mt-6">Kifüggesztés nincs itt</BrandBadge>
+        <h1 className="mt-4 font-brand text-7xl font-bold leading-none text-df-green">404</h1>
+        <h2 className="mt-4 font-brand text-2xl font-bold text-df-ink">Az oldal nem található</h2>
+        <p className="mt-3 text-sm leading-6 text-df-gray">
           A keresett oldal nem létezik, vagy időközben máshová került.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-df-green px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#173B2A]"
           >
+            <ArrowLeft className="h-4 w-4" />
             Vissza a főoldalra
           </Link>
         </div>
@@ -45,12 +53,16 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+    <div className="flex min-h-screen items-center justify-center bg-df-cream px-4 py-10">
+      <div className="w-full max-w-lg rounded-lg border border-df-border bg-df-card p-6 text-center shadow-[0_18px_55px_rgba(26,26,26,0.12)]">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-md border border-df-red/40 bg-df-red/10 text-df-red">
+          <AlertTriangle className="h-6 w-6" />
+        </div>
+        <BrandBadge className="mt-5">Dr Föld műhely</BrandBadge>
+        <h1 className="mt-4 font-brand text-3xl font-bold tracking-tight text-df-green">
           Ez az oldal most nem töltött be
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-3 text-sm leading-6 text-df-gray">
           Valami megakadt nálunk. Próbáld újratölteni, vagy menj vissza a főoldalra.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -59,13 +71,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-df-green px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#173B2A]"
           >
+            <RotateCw className="h-4 w-4" />
             Újrapróbálom
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-md border border-df-green bg-df-card px-4 py-2 text-sm font-semibold text-df-green transition-colors hover:bg-df-cream"
           >
             Főoldal
           </a>
