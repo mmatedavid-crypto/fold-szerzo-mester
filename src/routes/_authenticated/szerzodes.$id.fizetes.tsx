@@ -207,6 +207,9 @@ function PayPage() {
                   <div className="mt-1 font-brand text-2xl font-bold text-df-ink">
                     {formatHuf(p.monthly_price_huf)}
                   </div>
+                  <div className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-df-gray">
+                    {priceCadenceLabel(p.slug)}
+                  </div>
                   <div className="mt-1 text-xs leading-5 text-df-gray">{p.description}</div>
                   <Button
                     className="mt-3 w-full bg-df-green text-white hover:bg-[#173B2A]"
@@ -231,4 +234,8 @@ function TrustChip({ text }: { text: string }) {
       <span>{text}</span>
     </div>
   );
+}
+
+function priceCadenceLabel(slug: string): string {
+  return slug === "single" ? "egyszeri díj" : "havi díj";
 }
