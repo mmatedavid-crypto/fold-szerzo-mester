@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { WizardStepper } from "@/components/wizard/wizard-stepper";
+import { BrandBadge, StampBadge } from "@/components/brand/brand-elements";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 import { computeRank, computeAcceptanceDeadline } from "@/lib/rank/engine";
@@ -166,49 +167,58 @@ function NoticeDetailPage() {
 
   return (
     <PageShell>
-      <section className="container mx-auto px-4 py-8 max-w-3xl">
-        <Button asChild variant="ghost" size="sm" className="mb-2 -ml-2">
+      <section className="container mx-auto max-w-4xl px-4 py-8">
+        <Button asChild variant="outline" size="sm" className="mb-3 border-df-green text-df-green">
           <Link to="/kifuggesztesek">
             <ArrowLeft className="h-4 w-4 mr-1" /> Vissza
           </Link>
         </Button>
 
-        <Card className="p-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="flex flex-wrap gap-2 mb-2">
-                {n.notice_type && <Badge variant="outline">{n.notice_type}</Badge>}
-                {n.cultivation_branch && <Badge variant="secondary">{n.cultivation_branch}</Badge>}
+        <Card className="overflow-hidden border-df-border bg-df-card shadow-[0_18px_45px_rgba(26,26,26,0.10)]">
+          <div className="df-dark-card p-5 text-df-card md:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <BrandBadge className="bg-df-card text-df-green">Kifüggesztés</BrandBadge>
+                  {n.notice_type && (
+                    <Badge variant="outline" className="border-df-yellow text-df-yellow">
+                      {n.notice_type}
+                    </Badge>
+                  )}
+                  {n.cultivation_branch && (
+                    <Badge className="bg-df-yellow text-df-green">{n.cultivation_branch}</Badge>
+                  )}
+                </div>
+                <h1 className="font-brand text-2xl font-bold leading-tight md:text-3xl">
+                  {n.subject ?? n.source_notice_id ?? "Kifüggesztés"}
+                </h1>
+                <p className="text-sm text-df-cream mt-2">
+                  {n.settlement ?? "—"} {n.municipality ? `• ${n.municipality}` : ""}
+                </p>
+                <p className="text-xs text-df-cream mt-1">
+                  Közzététel: {n.publication_date ? formatDate(n.publication_date) : "—"}
+                  {deadline && (
+                    <>
+                      {" "}
+                      • Elfogadás határideje (15 nap):{" "}
+                      <strong className="text-df-yellow">
+                        {formatDate(deadline.toISOString())}
+                      </strong>
+                    </>
+                  )}
+                </p>
               </div>
-              <h1 className="font-serif text-xl leading-tight">
-                {n.subject ?? n.source_notice_id ?? "Kifüggesztés"}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {n.settlement ?? "—"} {n.municipality ? `• ${n.municipality}` : ""}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Közzététel: {n.publication_date ? formatDate(n.publication_date) : "—"}
-                {deadline && (
-                  <>
-                    {" "}
-                    • Elfogadás határideje (15 nap):{" "}
-                    <strong className="text-foreground">
-                      {formatDate(deadline.toISOString())}
-                    </strong>
-                  </>
-                )}
-              </p>
+              {n.original_detail_url && (
+                <Button asChild size="sm" className="bg-df-card text-df-green hover:bg-df-cream">
+                  <a href={n.original_detail_url} target="_blank" rel="noopener noreferrer">
+                    Hivatalos oldal <ExternalLink className="h-4 w-4 ml-1" />
+                  </a>
+                </Button>
+              )}
             </div>
-            {n.original_detail_url && (
-              <Button asChild size="sm" variant="outline">
-                <a href={n.original_detail_url} target="_blank" rel="noopener noreferrer">
-                  Hivatalos oldal <ExternalLink className="h-4 w-4 ml-1" />
-                </a>
-              </Button>
-            )}
           </div>
           {n.parcel_numbers?.length ? (
-            <p className="text-xs text-muted-foreground mt-3">
+            <p className="border-t border-df-border bg-df-card px-5 py-3 text-xs font-semibold text-df-gray md:px-6">
               Hrsz.: {n.parcel_numbers.join(", ")}
             </p>
           ) : null}
@@ -218,15 +228,17 @@ function NoticeDetailPage() {
           <WizardStepper steps={STEPS} current={step} />
         </div>
 
-        <Card className="p-5 mt-3">
+        <Card className="mt-3 border-df-border bg-df-card p-5 shadow-sm">
           {step === 0 && (
             <div className="space-y-3 text-sm">
-              <h2 className="font-serif text-lg">Van-e elővásárlási / előhaszonbérleti jogod?</h2>
-              <p className="text-muted-foreground">
+              <h2 className="font-brand text-2xl font-bold text-df-green">
+                Van-e elővásárlási / előhaszonbérleti jogod?
+              </h2>
+              <p className="leading-6 text-df-gray">
                 A 2013. évi CXXII. tv. (Földforgalmi tv.) 46. §-a alapján egy rövid kérdéssorral
                 kiszámoljuk a ranghelyedet, és összevetjük a kifüggesztett bérlőével.
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="rounded-md border border-df-border bg-df-cream/50 p-3 text-xs text-df-gray">
                 Tájékoztató jellegű, hatósági döntést nem helyettesít. Az adatok nem mentődnek.
               </p>
             </div>
@@ -234,7 +246,9 @@ function NoticeDetailPage() {
 
           {step === 1 && (
             <div className="space-y-5 text-sm">
-              <h2 className="font-serif text-lg">A föld besorolása és az ügylet típusa</h2>
+              <h2 className="font-brand text-2xl font-bold text-df-green">
+                A föld besorolása és az ügylet típusa
+              </h2>
               <div className="space-y-2">
                 <Label>Föld típusa</Label>
                 <RadioGroup
@@ -242,11 +256,11 @@ function NoticeDetailPage() {
                   onValueChange={(v) => setBranch(v as LandBranch)}
                   className="grid gap-2"
                 >
-                  <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-df-border bg-white/70 px-3 py-2 hover:border-df-green">
                     <RadioGroupItem value="non_forest" /> Termőföld (szántó, rét, legelő, szőlő,
                     gyümölcs, kert stb.)
                   </label>
-                  <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-df-border bg-white/70 px-3 py-2 hover:border-df-green">
                     <RadioGroupItem value="forest" /> Erdő (Evt. szerinti speciális szabályok)
                   </label>
                 </RadioGroup>
@@ -258,10 +272,10 @@ function NoticeDetailPage() {
                   onValueChange={(v) => setTransaction(v as TransactionKind)}
                   className="grid gap-2 md:grid-cols-2"
                 >
-                  <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-df-border bg-white/70 px-3 py-2 hover:border-df-green">
                     <RadioGroupItem value="lease" /> Haszonbérlet (előhaszonbérleti jog)
                   </label>
-                  <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-df-border bg-white/70 px-3 py-2 hover:border-df-green">
                     <RadioGroupItem value="sale" /> Adásvétel (elővásárlási jog)
                   </label>
                 </RadioGroup>
@@ -271,8 +285,10 @@ function NoticeDetailPage() {
 
           {step === 2 && (
             <div className="space-y-4 text-sm">
-              <h2 className="font-serif text-lg">A szerződő fél státusza</h2>
-              <p className="text-xs text-muted-foreground">
+              <h2 className="font-brand text-2xl font-bold text-df-green">
+                A kifüggesztett bérlő státusza
+              </h2>
+              <p className="text-xs leading-5 text-df-gray">
                 Jelöld be a kifüggesztett szerződésben szereplő vevő/bérlő jogcímeit. Ezek alapján a
                 rendszer kiszámolja a ranghelyét. Több jogcím is jelölhető — a motor a legerősebb
                 szerint sorolja be.
@@ -287,15 +303,15 @@ function NoticeDetailPage() {
               <Separator />
               <p className="text-xs text-muted-foreground">
                 Számított ranghely:{" "}
-                <strong className="text-foreground">{formatRank(partyRank)}</strong>
+                <strong className="text-df-green">{formatRank(partyRank)}</strong>
               </p>
             </div>
           )}
 
           {step === 3 && (
             <div className="space-y-4 text-sm">
-              <h2 className="font-serif text-lg">A te státuszod</h2>
-              <p className="text-xs text-muted-foreground">
+              <h2 className="font-brand text-2xl font-bold text-df-green">A te státuszod</h2>
+              <p className="text-xs leading-5 text-df-gray">
                 Jelöld be a saját jogcímeidet. Egyszerre több is bejelölhető (pl. helyben lakó +
                 állattartó).
               </p>
@@ -333,18 +349,27 @@ function NoticeDetailPage() {
               <ArrowLeft className="h-4 w-4 mr-1" /> Vissza
             </Button>
             {step < STEPS.length - 1 ? (
-              <Button size="sm" onClick={() => setStep(step + 1)}>
+              <Button
+                size="sm"
+                className="bg-df-green text-white hover:bg-[#173B2A]"
+                onClick={() => setStep(step + 1)}
+              >
                 Tovább <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
-              <Button size="sm" variant="ghost" onClick={() => router.invalidate()}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-df-green text-df-green"
+                onClick={() => router.invalidate()}
+              >
                 Újraszámítás
               </Button>
             )}
           </div>
         </Card>
 
-        <p className="text-xs text-muted-foreground mt-4">
+        <p className="mt-4 rounded-md border border-df-border bg-df-card p-3 text-xs leading-5 text-df-gray">
           A számítás csak előzetes tájékoztatás — a jogosultság megállapítása a jegyző /
           mezőgazdasági igazgatási szerv hatáskörébe tartozik.
         </p>
@@ -365,15 +390,15 @@ function CheckRow({
   desc: string;
 }) {
   return (
-    <label className="flex items-start gap-3 border rounded-md px-3 py-3 cursor-pointer hover:bg-muted/30">
+    <label className="flex cursor-pointer items-start gap-3 rounded-md border border-df-border bg-white/70 px-3 py-3 transition-colors hover:border-df-green hover:bg-df-cream/50">
       <Checkbox
         checked={checked}
         onCheckedChange={(v) => onChange(v === true)}
         className="mt-0.5"
       />
       <div className="min-w-0">
-        <div className="font-medium">{title}</div>
-        <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
+        <div className="font-semibold text-df-ink">{title}</div>
+        <div className="text-xs text-df-gray mt-0.5">{desc}</div>
       </div>
     </label>
   );
@@ -465,7 +490,7 @@ function ProfileFields({
       {branch === "forest" && (
         <>
           <Separator />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-df-gray">
             Erdő esetén kiegészítő jogcímek (Evt., 2009. évi XXXVII. tv.):
           </p>
           <CheckRow
@@ -511,45 +536,55 @@ function ResultPanel({
 
   return (
     <div className="space-y-4 text-sm">
-      <div className="flex items-start gap-3">
-        <div
-          className={
-            "h-10 w-10 rounded-full flex items-center justify-center shrink-0 " +
-            (stronger
-              ? "bg-primary/10 text-primary"
-              : hasRank
-                ? "bg-muted text-foreground"
-                : "bg-destructive/10 text-destructive")
-          }
-        >
-          {stronger ? (
-            <Trophy className="h-5 w-5" />
-          ) : hasRank ? (
-            <ShieldCheck className="h-5 w-5" />
-          ) : (
-            <ShieldAlert className="h-5 w-5" />
-          )}
+      <div className="df-dark-card rounded-lg p-5 text-df-card">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <StampBadge className="border-df-yellow text-df-yellow">Nem trükk. Ranghely.</StampBadge>
+          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-df-cream">
+            Előzetes eredmény
+          </span>
         </div>
-        <div className="min-w-0">
-          <h2 className="font-serif text-lg">
-            {hasRank ? `${result.rank}. ranghely` : "Az adott profillal nincs jogod"}
-          </h2>
-          <p className="text-muted-foreground mt-1">{result.reason}</p>
+        <div className="flex items-start gap-3">
+          <div
+            className={
+              "h-10 w-10 rounded-full flex items-center justify-center shrink-0 " +
+              (stronger
+                ? "bg-df-yellow text-df-green"
+                : hasRank
+                  ? "bg-df-card/15 text-df-cream"
+                  : "bg-df-red/20 text-df-red")
+            }
+          >
+            {stronger ? (
+              <Trophy className="h-5 w-5" />
+            ) : hasRank ? (
+              <ShieldCheck className="h-5 w-5" />
+            ) : (
+              <ShieldAlert className="h-5 w-5" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <h2 className="font-brand text-3xl font-bold leading-tight">
+              {hasRank ? `${result.rank}. ranghely` : "Az adott profillal nincs jogod"}
+            </h2>
+            <p className="text-df-cream mt-2 leading-6">{result.reason}</p>
+          </div>
         </div>
       </div>
 
       <div className="grid gap-2 md:grid-cols-2 pt-2">
-        <div className="rounded-md border p-3">
-          <div className="text-xs text-muted-foreground">Te</div>
-          <div className="font-serif text-base">{formatRank(result.rank)}</div>
+        <div className="rounded-md border border-df-border bg-white/70 p-3">
+          <div className="text-xs text-df-gray">Te</div>
+          <div className="font-brand text-xl font-bold text-df-green">
+            {formatRank(result.rank)}
+          </div>
         </div>
-        <div className="rounded-md border p-3">
-          <div className="text-xs text-muted-foreground">Kifüggesztett bérlő</div>
-          <div className="font-serif text-base">{formatRank(partyRank)}</div>
+        <div className="rounded-md border border-df-border bg-white/70 p-3">
+          <div className="text-xs text-df-gray">Kifüggesztett bérlő</div>
+          <div className="font-brand text-xl font-bold text-df-green">{formatRank(partyRank)}</div>
         </div>
       </div>
 
-      <Alert>
+      <Alert className="border-df-border bg-df-card">
         <Scale className="h-4 w-4" />
         <AlertTitle>
           {stronger === true
@@ -582,7 +617,7 @@ function ResultPanel({
       </Alert>
 
       {result.warnings.length > 0 && (
-        <Alert>
+        <Alert className="border-df-yellow bg-df-yellow/10">
           <AlertTitle>Figyelmeztetések</AlertTitle>
           <AlertDescription>
             <ul className="list-disc pl-5 space-y-1">
@@ -596,18 +631,18 @@ function ResultPanel({
 
       <div className="flex flex-wrap gap-2 pt-2">
         {stronger === true && (
-          <Button asChild>
+          <Button asChild className="bg-df-green text-white hover:bg-[#173B2A]">
             <Link to="/elfogado-nyilatkozat">
               <FileCheck2 className="h-4 w-4 mr-1" /> Elfogadó nyilatkozatot készítek
             </Link>
           </Button>
         )}
-        <Button variant="outline" onClick={onRestart}>
+        <Button variant="outline" className="border-df-green text-df-green" onClick={onRestart}>
           Új számítás
         </Button>
       </div>
 
-      <p className="text-[11px] text-muted-foreground pt-2">
+      <p className="text-[11px] text-df-gray pt-2">
         Szabálykészlet verzió: {result.rulesVersion} • Indoklás-kód:{" "}
         <code>{result.reasonCode}</code>
       </p>
