@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDate, formatHuf } from "@/lib/format";
 import { ArrowRight, BarChart3, Database, MapPinned, Search, TrendingUp } from "lucide-react";
 import { company } from "@/lib/company";
+import { HungaryCountyMap, type CountyValue } from "@/components/price-compass/hungary-county-map";
 
 export const Route = createFileRoute("/berleti-dij-iranytu")({
   head: () => ({
@@ -153,88 +154,6 @@ const MODE_COPY: Record<
     tableTitle: "Megyei földárak",
   },
 };
-
-const COUNTY_LAYOUT = [
-  {
-    name: "Győr-Moson-Sopron",
-    path: "M44 110 L98 92 L132 120 L116 162 L58 162 Z",
-    label: [83, 132],
-  },
-  { name: "Vas", path: "M42 162 L116 162 L124 210 L86 242 L36 218 Z", label: [78, 202] },
-  {
-    name: "Zala",
-    path: "M86 242 L124 210 L178 228 L170 278 L106 292 L48 260 Z",
-    label: [116, 258],
-  },
-  {
-    name: "Veszprém",
-    path: "M116 162 L182 140 L226 166 L208 224 L178 228 L124 210 Z",
-    label: [170, 190],
-  },
-  {
-    name: "Komárom-Esztergom",
-    path: "M132 120 L210 102 L238 134 L226 166 L182 140 Z",
-    label: [194, 132],
-  },
-  { name: "Fejér", path: "M226 166 L282 164 L302 208 L260 248 L208 224 Z", label: [254, 206] },
-  {
-    name: "Somogy",
-    path: "M106 292 L170 278 L238 294 L230 350 L152 362 L86 330 Z",
-    label: [166, 322],
-  },
-  {
-    name: "Tolna",
-    path: "M230 250 L260 248 L306 284 L300 340 L238 294 L170 278 L178 228 Z",
-    label: [260, 296],
-  },
-  {
-    name: "Baranya",
-    path: "M152 362 L230 350 L298 374 L264 424 L170 420 L104 382 Z",
-    label: [206, 392],
-  },
-  {
-    name: "Pest",
-    path: "M302 142 L372 138 L408 190 L388 244 L318 254 L302 208 L282 164 Z",
-    label: [352, 198],
-  },
-  { name: "Nógrád", path: "M270 92 L346 72 L372 138 L302 142 L238 134 Z", label: [310, 112] },
-  { name: "Heves", path: "M372 90 L454 104 L474 164 L408 190 L372 138 Z", label: [424, 142] },
-  {
-    name: "Jász-Nagykun-Szolnok",
-    path: "M408 190 L474 164 L548 210 L530 286 L430 296 L388 244 Z",
-    label: [470, 244],
-  },
-  {
-    name: "Bács-Kiskun",
-    path: "M318 254 L388 244 L430 296 L404 382 L298 374 L300 340 L306 284 Z",
-    label: [360, 326],
-  },
-  {
-    name: "Csongrád-Csanád",
-    path: "M404 382 L430 296 L530 286 L560 370 L520 430 L440 430 Z",
-    label: [480, 378],
-  },
-  {
-    name: "Borsod-Abaúj-Zemplén",
-    path: "M454 84 L574 58 L658 96 L628 166 L548 210 L474 164 Z",
-    label: [560, 128],
-  },
-  {
-    name: "Hajdú-Bihar",
-    path: "M548 210 L628 166 L704 212 L708 302 L632 334 L530 286 Z",
-    label: [622, 260],
-  },
-  {
-    name: "Szabolcs-Szatmár-Bereg",
-    path: "M628 166 L658 96 L760 130 L802 214 L708 302 L704 212 Z",
-    label: [706, 192],
-  },
-  {
-    name: "Békés",
-    path: "M530 286 L632 334 L650 424 L560 470 L520 430 L560 370 Z",
-    label: [588, 394],
-  },
-];
 
 function PriceCompassPage() {
   const [mode, setMode] = useState<CompassMode>("rent");
