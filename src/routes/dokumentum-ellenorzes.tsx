@@ -14,7 +14,7 @@ export const Route = createFileRoute("/dokumentum-ellenorzes")({
       { title: "Dokumentum ellenőrzése | Dr Föld" },
       {
         name: "description",
-        content: "Ellenőrizd egy Dr Földdel generált dokumentum azonosítóját és hash-ét.",
+        content: "Ellenőrizd, hogy egy Dr Föld dokumentumazonosító szerepel-e a nyilvántartásban.",
       },
     ],
   }),
@@ -26,7 +26,7 @@ type VerifyResult = { ok: boolean; message: string; meta?: Record<string, string
 function VerifyPage() {
   const verify = useServerFn(verifyDocument);
   const [num, setNum] = useState("");
-  const [hash, setHash] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [result, setResult] = useState<VerifyResult | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -35,15 +35,21 @@ function VerifyPage() {
     setLoading(true);
     try {
       const r = await verify({
-        data: { document_number: num.trim(), document_hash: hash.trim() || undefined },
+        data: {
+          document_number: num.trim(),
+          document_hash: verificationCode.trim() || undefined,
+        },
       });
       // meta is Record<string, unknown>; coerce
       const meta = r.meta
         ? Object.fromEntries(Object.entries(r.meta).map(([k, v]) => [k, String(v)]))
         : undefined;
       setResult({ ok: r.ok, message: r.message, meta });
-    } catch (err) {
-      setResult({ ok: false, message: err instanceof Error ? err.message : "Ismeretlen hiba" });
+    } catch {
+      setResult({
+        ok: false,
+        message: "Az ellenőrzés most nem sikerült. Kérjük, próbáld újra később.",
+      });
     } finally {
       setLoading(false);
     }
@@ -54,8 +60,8 @@ function VerifyPage() {
       <section className="container mx-auto px-4 py-16 max-w-2xl">
         <h1 className="font-serif text-3xl">Dokumentum ellenőrzése</h1>
         <p className="mt-3 text-muted-foreground">
-          Add meg a dokumentumazonosítót (és opcionálisan az ellenőrző hash-t) a szerződés lábléce
-          alapján.
+          Add meg a dokumentumazonosítót a PDF lábrésze alapján. Az ellenőrző kód nem kötelező, de
+          pontosabb egyezést ad, ha szerepel nálad.
         </p>
         <Card className="p-6 mt-6">
           <form onSubmit={onSubmit} className="space-y-4">
@@ -70,16 +76,19 @@ function VerifyPage() {
               />
             </div>
             <div>
-              <Label htmlFor="hash">Ellenőrző hash (opcionális)</Label>
+              <Label htmlFor="verification-code">Ellenőrző kód (opcionális)</Label>
               <Input
-                id="hash"
-                value={hash}
-                onChange={(e) => setHash(e.target.value)}
-                placeholder="SHA-256 hex"
+                id="verification-code"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                placeholder="ha szerepel a PDF lábrészén"
               />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Ez a hosszabb technikai azonosító segít kizárni, hogy a dokumentumot módosították.
+              </p>
             </div>
             <Button type="submit" disabled={loading}>
-              {loading ? "Ellenőrzés..." : "Ellenőrzés"}
+              {loading ? "Ellenőrzés..." : "Dokumentum ellenőrzése"}
             </Button>
           </form>
           {result && (
@@ -94,7 +103,7 @@ function VerifyPage() {
                   {Object.entries(result.meta).map(([k, v]) => (
                     <div key={k} className="contents">
                       <dt className="text-muted-foreground">{k}</dt>
-                      <dd className="font-mono break-all">{v}</dd>
+                      <dd className="break-all font-medium text-foreground">{v}</dd>
                     </div>
                   ))}
                 </dl>
