@@ -9,10 +9,16 @@ const plansQuery = queryOptions({ queryKey: ["plans"], queryFn: () => listPlans(
 export const Route = createFileRoute("/arak")({
   head: () => ({
     meta: [
-      { title: "Árak — Földbérleti Szerződés Generátor" },
-      { name: "description", content: "Egy szerződés 9 900 Ft-tól, vagy havi előfizetés gazdaságoknak." },
-      { property: "og:title", content: "Árak — Földbérleti Szerződés Generátor" },
-      { property: "og:description", content: "Egyszeri szerződés vagy havi előfizetés gazdaságoknak." },
+      { title: "Árak és csomagok | Dr Föld" },
+      {
+        name: "description",
+        content: "Egy szerződés 9 900 Ft-tól, vagy havi előfizetés gazdaságoknak.",
+      },
+      { property: "og:title", content: "Árak és csomagok | Dr Föld" },
+      {
+        property: "og:description",
+        content: "Egyszeri szerződés vagy havi előfizetés gazdaságoknak.",
+      },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(plansQuery),
@@ -31,7 +37,9 @@ function ArakPage() {
           Az árak bruttó értékek. A végleges PDF dokumentum csak fizetés vagy elérhető előfizetési
           keret után érhető el. A szerződés a megadott felekhez és helyrajzi számokhoz kötött.
         </p>
-        <div className="mt-10"><PricingCards plans={plans} /></div>
+        <div className="mt-10">
+          <PricingCards plans={plans} />
+        </div>
       </section>
     </PageShell>
   );

@@ -4,11 +4,11 @@ import { PageShell } from "@/components/layout/page-shell";
 export const Route = createFileRoute("/adatkezeles")({
   head: () => ({
     meta: [
-      { title: "Adatkezelési tájékoztató — foldberletiszerzodes.hu" },
+      { title: "Adatkezelési tájékoztató | Dr Föld" },
       {
         name: "description",
         content:
-          "GDPR alapú adatkezelési tájékoztató a foldberletiszerzodes.hu szerződés-előkészítő szolgáltatáshoz.",
+          "GDPR alapú adatkezelési tájékoztató a Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatáshoz.",
       },
     ],
   }),
@@ -28,13 +28,18 @@ function PrivacyPage() {
         <h2>1. Adatkezelő</h2>
         <p>
           <strong>[Cégnév Kft.]</strong> (székhely: [cím], adószám: [szám], e-mail:{" "}
-          <a href="mailto:hello@foldberletiszerzodes.hu">hello@foldberletiszerzodes.hu</a>).
+          <a href="mailto:hello@drfold.hu">hello@drfold.hu</a>).
         </p>
 
         <h2>2. Kezelt adatok és célok</h2>
         <table>
           <thead>
-            <tr><th>Adatkör</th><th>Cél</th><th>Jogalap</th><th>Tárolási idő</th></tr>
+            <tr>
+              <th>Adatkör</th>
+              <th>Cél</th>
+              <th>Jogalap</th>
+              <th>Tárolási idő</th>
+            </tr>
           </thead>
           <tbody>
             <tr>
@@ -72,38 +77,62 @@ function PrivacyPage() {
 
         <h2>3. Adatfeldolgozók</h2>
         <ul>
-          <li><strong>Supabase</strong> (adatbázis, fájltárolás, auth) — EU régió.</li>
-          <li><strong>Cloudflare</strong> (hosting, CDN) — EU adatközpontok.</li>
-          <li><strong>Apple, Google</strong> — OAuth bejelentkezés (csak ha a Felhasználó választja).</li>
-          <li>Fizetési szolgáltató — a megrendeléstől függően (pl. SimplePay), részleteit a fizetés előtt megjelenítjük.</li>
+          <li>
+            <strong>Supabase</strong> (adatbázis, fájltárolás, auth) — EU régió.
+          </li>
+          <li>
+            <strong>Cloudflare</strong> (hosting, CDN) — EU adatközpontok.
+          </li>
+          <li>
+            <strong>Apple, Google</strong> — OAuth bejelentkezés (csak ha a Felhasználó választja).
+          </li>
+          <li>
+            Fizetési szolgáltató — a megrendeléstől függően (pl. SimplePay), részleteit a fizetés
+            előtt megjelenítjük.
+          </li>
         </ul>
 
         <h2>4. Az érintett jogai</h2>
         <p>Az érintett bármikor kérheti:</p>
         <ul>
-          <li><strong>Tájékoztatást</strong> a kezelt adatairól</li>
-          <li><strong>Helyesbítést</strong> hibás adat esetén</li>
-          <li><strong>Adathordozhatóságot</strong> — strukturált export (JSON)</li>
-          <li><strong>Törlést</strong> (elfelejtéshez való jog) a számviteli korlátok között</li>
-          <li><strong>Korlátozást</strong>, illetve <strong>tiltakozást</strong> a jogos érdeken alapuló kezelés ellen</li>
+          <li>
+            <strong>Tájékoztatást</strong> a kezelt adatairól
+          </li>
+          <li>
+            <strong>Helyesbítést</strong> hibás adat esetén
+          </li>
+          <li>
+            <strong>Adathordozhatóságot</strong> — strukturált export (JSON)
+          </li>
+          <li>
+            <strong>Törlést</strong> (elfelejtéshez való jog) a számviteli korlátok között
+          </li>
+          <li>
+            <strong>Korlátozást</strong>, illetve <strong>tiltakozást</strong> a jogos érdeken
+            alapuló kezelés ellen
+          </li>
         </ul>
         <p>
-          Az adatexport és fiók-törlés a bejelentkezett <a href="/dashboard">Műhelyben</a> egy kattintással
-          kezdeményezhető, vagy írhatsz a fenti e-mail címre.
+          Az adatexport és fiók-törlés a bejelentkezett <a href="/dashboard">Műhelyben</a> egy
+          kattintással kezdeményezhető, vagy írhatsz a fenti e-mail címre.
         </p>
 
         <h2>5. Adatbiztonság</h2>
         <p>
-          Az adatok titkosított csatornán (TLS) közlekednek. A jelszavak egyirányú hash-eléssel kerülnek
-          tárolásra. A szerződés-fájlok privát storage bucketben, aláírt URL-en keresztül érhetők el.
-          Sor-szintű biztonsági szabályok (RLS) garantálják, hogy minden felhasználó csak a saját adataihoz fér hozzá.
+          Az adatok titkosított csatornán (TLS) közlekednek. A jelszavak egyirányú hash-eléssel
+          kerülnek tárolásra. A szerződés-fájlok privát storage bucketben, aláírt URL-en keresztül
+          érhetők el. Sor-szintű biztonsági szabályok (RLS) garantálják, hogy minden felhasználó
+          csak a saját adataihoz fér hozzá.
         </p>
 
         <h2>6. Adatvédelmi hatóság</h2>
         <p>
-          Panasszal a <strong>Nemzeti Adatvédelmi és Információszabadság Hatóságnál</strong> (NAIH) lehet élni:
-          1055 Budapest, Falk Miksa utca 9-11.,{" "}
-          <a href="https://naih.hu" target="_blank" rel="noreferrer">naih.hu</a>.
+          Panasszal a <strong>Nemzeti Adatvédelmi és Információszabadság Hatóságnál</strong> (NAIH)
+          lehet élni: 1055 Budapest, Falk Miksa utca 9-11.,{" "}
+          <a href="https://naih.hu" target="_blank" rel="noreferrer">
+            naih.hu
+          </a>
+          .
         </p>
       </article>
     </PageShell>

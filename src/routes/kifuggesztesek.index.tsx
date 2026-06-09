@@ -5,8 +5,21 @@ import { useServerFn } from "@tanstack/react-start";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Search, Calculator, Mail, Loader2 } from "lucide-react";
@@ -15,15 +28,25 @@ import { formatDate } from "@/lib/format";
 import { cleanSettlement } from "@/lib/notices/clean";
 import { subscribeToSettlement } from "@/lib/subscriptions/subscribe.functions";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/kifuggesztesek/")({
   head: () => ({
     meta: [
-      { title: "Kifüggesztés kereső — Földbérleti hirdetmények | Földbérleti Szerződés Generátor" },
-      { name: "description", content: "Aktív földbérleti hirdetmények böngészése településenként és művelési áganként, közvetlen hivatkozással a hirdetmenyek.gov.hu eredeti dokumentumára." },
+      { title: "Kifüggesztések keresése | Dr Föld" },
+      {
+        name: "description",
+        content:
+          "Aktív termőföld kifüggesztések böngészése településenként, helyrajzi szám alapján és ranghely-kalkulátorral.",
+      },
     ],
   }),
   component: NoticesPage,
@@ -50,7 +73,9 @@ function NoticesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("notices")
-        .select("id, source_notice_id, subject, settlement, municipality, parcel_numbers, notice_type, publication_date, original_detail_url")
+        .select(
+          "id, source_notice_id, subject, settlement, municipality, parcel_numbers, notice_type, publication_date, original_detail_url",
+        )
         .order("publication_date", { ascending: false, nullsFirst: false })
         .limit(5000);
       if (error) throw error;
@@ -78,7 +103,13 @@ function NoticesPage() {
     return (q.data ?? []).filter((n) => {
       if (type !== "all" && n.notice_type !== type) return false;
       if (!s) return true;
-      const hay = [cleanSettlement(n.settlement), n.municipality, n.subject, (n.parcel_numbers ?? []).join(" "), n.source_notice_id]
+      const hay = [
+        cleanSettlement(n.settlement),
+        n.municipality,
+        n.subject,
+        (n.parcel_numbers ?? []).join(" "),
+        n.source_notice_id,
+      ]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
@@ -91,7 +122,8 @@ function NoticesPage() {
       <section className="container mx-auto px-4 py-10 max-w-6xl">
         <h1 className="font-serif text-3xl">Kifüggesztések</h1>
         <p className="mt-2 text-muted-foreground text-sm max-w-2xl">
-          Aktuális termőföld kifüggesztések. A részletekért (terület, díj, határidő, csatolmány) nyisd meg a hivatalos oldalt.
+          Aktuális termőföld kifüggesztések. A részletekért (terület, díj, határidő, csatolmány)
+          nyisd meg a hivatalos oldalt.
         </p>
 
         <SubscribeBanner settlements={settlements} />
@@ -99,7 +131,9 @@ function NoticesPage() {
         <div className="mt-4 rounded border bg-primary/5 border-primary/30 p-3 flex flex-wrap items-center gap-2 text-sm">
           <Calculator className="h-4 w-4 text-primary" />
           <span className="font-medium">Új: önálló Ranghely kalkulátor</span>
-          <span className="text-muted-foreground">— jelöld be, mi igaz rád, és nézd meg, ki áll előrébb a sorban.</span>
+          <span className="text-muted-foreground">
+            — jelöld be, mi igaz rád, és nézd meg, ki áll előrébb a sorban.
+          </span>
           <Button asChild size="sm" className="ml-auto">
             <Link to="/ranghely-kalkulator">Kalkulátor megnyitása</Link>
           </Button>
@@ -117,10 +151,16 @@ function NoticesPage() {
               />
             </div>
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger><SelectValue placeholder="Típus" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Típus" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Minden típus</SelectItem>
-                {types.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                {types.map((b) => (
+                  <SelectItem key={b} value={b}>
+                    {b}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -145,8 +185,12 @@ function NoticesPage() {
               {filtered.map((n) => (
                 <TableRow key={n.id}>
                   <TableCell>{cleanSettlement(n.settlement) ?? n.settlement ?? "—"}</TableCell>
-                  <TableCell className="text-xs">{(n.parcel_numbers ?? []).join(", ") || "—"}</TableCell>
-                  <TableCell className="text-sm"><Badge variant="outline">{n.notice_type ?? "—"}</Badge></TableCell>
+                  <TableCell className="text-xs">
+                    {(n.parcel_numbers ?? []).join(", ") || "—"}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    <Badge variant="outline">{n.notice_type ?? "—"}</Badge>
+                  </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
                     <Button asChild size="sm" variant="ghost">
                       <Link to="/kifuggesztesek/$noticeId" params={{ noticeId: n.id }}>
@@ -161,18 +205,21 @@ function NoticesPage() {
                       </Button>
                     ) : null}
                   </TableCell>
-                  <TableCell className="text-right text-sm whitespace-nowrap">{n.publication_date ? formatDate(n.publication_date) : "—"}</TableCell>
+                  <TableCell className="text-right text-sm whitespace-nowrap">
+                    {n.publication_date ? formatDate(n.publication_date) : "—"}
+                  </TableCell>
                 </TableRow>
               ))}
               {!q.isLoading && filtered.length === 0 && (
-                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-10">
-                  Nincs találat.
-                </TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-10">
+                    Nincs találat.
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
         </Card>
-
       </section>
     </PageShell>
   );
@@ -201,7 +248,11 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
     try {
       const res = await sub({ data: { email, settlement } });
       if (res.ok) {
-        toast.success(res.reactivated ? "Előfizetésed megújítva 52 hétre." : `Sikeres feliratkozás: ${res.settlement_clean}`);
+        toast.success(
+          res.reactivated
+            ? "Előfizetésed megújítva 52 hétre."
+            : `Sikeres feliratkozás: ${res.settlement_clean}`,
+        );
         setOpen(false);
         setEmail("");
         setSettlement("");
@@ -224,7 +275,8 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
             <h2 className="font-serif text-lg">Heti értesítő emailben</h2>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Válassz települést és minden héten elküldjük az aktuális kifüggesztéseket. 52 hét. <strong>9.990 Ft / év.</strong>
+            Válassz települést és minden héten elküldjük az aktuális kifüggesztéseket. 52 hét.{" "}
+            <strong>9.990 Ft / év.</strong>
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -235,31 +287,53 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
             <DialogHeader>
               <DialogTitle>Heti kifüggesztés értesítő</DialogTitle>
               <DialogDescription>
-                52 héten át minden héten emailben megkapod az adott település aktuális termőföld kifüggesztéseit.
+                52 héten át minden héten emailben megkapod az adott település aktuális termőföld
+                kifüggesztéseit.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
               <div>
                 <label className="text-xs text-muted-foreground">Email cím</label>
-                <Input type="email" placeholder="te@email.hu" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input
+                  type="email"
+                  placeholder="te@email.hu"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground">Település</label>
-                <Input placeholder="Keresés..." value={filter} onChange={(e) => setFilter(e.target.value)} className="mb-2" />
+                <Input
+                  placeholder="Keresés..."
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="mb-2"
+                />
                 <Select value={settlement} onValueChange={setSettlement}>
-                  <SelectTrigger><SelectValue placeholder="Válassz települést" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Válassz települést" />
+                  </SelectTrigger>
                   <SelectContent>
-                    {options.length === 0 && <div className="p-2 text-xs text-muted-foreground">Nincs találat</div>}
-                    {options.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    {options.length === 0 && (
+                      <div className="p-2 text-xs text-muted-foreground">Nincs találat</div>
+                    )}
+                    {options.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <p className="text-xs text-muted-foreground">
-                A feliratkozással elfogadod a heti értesítő küldését. Bármikor leiratkozhatsz az emailben található linkkel.
+                A feliratkozással elfogadod a heti értesítő küldését. Bármikor leiratkozhatsz az
+                emailben található linkkel.
               </p>
             </div>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setOpen(false)}>Mégse</Button>
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                Mégse
+              </Button>
               <Button onClick={submit} disabled={loading}>
                 {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Feliratkozom

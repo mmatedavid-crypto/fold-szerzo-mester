@@ -4,7 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { listMyDocuments, getMyQuota, getDownloadUrl } from "@/lib/contracts/finalize.functions";
 import { listDrafts } from "@/lib/contracts/drafts.functions";
 import { formatDate } from "@/lib/format";
@@ -14,7 +21,7 @@ import { toast } from "sonner";
 import { GdprSection } from "@/components/dashboard/gdpr-section";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Műhely — Földbérleti Szerződés Generátor" }] }),
+  head: () => ({ meta: [{ title: "Műhely | Dr Föld" }] }),
   component: Dashboard,
 });
 
@@ -45,11 +52,21 @@ function Dashboard() {
         <div className="flex items-start justify-between flex-wrap gap-3">
           <div>
             <h1 className="font-serif text-3xl">Műhely</h1>
-            <p className="text-muted-foreground text-sm mt-1">Szerződéseid, vázlataid és kereted egy helyen.</p>
+            <p className="text-muted-foreground text-sm mt-1">
+              Szerződéseid, vázlataid és kereted egy helyen.
+            </p>
           </div>
           <div className="flex gap-2">
-            <Button asChild><Link to="/szerzodes/uj"><FilePlus2 className="h-4 w-4 mr-1" />Új szerződés</Link></Button>
-            <Button variant="ghost" onClick={onSignOut}><LogOut className="h-4 w-4 mr-1" />Kilépés</Button>
+            <Button asChild>
+              <Link to="/szerzodes/uj">
+                <FilePlus2 className="h-4 w-4 mr-1" />
+                Új szerződés
+              </Link>
+            </Button>
+            <Button variant="ghost" onClick={onSignOut}>
+              <LogOut className="h-4 w-4 mr-1" />
+              Kilépés
+            </Button>
           </div>
         </div>
 
@@ -65,15 +82,24 @@ function Dashboard() {
                 <div className="text-3xl font-semibold mt-1">
                   {quota.data.subscription.used} / {quota.data.subscription.total}
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">Felhasznált szerződések az éves keretből</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Felhasznált szerződések az éves keretből
+                </div>
               </>
             ) : (
-              <div className="text-sm mt-2 text-muted-foreground">Nincs aktív előfizetés. <Link to="/arak" className="text-primary underline">Előfizetés</Link></div>
+              <div className="text-sm mt-2 text-muted-foreground">
+                Nincs aktív előfizetés.{" "}
+                <Link to="/arak" className="text-primary underline">
+                  Előfizetés
+                </Link>
+              </div>
             )}
           </Card>
           <Card className="p-5">
             <div className="text-sm text-muted-foreground">Korábbi vázlatok</div>
-            <div className="text-3xl font-semibold mt-1">{drafts.data?.filter((d) => d.status !== "finalized").length ?? "—"}</div>
+            <div className="text-3xl font-semibold mt-1">
+              {drafts.data?.filter((d) => d.status !== "finalized").length ?? "—"}
+            </div>
           </Card>
         </div>
 
@@ -100,7 +126,9 @@ function Dashboard() {
                   <TableCell>{d.lessor_name ?? "—"}</TableCell>
                   <TableCell>{d.lessee_name ?? "—"}</TableCell>
                   <TableCell>{d.settlement ?? "—"}</TableCell>
-                  <TableCell className="text-xs">{(d.parcel_numbers ?? []).join(", ") || "—"}</TableCell>
+                  <TableCell className="text-xs">
+                    {(d.parcel_numbers ?? []).join(", ") || "—"}
+                  </TableCell>
                   <TableCell className="text-xs">{d.legal_template_version}</TableCell>
                   <TableCell className="text-right">
                     <Button size="sm" variant="ghost" onClick={() => onDownload(d.id as string)}>
@@ -110,7 +138,11 @@ function Dashboard() {
                 </TableRow>
               ))}
               {(!docs.data || docs.data.length === 0) && (
-                <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Még nincs generált dokumentum.</TableCell></TableRow>
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                    Még nincs generált dokumentum.
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
@@ -128,20 +160,29 @@ function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(drafts.data ?? []).filter((d) => d.status !== "finalized").map((d) => (
-                <TableRow key={d.id}>
-                  <TableCell>{d.title ?? "Vázlat"}</TableCell>
-                  <TableCell className="text-xs">{d.status}</TableCell>
-                  <TableCell className="text-sm">{formatDate(d.updated_at)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button asChild size="sm" variant="outline">
-                      <Link to="/szerzodes/$id/ellenorzes" params={{ id: d.id }}>Folytatás</Link>
-                    </Button>
+              {(drafts.data ?? [])
+                .filter((d) => d.status !== "finalized")
+                .map((d) => (
+                  <TableRow key={d.id}>
+                    <TableCell>{d.title ?? "Vázlat"}</TableCell>
+                    <TableCell className="text-xs">{d.status}</TableCell>
+                    <TableCell className="text-sm">{formatDate(d.updated_at)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild size="sm" variant="outline">
+                        <Link to="/szerzodes/$id/ellenorzes" params={{ id: d.id }}>
+                          Folytatás
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              {(!drafts.data ||
+                drafts.data.filter((d) => d.status !== "finalized").length === 0) && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                    Nincs nyitott vázlat.
                   </TableCell>
                 </TableRow>
-              ))}
-              {(!drafts.data || drafts.data.filter((d) => d.status !== "finalized").length === 0) && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nincs nyitott vázlat.</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

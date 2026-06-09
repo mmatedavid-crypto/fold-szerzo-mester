@@ -28,13 +28,13 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/kifuggesztesek/$noticeId")({
-  head: ({ params }) => ({
+  head: () => ({
     meta: [
-      { title: `Ranghely-kalkulátor — ${params.noticeId} | Földbérleti Szerződés Generátor` },
+      { title: `Ranghely-kalkulátor | Dr Föld` },
       {
         name: "description",
         content:
-          "Ellenőrizd a Földforgalmi tv. 46. §-a szerinti elővásárlási/előhaszonbérleti ranghelyedet a kifüggesztett hirdetményhez.",
+          "Ellenőrizd az előhaszonbérleti ranghelyedet a kifüggesztett hirdetményhez. Ha előrébb állsz, ne maradj hátul.",
       },
       { name: "robots", content: "noindex,nofollow" },
     ],

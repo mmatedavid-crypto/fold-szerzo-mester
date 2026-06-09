@@ -12,8 +12,11 @@ import { OAuthButton } from "@/components/auth/apple-button";
 export const Route = createFileRoute("/regisztracio")({
   head: () => ({
     meta: [
-      { title: "Regisztráció — Földbérleti Szerződés Generátor" },
-      { name: "description", content: "Hozz létre fiókot a szerződés-előkészítő szolgáltatáshoz." },
+      { title: "Regisztráció | Dr Föld" },
+      {
+        name: "description",
+        content: "Hozz létre Dr Föld fiókot a földügyi eszközök használatához.",
+      },
     ],
   }),
   component: RegPage,
@@ -56,11 +59,24 @@ function RegPage() {
             </div>
             <div>
               <Label htmlFor="email">E-mail</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="password">Jelszó</Label>
-              <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="password"
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Regisztráció..." : "Regisztrálok"}
@@ -76,7 +92,10 @@ function RegPage() {
             <OAuthButton provider="apple" />
           </div>
           <p className="mt-4 text-sm text-center text-muted-foreground">
-            Van már fiókod? <Link to="/belepes" className="text-primary underline">Belépés</Link>
+            Van már fiókod?{" "}
+            <Link to="/belepes" className="text-primary underline">
+              Belépés
+            </Link>
           </p>
         </Card>
       </section>

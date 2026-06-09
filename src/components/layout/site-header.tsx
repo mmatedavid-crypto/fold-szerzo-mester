@@ -28,6 +28,9 @@ export function SiteHeader() {
           <Link to="/kifuggesztesek" className="hover:text-df-green">
             Kifüggesztések
           </Link>
+          <Link to="/berleti-dij-iranytu" className="hover:text-df-green">
+            Ár iránytű
+          </Link>
           <Link to="/ranghely-kalkulator" className="hover:text-df-green">
             Ranghely kalkulátor
           </Link>

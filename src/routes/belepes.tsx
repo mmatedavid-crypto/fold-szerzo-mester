@@ -12,8 +12,8 @@ import { OAuthButton } from "@/components/auth/apple-button";
 export const Route = createFileRoute("/belepes")({
   head: () => ({
     meta: [
-      { title: "Belépés — Földbérleti Szerződés Generátor" },
-      { name: "description", content: "Lépj be a fiókodba a szerződések kezeléséhez." },
+      { title: "Belépés | Dr Föld" },
+      { name: "description", content: "Lépj be a Dr Föld fiókodba." },
     ],
   }),
   component: BelepesPage,
@@ -46,11 +46,23 @@ function BelepesPage() {
           <form onSubmit={onSubmit} className="mt-5 space-y-4">
             <div>
               <Label htmlFor="email">E-mail</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="password">Jelszó</Label>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Belépés..." : "Belépés"}
@@ -66,7 +78,10 @@ function BelepesPage() {
             <OAuthButton provider="apple" label="Belépés Apple-lel" />
           </div>
           <p className="mt-4 text-sm text-center text-muted-foreground">
-            Még nincs fiókod? <Link to="/regisztracio" className="text-primary underline">Regisztráció</Link>
+            Még nincs fiókod?{" "}
+            <Link to="/regisztracio" className="text-primary underline">
+              Regisztráció
+            </Link>
           </p>
         </Card>
       </section>

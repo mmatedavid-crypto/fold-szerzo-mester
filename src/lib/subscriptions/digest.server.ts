@@ -104,7 +104,7 @@ async function sendResendEmail(
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
   if (!LOVABLE_API_KEY || !RESEND_API_KEY)
     throw new Error("Missing LOVABLE_API_KEY or RESEND_API_KEY");
-  const from = process.env.NOTICES_FROM_EMAIL ?? "Földbérleti értesítő <onboarding@resend.dev>";
+  const from = process.env.NOTICES_FROM_EMAIL ?? "Dr Föld értesítő <hello@drfold.hu>";
   const res = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
     method: "POST",
     headers: {
