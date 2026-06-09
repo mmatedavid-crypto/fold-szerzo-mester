@@ -7,7 +7,15 @@ import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CheckCircle2, FileWarning, ShieldAlert, Lock } from "lucide-react";
+import { BrandBadge, StampBadge } from "@/components/brand/brand-elements";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  FileWarning,
+  Lock,
+  ShieldAlert,
+} from "lucide-react";
 import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/ellenorzes")({
@@ -15,11 +23,34 @@ export const Route = createFileRoute("/_authenticated/szerzodes/$id/ellenorzes")
   component: RiskPage,
 });
 
-const LEVEL_META: Record<RiskLevel, { label: string; icon: typeof CheckCircle2; cls: string }> = {
-  rendben: { label: "Rendben", icon: CheckCircle2, cls: "text-primary" },
-  figyelmeztetes: { label: "Figyelmeztetés", icon: AlertTriangle, cls: "text-warning" },
-  jogi_ellenorzes: { label: "Jogi ellenőrzést igényel", icon: ShieldAlert, cls: "text-warning" },
-  hianyzo_kotelezo: { label: "Hiányzó kötelező adat", icon: FileWarning, cls: "text-destructive" },
+const LEVEL_META: Record<
+  RiskLevel,
+  { label: string; icon: typeof CheckCircle2; cls: string; badge: string }
+> = {
+  rendben: {
+    label: "Rendben",
+    icon: CheckCircle2,
+    cls: "text-df-green",
+    badge: "border-df-green text-df-green",
+  },
+  figyelmeztetes: {
+    label: "Figyelmeztetés",
+    icon: AlertTriangle,
+    cls: "text-df-yellow",
+    badge: "border-df-yellow text-df-green",
+  },
+  jogi_ellenorzes: {
+    label: "Jogi ellenőrzést igényel",
+    icon: ShieldAlert,
+    cls: "text-df-yellow",
+    badge: "border-df-yellow text-df-green",
+  },
+  hianyzo_kotelezo: {
+    label: "Hiányzó kötelező adat",
+    icon: FileWarning,
+    cls: "text-df-red",
+    badge: "border-df-red text-df-red",
+  },
 };
 
 function RiskPage() {
@@ -57,31 +88,39 @@ function RiskPage() {
 
   return (
     <PageShell>
-      <section className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="font-serif text-3xl">Jogi kockázati ellenőrzés</h1>
-        <p className="text-muted-foreground mt-2 text-sm">
-          A végleges szerződés szövege csak fizetés vagy elérhető előfizetési keret után készül el.
-          Ezen a lépésen csak az ellenőrzést és a tervezett szerződés felépítését látod.
-        </p>
+      <section className="container mx-auto max-w-5xl px-4 py-10">
+        <div className="rounded-lg border border-df-border bg-df-card p-6 shadow-[0_18px_45px_rgba(26,26,26,0.08)]">
+          <BrandBadge>Ravasz, de szabályos</BrandBadge>
+          <h1 className="mt-4 font-brand text-4xl font-bold leading-tight text-df-green md:text-5xl">
+            Jogi kockázati ellenőrzés
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-df-gray md:text-base">
+            A végleges szerződés szövege csak fizetés vagy elérhető előfizetési keret után készül
+            el. Itt még átnézed a kötelező adatokat, a kockázati jelzéseket és a tervezett szerződés
+            felépítését.
+          </p>
+        </div>
 
         {error && (
-          <Card className="mt-6 p-6">
-            <h2 className="font-serif text-xl text-df-green">Az ellenőrzés most nem futott le.</h2>
-            <p className="mt-2 text-sm text-muted-foreground">{error}</p>
-            <Button asChild className="mt-4" variant="outline">
+          <Card className="mt-6 border-df-red/40 bg-df-red/10 p-6">
+            <h2 className="font-brand text-xl font-bold text-df-red">
+              Az ellenőrzés most nem futott le.
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-df-ink">{error}</p>
+            <Button asChild className="mt-4 border-df-green text-df-green" variant="outline">
               <Link to="/dashboard">Vissza a Műhelybe</Link>
             </Button>
           </Card>
         )}
         {!draft && !report && !error && (
-          <Card className="mt-6 p-6 text-sm text-muted-foreground">
+          <Card className="mt-6 border-df-border bg-df-card p-6 text-sm text-df-gray">
             Kockázati ellenőrzés előkészítése…
           </Card>
         )}
         {draft && report && (
           <>
-            <Card className="p-6 mt-6">
-              <h2 className="font-serif text-xl">Adatok összesítése</h2>
+            <Card className="mt-6 border-df-border bg-df-card p-6 shadow-sm">
+              <h2 className="font-brand text-2xl font-bold text-df-green">Adatok összesítése</h2>
               <dl className="grid md:grid-cols-2 gap-x-6 gap-y-2 mt-3 text-sm">
                 <Row
                   k="Haszonbérbeadó"
@@ -109,17 +148,31 @@ function RiskPage() {
               </dl>
             </Card>
 
-            <Card className="p-6 mt-4">
-              <h2 className="font-serif text-xl">Kockázati riport</h2>
+            <Card className="mt-4 border-df-border bg-df-card p-6 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-brand text-2xl font-bold text-df-green">Kockázati riport</h2>
+                <StampBadge
+                  className={
+                    report.can_finalize
+                      ? "border-df-green text-df-green"
+                      : "border-df-red text-df-red"
+                  }
+                >
+                  {report.can_finalize ? "Véglegesíthető" : "Javítandó"}
+                </StampBadge>
+              </div>
               <ul className="mt-3 space-y-2">
                 {report.items.map((it) => {
                   const m = LEVEL_META[it.level];
                   const Icon = m.icon;
                   return (
-                    <li key={it.id} className="flex items-start gap-2 text-sm">
+                    <li
+                      key={it.id}
+                      className="flex items-start gap-3 rounded-md border border-df-border bg-white/70 p-3 text-sm"
+                    >
                       <Icon className={"h-4 w-4 mt-0.5 " + m.cls} />
                       <div>
-                        <Badge variant="outline" className={"mr-2 " + m.cls}>
+                        <Badge variant="outline" className={"mr-2 " + m.badge}>
                           {m.label}
                         </Badge>
                         <span>{it.message}</span>
@@ -130,48 +183,52 @@ function RiskPage() {
               </ul>
             </Card>
 
-            <Card className="p-6 mt-4 relative overflow-hidden">
-              <h2 className="font-serif text-xl">Tervezett szerződés szakaszai</h2>
+            <Card className="relative mt-4 overflow-hidden border-df-border bg-df-card p-6 shadow-sm">
+              <h2 className="font-brand text-2xl font-bold text-df-green">
+                Tervezett szerződés szakaszai
+              </h2>
               <div className="mt-3 space-y-2">
                 {sections.map((s, i) => (
-                  <div key={s} className="text-sm border-l-2 border-primary/40 pl-3 py-1">
-                    <span className="text-muted-foreground mr-2">{i + 1}.</span>
+                  <div key={s} className="text-sm border-l-2 border-df-green/40 pl-3 py-1">
+                    <span className="text-df-gray mr-2">{i + 1}.</span>
                     {s}
                   </div>
                 ))}
               </div>
-              <div className="mt-6 relative rounded-md border border-dashed border-border bg-muted/30 p-6 select-none">
-                <div className="text-xs font-mono blur-sm text-muted-foreground leading-relaxed">
+              <div className="mt-6 relative rounded-md border border-dashed border-df-border bg-df-cream/50 p-6 select-none">
+                <div className="text-xs font-mono blur-sm text-df-gray leading-relaxed">
                   A végleges szerződés-előkészítő dokumentum a megadott felek, földterületek,
                   bérleti díj, időtartam és előhaszonbérleti adatok alapján készül el. A jogszabályi
                   hivatkozások és klauzulák a kiválasztott sablonverzió szerint kerülnek
                   beillesztésre.
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="rotate-[-12deg] text-2xl font-bold text-primary/60 border-4 border-primary/40 px-6 py-2 rounded">
+                  <div className="rotate-[-12deg] border-4 border-df-red/40 px-6 py-2 text-2xl font-bold text-df-red/70 rounded">
                     MINTA — NEM ÉRVÉNYES
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
+              <p className="text-xs text-df-gray mt-3 flex items-center gap-1">
                 <Lock className="h-3 w-3" /> A teljes szerződés szövege csak a véglegesítés után
                 érhető el.
               </p>
             </Card>
 
             <div className="flex justify-between mt-6 gap-2 flex-wrap">
-              <Button asChild variant="ghost">
+              <Button asChild variant="outline" className="border-df-green text-df-green">
                 <Link to="/szerzodes/$id/szerkesztes" params={{ id: draft.id }}>
                   ← Vissza szerkesztésre
                 </Link>
               </Button>
               <Button
+                className="bg-df-green text-white hover:bg-[#173B2A]"
                 disabled={!report.can_finalize}
                 onClick={() => navigate({ to: "/szerzodes/$id/fizetes", params: { id: draft.id } })}
               >
                 {report.can_finalize
                   ? "Tovább a fizetésre / véglegesítésre"
                   : "Hiányzó kötelező adat — javítsd a vázlatban"}
+                {report.can_finalize && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </div>
           </>
@@ -184,8 +241,8 @@ function RiskPage() {
 function Row({ k, v }: { k: string; v?: string | null }) {
   return (
     <>
-      <dt className="text-muted-foreground">{k}</dt>
-      <dd>{v ?? "—"}</dd>
+      <dt className="text-df-gray">{k}</dt>
+      <dd className="font-medium text-df-ink">{v ?? "—"}</dd>
     </>
   );
 }
