@@ -12,7 +12,7 @@ import { updateDraft } from "@/lib/contracts/drafts.functions";
 import type { Draft, Parcel, Lessor, Lessee, Rent, Term, PreLease, ClausesSelection } from "@/lib/contracts/types";
 import { WizardStepper } from "./wizard-stepper";
 import { toast } from "sonner";
-import { ArrowRight, FileText, Plus, Save, ShieldCheck, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowRight, FileText, Plus, Save, ShieldCheck, Trash2 } from "lucide-react";
 
 const STEPS = [
   "Felek", "Földterület", "Időtartam", "Díj", "Előhaszonbérlet", "Klauzulák",
@@ -43,6 +43,7 @@ export function ContractEditor({ draft }: { draft: Draft }) {
     clauses: draft.clauses ?? {},
   }));
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
 
@@ -66,8 +67,10 @@ export function ContractEditor({ draft }: { draft: Draft }) {
             },
           },
         });
+        setSaveError(null);
       } catch (err) {
         console.error(err);
+        setSaveError("Az automatikus mentés most nem sikerült. Ellenőrizd a kapcsolatot, majd próbáld újra.");
       } finally {
         setSaving(false);
       }
@@ -101,9 +104,12 @@ export function ContractEditor({ draft }: { draft: Draft }) {
           },
         },
       });
+      setSaveError(null);
       navigate({ to: "/szerzodes/$id/ellenorzes", params: { id: draft.id } });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Mentés hiba");
+      const message = err instanceof Error ? err.message : "Nem sikerült menteni a vázlatot.";
+      setSaveError(message);
+      toast.error(message);
     }
   }
 
@@ -146,6 +152,15 @@ export function ContractEditor({ draft }: { draft: Draft }) {
         </div>
         <div className="space-y-5 p-5 md:p-6">
           <WizardStepper steps={STEPS} current={currentStep} />
+          {saveError && (
+            <div className="flex gap-3 rounded-md border border-df-red/40 bg-df-red/10 p-3 text-sm leading-6 text-df-ink">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-df-red" />
+              <div>
+                <div className="font-semibold text-df-red">Mentési figyelmeztetés</div>
+                <p>{saveError}</p>
+              </div>
+            </div>
+          )}
           <div className="rounded-md border border-df-border bg-df-cream/60 p-3 text-sm leading-6 text-df-gray">
             <span className="font-semibold text-df-green">
               {completedSteps} / {STEPS.length} rész alapadatai megadva.
