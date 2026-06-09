@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import QRCode from "qrcode";
+import { company, companyLegalDisclaimerAscii, companyLegalLineAscii } from "@/lib/company";
 
 export type PdfInput = {
   documentNumber: string;
@@ -66,18 +67,18 @@ export async function renderContractPdf(input: PdfInput): Promise<Uint8Array> {
       thickness: 0.6,
       color: DF_CREAM,
     });
-    const footer = `drfold.hu | Dokumentum ID: ${input.documentNumber} | Generálva: ${input.generatedAt.toISOString().slice(0, 10)} | Sablonverzió: ${input.templateVersion} | Klauzulacsomag: ${input.clauseVersion}`;
-    p.drawText("A Dr Fold dokumentumgeneralo es dontestamogato szolgaltatas, nem ugyvedi iroda.", {
+    const footer = `${company.domain} | Dokumentum ID: ${input.documentNumber} | Generálva: ${input.generatedAt.toISOString().slice(0, 10)} | Sablonverzió: ${input.templateVersion} | Klauzulacsomag: ${input.clauseVersion}`;
+    p.drawText(companyLegalDisclaimerAscii, {
       x: MARGIN,
       y: 32,
-      size: 7,
+      size: 6.4,
       font,
       color: DF_GRAY,
     });
-    p.drawText("Egyedi, vitas vagy nagy erteku ugyben ugyvedi ellenorzes javasolt.", {
+    p.drawText(companyLegalLineAscii, {
       x: MARGIN,
       y: 23,
-      size: 7,
+      size: 6.4,
       font,
       color: DF_GRAY,
     });

@@ -15,7 +15,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Sprout, TreePine } from "lucide-react";
-import type { Cultivation, LandContext, Transaction, YesNoUnknown } from "@/lib/rank/leaseTypes";
+import type { LandContextValue } from "@/lib/rank/landContextUi";
+import type { Cultivation, Transaction, YesNoUnknown } from "@/lib/rank/leaseTypes";
 
 const CULTIVATIONS: { value: Cultivation; label: string }[] = [
   { value: "szanto", label: "szántó" },
@@ -28,49 +29,6 @@ const CULTIVATIONS: { value: Cultivation; label: string }[] = [
   { value: "erdo", label: "erdő / fásított terület" },
   { value: "vegyes", label: "nem tudom" },
 ];
-
-export interface LandContextValue extends LandContext {
-  commonOwnershipUI: YesNoUnknown;
-  coOwnerLeaseUI: YesNoUnknown;
-  wineUI: YesNoUnknown;
-  mixedParcelUI: YesNoUnknown;
-  bundledLeaseUI: YesNoUnknown;
-}
-
-const yesNo = (v: YesNoUnknown) => v === "yes";
-
-export function toLandContext(v: LandContextValue): LandContext {
-  return {
-    transaction: v.transaction,
-    branch: v.branch,
-    cultivationBranch: v.cultivationBranch,
-    commonOwnership: yesNo(v.commonOwnershipUI),
-    coOwnerLeaseToThirdParty: yesNo(v.coOwnerLeaseUI),
-    wineGeoIndication: yesNo(v.wineUI),
-    mixedParcel: yesNo(v.mixedParcelUI),
-    largerArea: v.largerArea,
-    bundledLease: yesNo(v.bundledLeaseUI),
-    exceptions: v.exceptions,
-  };
-}
-
-export const DEFAULT_LAND: LandContextValue = {
-  transaction: "lease",
-  branch: "non_forest",
-  cultivationBranch: undefined,
-  commonOwnershipUI: "unknown",
-  coOwnerLeaseUI: "unknown",
-  wineUI: "unknown",
-  mixedParcelUI: "no",
-  bundledLeaseUI: "no",
-  largerArea: "unknown",
-  commonOwnership: false,
-  coOwnerLeaseToThirdParty: false,
-  wineGeoIndication: false,
-  mixedParcel: false,
-  bundledLease: false,
-  exceptions: [],
-};
 
 function YNU({ value, onChange }: { value: YesNoUnknown; onChange: (v: YesNoUnknown) => void }) {
   return (
@@ -123,7 +81,7 @@ export function LandContextCard({
           </label>
           <label className="flex items-center gap-1.5 cursor-not-allowed text-muted-foreground">
             <RadioGroupItem value="sale" disabled /> Adásvétel{" "}
-            <span className="text-xs">(hamarosan)</span>
+            <span className="text-xs">(külön ranghelylogika készül)</span>
           </label>
         </RadioGroup>
       </div>

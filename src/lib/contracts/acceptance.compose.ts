@@ -4,6 +4,7 @@ import {
   LEGAL_RULESET_VERSION,
   legalSourcesSummary,
 } from "@/lib/legal/ruleset";
+import { companyLegalDisclaimer, companyLegalLine } from "@/lib/company";
 
 export type AcceptanceInput = {
   noticeId?: string;
@@ -200,7 +201,8 @@ export function composeAcceptanceStatement(input: AcceptanceInput): AcceptanceCo
           "Felhasznált jogszabályi források:",
           legalSourcesSummary(),
           "",
-          "A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás, nem ügyvédi iroda. Egyedi, vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.",
+          companyLegalDisclaimer,
+          companyLegalLine,
         ].join("\n"),
       },
     ],

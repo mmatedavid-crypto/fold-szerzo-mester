@@ -56,7 +56,7 @@ type Notice = {
   original_detail_url: string | null;
 };
 
-const STEPS = ["Hirdetmény", "Föld", "Szerződő fél", "Te", "Eredmény"];
+const STEPS = ["Hirdetmény", "Föld", "Kifüggesztett bérlő", "Te", "Eredmény"];
 
 const DEFAULT_CLAIMANT: ClaimantProfile = {
   isFoldmuves: false,
@@ -103,7 +103,7 @@ function NoticeDetailPage() {
     return tags;
   }, [q.data]);
 
-  // A szerződő fél ranghelyét UGYANAZZAL a motorral számoljuk —
+  // A kifüggesztett bérlő ranghelyét UGYANAZZAL a motorral számoljuk —
   // így biztosítjuk, hogy a saját rangsorral konzisztens módon vethető össze.
   const partyRank = useMemo(() => {
     const baseFacts: NoticeFacts = {
@@ -224,7 +224,7 @@ function NoticeDetailPage() {
               <h2 className="font-serif text-lg">Van-e elővásárlási / előhaszonbérleti jogod?</h2>
               <p className="text-muted-foreground">
                 A 2013. évi CXXII. tv. (Földforgalmi tv.) 46. §-a alapján egy rövid kérdéssorral
-                kiszámoljuk a ranghelyedet, és összevetjük a szerződő félével.
+                kiszámoljuk a ranghelyedet, és összevetjük a kifüggesztett bérlőével.
               </p>
               <p className="text-xs text-muted-foreground">
                 Tájékoztató jellegű, hatósági döntést nem helyettesít. Az adatok nem mentődnek.
@@ -243,8 +243,8 @@ function NoticeDetailPage() {
                   className="grid gap-2"
                 >
                   <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
-                    <RadioGroupItem value="non_forest" /> Nem erdő (szántó, rét, legelő, szőlő,
-                    gyümölcs, stb.)
+                    <RadioGroupItem value="non_forest" /> Termőföld (szántó, rét, legelő, szőlő,
+                    gyümölcs, kert stb.)
                   </label>
                   <label className="flex items-center gap-2 border rounded-md px-3 py-2 cursor-pointer">
                     <RadioGroupItem value="forest" /> Erdő (Evt. szerinti speciális szabályok)
@@ -544,7 +544,7 @@ function ResultPanel({
           <div className="font-serif text-base">{formatRank(result.rank)}</div>
         </div>
         <div className="rounded-md border p-3">
-          <div className="text-xs text-muted-foreground">Szerződő fél</div>
+          <div className="text-xs text-muted-foreground">Kifüggesztett bérlő</div>
           <div className="font-serif text-base">{formatRank(partyRank)}</div>
         </div>
       </div>
@@ -553,11 +553,11 @@ function ResultPanel({
         <Scale className="h-4 w-4" />
         <AlertTitle>
           {stronger === true
-            ? "Erősebb vagy a szerződő félnél"
+            ? "Erősebb lehetsz a kifüggesztett bérlőnél"
             : sameRank
               ? "Azonos ranghelyen álltok"
               : hasRank && partyRank !== null
-                ? "A szerződő fél erősebb"
+                ? "A kifüggesztett bérlő állhat előrébb"
                 : "Összevetés nem értelmezhető"}
         </AlertTitle>
         <AlertDescription>

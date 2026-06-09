@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { ResultPanel } from "./ResultPanel";
-import type { LandContextValue } from "./LandContextCard";
+import type { LandContextValue } from "@/lib/rank/landContextUi";
 import type { PartyStatus, TransactionException } from "@/lib/rank/leaseTypes";
 import { applyPresetByValue, TRANSACTION_EXCEPTIONS } from "@/lib/rank/rankPresets";
 import type { LeaseComparisonResult } from "@/lib/rank/leaseRankComparison";
@@ -81,7 +81,7 @@ export function GuidedFlow({
           <Choices
             options={[
               { value: "lease", label: "Bérelni szeretnék (haszonbérlet)" },
-              { value: "sale", label: "Venni szeretnék (adásvétel) — hamarosan" },
+              { value: "sale", label: "Venni szeretnék (adásvételi ranghely készül)" },
             ]}
             onPick={(v) => {
               setLand({ ...land, transaction: v as "lease" | "sale" });

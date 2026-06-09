@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { DrFoldLogo } from "@/components/brand/dr-fold-logo";
 import { StampBadge } from "@/components/brand/brand-elements";
-import { company } from "@/lib/company";
+import { company, companyLegalDisclaimer, companyLegalLine } from "@/lib/company";
 
 export function SiteFooter() {
   return (
@@ -45,10 +45,8 @@ export function SiteFooter() {
         </div>
         <div>
           <div className="mb-3 font-semibold text-df-ink">Jogi tájékoztatás</div>
-          <p className="text-df-gray">
-            A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás, nem ügyvédi iroda. Egyedi,
-            vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.
-          </p>
+          <p className="text-df-gray">{companyLegalDisclaimer}</p>
+          <p className="mt-3 text-xs text-df-gray">{companyLegalLine}</p>
           <ul className="mt-3 space-y-1 text-df-gray">
             <li>
               <Link to="/aszf" className="hover:text-primary">

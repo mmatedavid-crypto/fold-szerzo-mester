@@ -7,6 +7,7 @@ import {
   legalSourcesSummary,
   LEGAL_RULESET_VERSION,
 } from "@/lib/legal/ruleset";
+import { companyLegalDisclaimer, companyLegalLine } from "@/lib/company";
 
 type Clause = { clause_key: string; title: string; text: string; sort_order: number };
 
@@ -178,7 +179,8 @@ export function composeContract(
       "Draft audit:",
       legalAuditText(legalAudit),
       "",
-      "A Dr Föld dokumentumgeneráló és döntéstámogató szolgáltatás, nem ügyvédi iroda. Egyedi, vitás vagy nagy értékű ügyben ügyvédi ellenőrzés javasolt.",
+      companyLegalDisclaimer,
+      companyLegalLine,
     ].join("\n"),
   });
   return { title: "TERMŐFÖLD HASZONBÉRLETI SZERZŐDÉS", sections };

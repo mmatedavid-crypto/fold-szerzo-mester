@@ -4,12 +4,9 @@ import { toast } from "sonner";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, X } from "lucide-react";
-import {
-  DEFAULT_LAND,
-  toLandContext,
-  type LandContextValue,
-} from "@/components/rank/LandContextCard";
+import { LandContextCard } from "@/components/rank/LandContextCard";
 import { GuidedFlow } from "@/components/rank/GuidedFlow";
+import { DEFAULT_LAND, toLandContext, type LandContextValue } from "@/lib/rank/landContextUi";
 import { EMPTY_PARTY, type PartyStatus } from "@/lib/rank/leaseTypes";
 import { compareLeaseRanks } from "@/lib/rank/leaseRankComparison";
 
