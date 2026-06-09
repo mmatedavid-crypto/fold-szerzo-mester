@@ -396,8 +396,12 @@ function Field({
 }) {
   const id = label.toLowerCase().replace(/[^a-z0-9]+/gi, "-");
   return (
-    <div className={className}>
-      <Label htmlFor={id} className="mb-2 block text-sm font-medium">
+    <div
+      className={`[&_input]:border-df-border [&_input]:bg-white [&_input]:text-df-ink [&_input]:focus-visible:ring-df-green/40 [&_textarea]:border-df-border [&_textarea]:bg-white [&_textarea]:text-df-ink [&_textarea]:focus-visible:ring-df-green/40 ${
+        className ?? ""
+      }`}
+    >
+      <Label htmlFor={id} className="mb-2 block text-sm font-semibold text-df-ink">
         {label}
       </Label>
       {children}
