@@ -92,8 +92,8 @@ export function ResultPanel({
 
         {missingConditions.length > 0 && (
           <div className="text-sm">
-            <div className="mb-1 font-medium">Mi hiányozhat?</div>
-            <ul className="list-disc space-y-0.5 pl-5 text-xs text-muted-foreground">
+            <div className="mb-1 font-semibold text-df-ink">Mi hiányozhat?</div>
+            <ul className="list-disc space-y-0.5 pl-5 text-xs leading-5 text-df-gray">
               {missingConditions.map((m, i) => (
                 <li key={i}>{m}</li>
               ))}
@@ -125,10 +125,10 @@ export function ResultPanel({
                 if (!items.length) return null;
                 return (
                   <div key={cat} className="mb-2">
-                    <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
+                    <div className="mb-1 text-xs uppercase tracking-wide text-df-gray">
                       {CATEGORY_LABEL[cat]}
                     </div>
-                    <ul className="list-disc space-y-0.5 pl-5 text-xs">
+                    <ul className="list-disc space-y-0.5 pl-5 text-xs leading-5 text-df-ink">
                       {items.map((p) => (
                         <li key={p.id}>{p.label}</li>
                       ))}
@@ -152,10 +152,13 @@ export function ResultPanel({
           )}
           {comparison === "same_rank" && (
             <>
-              <Button className="w-full" onClick={onAccept}>
+              <Button
+                className="w-full bg-df-green text-white hover:bg-[#173B2A]"
+                onClick={onAccept}
+              >
                 Elfogadó nyilatkozat előkészítése
               </Button>
-              <p className="text-xs text-amber-700">
+              <p className="rounded-md border border-df-yellow/50 bg-df-yellow/10 p-2 text-xs text-df-ink">
                 Azonos ranghely esetén nem biztos, hogy átveheted a bérlő helyét. Jogi ellenőrzés
                 javasolt.
               </p>
@@ -163,40 +166,47 @@ export function ResultPanel({
           )}
           {comparison === "lessee_unknown" && (
             <>
-              <Button className="w-full" onClick={onAccept}>
+              <Button
+                className="w-full bg-df-green text-white hover:bg-[#173B2A]"
+                onClick={onAccept}
+              >
                 Elfogadó nyilatkozat előkészítése
               </Button>
-              <p className="text-xs text-amber-700">
+              <p className="rounded-md border border-df-yellow/50 bg-df-yellow/10 p-2 text-xs text-df-ink">
                 A bérlő jogcíme nélkül a kimenetel bizonytalan.
               </p>
             </>
           )}
           {comparison === "user_weaker" && (
-            <Button className="w-full" variant="outline">
+            <Button className="w-full border-df-green text-df-green" variant="outline">
               Megnézem, milyen jogcím hiányzik
             </Button>
           )}
           {comparison === "incomplete_special" && (
-            <Button className="w-full" variant="outline">
+            <Button className="w-full border-df-green text-df-green" variant="outline">
               Hiányzó feltételek bepipálása
             </Button>
           )}
           {comparison === "cannot_determine" && (
-            <Button className="w-full" variant="outline">
+            <Button className="w-full border-df-green text-df-green" variant="outline">
               Adatok pontosítása
             </Button>
           )}
         </div>
 
         {(userStrongestRank || lesseeStrongestRank) && (
-          <Collapsible open={openLegal} onOpenChange={setOpenLegal} className="border-t pt-3">
-            <CollapsibleTrigger className="text-xs text-muted-foreground flex items-center gap-1 cursor-pointer">
+          <Collapsible
+            open={openLegal}
+            onOpenChange={setOpenLegal}
+            className="border-t border-df-border pt-3"
+          >
+            <CollapsibleTrigger className="text-xs text-df-gray flex items-center gap-1 cursor-pointer">
               <ChevronDown
                 className={`h-3 w-3 transition-transform ${openLegal ? "rotate-180" : ""}`}
               />{" "}
               Jogszabályi háttér
             </CollapsibleTrigger>
-            <CollapsibleContent className="mt-2 space-y-1 text-xs text-muted-foreground">
+            <CollapsibleContent className="mt-2 space-y-1 text-xs text-df-gray">
               {userStrongestRank && <div>• {userStrongestRank.legalRef}</div>}
               {lesseeStrongestRank && lesseeStrongestRank.id !== userStrongestRank?.id && (
                 <div>• {lesseeStrongestRank.legalRef}</div>
@@ -205,7 +215,7 @@ export function ResultPanel({
           </Collapsible>
         )}
 
-        <p className="border-t pt-3 text-[11px] text-muted-foreground">
+        <p className="border-t border-df-border pt-3 text-[11px] leading-5 text-df-gray">
           A kalkulátor tájékoztató jellegű. A jogosultságot és az elfogadó jognyilatkozat
           figyelembevételét a hatóság vizsgálja. Vitás ügyben ügyvédi ellenőrzés javasolt.
         </p>
@@ -226,9 +236,11 @@ function RankCell({
   state?: "match" | "incomplete";
 }) {
   return (
-    <div className="rounded-md border border-df-border bg-df-cream/40 p-3">
-      <div className="text-xs text-muted-foreground">{title}</div>
-      <div className="text-sm font-medium mt-1 leading-tight">{rank ?? "—"}</div>
+    <div className="rounded-md border border-df-border bg-white/70 p-3">
+      <div className="text-xs text-df-gray">{title}</div>
+      <div className="mt-1 font-brand text-base font-bold leading-tight text-df-green">
+        {rank ?? "—"}
+      </div>
       {state && (
         <Badge
           variant="outline"
@@ -237,7 +249,7 @@ function RankCell({
           {state === "match" ? "érvényes" : "hiányos"}
         </Badge>
       )}
-      {legalRef && <div className="text-[11px] text-muted-foreground mt-1">{legalRef}</div>}
+      {legalRef && <div className="mt-1 text-[11px] leading-4 text-df-gray">{legalRef}</div>}
     </div>
   );
 }

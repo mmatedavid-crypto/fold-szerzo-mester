@@ -2,9 +2,9 @@ import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { PageShell } from "@/components/layout/page-shell";
+import { BrandBadge } from "@/components/brand/brand-elements";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, X } from "lucide-react";
-import { LandContextCard } from "@/components/rank/LandContextCard";
+import { Search, Sparkles, X } from "lucide-react";
 import { GuidedFlow } from "@/components/rank/GuidedFlow";
 import { DEFAULT_LAND, toLandContext, type LandContextValue } from "@/lib/rank/landContextUi";
 import { EMPTY_PARTY, type PartyStatus } from "@/lib/rank/leaseTypes";
@@ -87,26 +87,27 @@ function RankCalculatorPage() {
   return (
     <PageShell>
       <div className="min-h-[calc(100vh-4rem)] space-y-6 bg-df-cream px-4 py-6 md:px-8 md:py-10">
-        <header className="mx-auto max-w-2xl space-y-2 text-center">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Badge variant="outline" className="border-primary/40 text-primary">
-              Dr Föld
+        <header className="mx-auto max-w-3xl rounded-lg border border-df-border bg-df-card p-6 text-center shadow-[0_18px_45px_rgba(26,26,26,0.08)] md:p-8">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <BrandBadge>Ranghely kalkulátor</BrandBadge>
+            <Badge variant="outline" className="border-df-yellow text-df-green">
+              Ravasz a gazda
             </Badge>
-            <span>Ranghely kalkulátor</span>
           </div>
-          <h1 className="font-brand text-3xl font-bold tracking-[-0.02em] text-df-ink md:text-5xl">
-            Ranghely kalkulátor
+          <h1 className="mt-4 font-brand text-4xl font-bold leading-tight text-df-green md:text-6xl">
+            Ha előrébb állsz, ne maradj hátul.
           </h1>
-          <p className="mx-auto max-w-xl text-df-gray">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-df-gray md:text-lg">
             Válaszolj pár egyszerű kérdésre. Dr Föld megmutatja, kinek lehet erősebb
             előhaszonbérleti ranghelye.
           </p>
-          <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-df-green">
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-sm font-semibold text-df-green">
             <Sparkles className="h-4 w-4" /> Ravasz a gazda: nézd meg, hol állsz a sorban.
           </p>
           {showNoticeChip && (
-            <div className="pt-2">
-              <div className="inline-flex items-center gap-2 text-xs bg-muted px-2.5 py-1 rounded-full">
+            <div className="pt-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-df-border bg-df-cream px-3 py-1.5 text-xs font-semibold text-df-green">
+                <Search className="h-3.5 w-3.5" />
                 Kifüggesztésből indítva
                 <button onClick={() => setShowNoticeChip(false)} aria-label="Bezár">
                   <X className="h-3 w-3" />

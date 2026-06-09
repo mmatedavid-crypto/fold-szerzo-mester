@@ -66,11 +66,16 @@ export function GuidedFlow({
   };
 
   return (
-    <Card className="mx-auto max-w-2xl space-y-6 border border-df-border bg-df-card p-5 shadow-[0_16px_42px_rgba(26,26,26,0.08)] md:p-7">
+    <Card className="mx-auto max-w-2xl space-y-6 border border-df-border bg-df-card p-5 shadow-[0_18px_45px_rgba(26,26,26,0.10)] md:p-7">
       <div>
         <Progress value={((step + 1) / (total + 1)) * 100} className="h-1.5" />
-        <div className="mt-2 text-xs font-semibold text-df-gray">
-          {step + 1}. / {total + 1}. lépés
+        <div className="mt-2 flex items-center justify-between gap-3 text-xs font-semibold text-df-gray">
+          <span>
+            {step + 1}. / {total + 1}. lépés
+          </span>
+          <span className="rounded-full border border-df-border bg-df-cream px-2 py-0.5 text-df-green">
+            Ranghelyet néz, nem szerencsét
+          </span>
         </div>
       </div>
 
@@ -275,7 +280,11 @@ export function GuidedFlow({
       {step >= 7 && (
         <div className="space-y-4">
           <ResultPanel result={result} onAccept={onAccept} />
-          <Button variant="outline" className="w-full" onClick={onFinish}>
+          <Button
+            variant="outline"
+            className="w-full border-df-green text-df-green"
+            onClick={onFinish}
+          >
             Újrakezdem <Sparkles className="h-4 w-4" />
           </Button>
         </div>
@@ -283,10 +292,20 @@ export function GuidedFlow({
 
       {step > 0 && step < 7 && (
         <div className="flex justify-between pt-2">
-          <Button variant="ghost" size="sm" onClick={back}>
+          <Button
+            variant="outline"
+            className="border-df-border text-df-green"
+            size="sm"
+            onClick={back}
+          >
             <ArrowLeft className="h-3 w-3" /> Vissza
           </Button>
-          <Button variant="ghost" size="sm" onClick={next}>
+          <Button
+            variant="outline"
+            className="border-df-border text-df-green"
+            size="sm"
+            onClick={next}
+          >
             Most kihagyom <ArrowRight className="h-3 w-3" />
           </Button>
         </div>
