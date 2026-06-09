@@ -5,6 +5,7 @@ import { PricingCards } from "@/components/pricing/pricing-cards";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { listPlans } from "@/lib/plans.functions";
+import { company } from "@/lib/company";
 
 const plansQuery = queryOptions({ queryKey: ["plans"], queryFn: () => listPlans() });
 
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/arak")({
         content: "Egyszeri szerződés vagy havi előfizetés gazdaságoknak.",
       },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/arak` }],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(plansQuery),
   errorComponent: PricingError,

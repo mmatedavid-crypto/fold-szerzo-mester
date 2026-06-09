@@ -28,6 +28,7 @@ import { formatDate } from "@/lib/format";
 import { cleanSettlement } from "@/lib/notices/clean";
 import { subscribeToSettlement } from "@/lib/subscriptions/subscribe.functions";
 import { subscriptionErrorMessage } from "@/lib/user-facing-errors";
+import { company } from "@/lib/company";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,7 @@ export const Route = createFileRoute("/kifuggesztesek/")({
           "Aktív termőföld kifüggesztések böngészése településenként, helyrajzi szám alapján és ranghely-kalkulátorral.",
       },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/kifuggesztesek` }],
   }),
   component: NoticesPage,
 });

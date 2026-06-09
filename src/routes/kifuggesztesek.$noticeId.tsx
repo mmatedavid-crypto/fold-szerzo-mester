@@ -30,7 +30,7 @@ import {
 export const Route = createFileRoute("/kifuggesztesek/$noticeId")({
   head: () => ({
     meta: [
-      { title: `Ranghely-kalkulátor | Dr Föld` },
+      { title: `Kifüggesztés ranghely ellenőrzése | Dr Föld` },
       {
         name: "description",
         content:

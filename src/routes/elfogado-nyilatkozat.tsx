@@ -11,6 +11,7 @@ import {
   composeAcceptanceStatement,
   type AcceptanceInput,
 } from "@/lib/contracts/acceptance.compose";
+import { company } from "@/lib/company";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/elfogado-nyilatkozat")({
         content: "Előhaszonbérleti nyilatkozat előkészítése kézi indítással vagy ranghely alapján.",
       },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/elfogado-nyilatkozat` }],
   }),
   component: AcceptancePage,
 });

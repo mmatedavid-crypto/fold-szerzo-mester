@@ -3,6 +3,7 @@ import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Landmark, ArrowRight } from "lucide-react";
+import { company } from "@/lib/company";
 
 export const Route = createFileRoute("/fold-adas-vetel")({
   head: () => ({
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/fold-adas-vetel")({
           "Termőföld adásvételi ügyekhez készülő Dr Föld modul, földár iránytűvel és kifüggesztés figyeléssel.",
       },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/fold-adas-vetel` }],
   }),
   component: LandSalePage,
 });

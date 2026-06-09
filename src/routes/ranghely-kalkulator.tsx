@@ -9,6 +9,7 @@ import { GuidedFlow } from "@/components/rank/GuidedFlow";
 import { DEFAULT_LAND, toLandContext, type LandContextValue } from "@/lib/rank/landContextUi";
 import { EMPTY_PARTY, type PartyStatus } from "@/lib/rank/leaseTypes";
 import { compareLeaseRanks } from "@/lib/rank/leaseRankComparison";
+import { company } from "@/lib/company";
 
 type Search = {
   from?: string;
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/ranghely-kalkulator")({
       { property: "og:title", content: "Dr Föld — Ranghely kalkulátor" },
       { property: "og:description", content: "Ravasz a gazda: nézd meg, hol állsz a sorban." },
     ],
+    links: [{ rel: "canonical", href: `${company.websiteUrl}/ranghely-kalkulator` }],
   }),
   validateSearch: (s): Search => ({
     from: typeof s.from === "string" ? s.from : undefined,
