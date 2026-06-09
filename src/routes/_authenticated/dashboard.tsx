@@ -251,7 +251,11 @@ function Dashboard() {
                 .map((d) => (
                   <TableRow key={d.id}>
                     <TableCell>{d.title ?? "Vázlat"}</TableCell>
-                    <TableCell className="text-xs">{d.status}</TableCell>
+                    <TableCell className="text-xs">
+                      <Badge variant="outline" className="border-df-border bg-white text-df-green">
+                        {draftStatusLabel(d.status)}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-sm">{formatDate(d.updated_at)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
@@ -366,4 +370,19 @@ function MetricError({ text }: { text: string }) {
       {text}
     </div>
   );
+}
+
+function draftStatusLabel(status: string | null | undefined): string {
+  switch (status) {
+    case "draft":
+      return "Vázlat";
+    case "reviewed":
+      return "Ellenőrizve";
+    case "paid":
+      return "Fizetve";
+    case "finalized":
+      return "Véglegesítve";
+    default:
+      return "Folyamatban";
+  }
 }
