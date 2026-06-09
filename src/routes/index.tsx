@@ -49,6 +49,13 @@ const services = [
     cta: "Keresek kifüggesztést",
   },
   {
+    icon: "price" as const,
+    title: "Ár iránytű",
+    text: "Nézd meg megyei hőtérképen, merre mozognak a bérleti díjak és földárak.",
+    to: "/berleti-dij-iranytu",
+    cta: "Árakat nézek",
+  },
+  {
     icon: "acceptance" as const,
     title: "Elfogadó nyilatkozat",
     text: "Készíts jogszerű elfogadó nyilatkozatot gyorsan, hibamentesen.",
@@ -88,6 +95,11 @@ function Index() {
                   Kifüggesztések keresése <ArrowRight className="h-4 w-4" />
                 </Link>
               </BrandButton>
+              <BrandButton asChild variant="secondary">
+                <Link to="/berleti-dij-iranytu">
+                  Ár iránytű <ArrowRight className="h-4 w-4" />
+                </Link>
+              </BrandButton>
             </div>
           </div>
 
@@ -96,7 +108,7 @@ function Index() {
       </section>
 
       <section className="container mx-auto -mt-8 px-4 pb-8 md:-mt-14">
-        <div className="grid overflow-hidden rounded-lg border border-df-border bg-df-card shadow-[0_16px_42px_rgba(26,26,26,0.08)] md:grid-cols-4">
+        <div className="grid overflow-hidden rounded-lg border border-df-border bg-df-card shadow-[0_16px_42px_rgba(26,26,26,0.08)] sm:grid-cols-2 lg:grid-cols-5">
           {services.map((service) => (
             <ServiceCard key={service.title} {...service} />
           ))}

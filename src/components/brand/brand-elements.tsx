@@ -11,6 +11,7 @@ import {
   Scale,
   Search,
   ShieldCheck,
+  TrendingUp,
   UserCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -133,7 +134,7 @@ export function ServiceCard({
   text: string;
   to: string;
   cta: string;
-  icon: "rank" | "notice" | "acceptance" | "contract";
+  icon: "rank" | "notice" | "acceptance" | "contract" | "price";
 }) {
   const Icon = serviceIconMap[icon];
   return (
@@ -263,4 +264,5 @@ const serviceIconMap = {
   notice: Search,
   acceptance: FileCheck2,
   contract: FileSignature,
+  price: TrendingUp,
 };
