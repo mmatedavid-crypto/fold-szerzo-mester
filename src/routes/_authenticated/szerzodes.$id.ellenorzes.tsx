@@ -19,7 +19,16 @@ import {
 import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/ellenorzes")({
-  head: () => ({ meta: [{ title: "Jogi kockázati ellenőrzés" }] }),
+  head: () => ({
+    meta: [
+      { title: "Jogi kockázati ellenőrzés | Dr Föld" },
+      {
+        name: "description",
+        content:
+          "Dr Föld kockázati ellenőrzés a földbérleti szerződésvázlat kötelező adataihoz és jogi figyelmeztetéseihez.",
+      },
+    ],
+  }),
   component: RiskPage,
 });
 

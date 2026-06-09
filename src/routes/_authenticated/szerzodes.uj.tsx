@@ -10,7 +10,16 @@ import { Button } from "@/components/ui/button";
 import { FilePlus2, Loader2, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/uj")({
-  head: () => ({ meta: [{ title: "Új szerződés | Dr Föld" }] }),
+  head: () => ({
+    meta: [
+      { title: "Új földbérleti szerződés | Dr Föld" },
+      {
+        name: "description",
+        content:
+          "Új Dr Föld földbérleti szerződésvázlat indítása a Műhelyben, automatikus mentéssel.",
+      },
+    ],
+  }),
   component: NewContract,
 });
 

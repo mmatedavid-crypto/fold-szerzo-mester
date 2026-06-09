@@ -11,7 +11,16 @@ import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
 import { Loader2, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/szerkesztes")({
-  head: () => ({ meta: [{ title: "Szerződés szerkesztése" }] }),
+  head: () => ({
+    meta: [
+      { title: "Földbérleti szerződés szerkesztése | Dr Föld" },
+      {
+        name: "description",
+        content:
+          "Földbérleti szerződésvázlat szerkesztése: felek, földterület, díj, időtartam és klauzulák rendezése.",
+      },
+    ],
+  }),
   component: EditDraft,
 });
 

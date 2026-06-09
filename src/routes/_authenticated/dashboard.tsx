@@ -34,7 +34,16 @@ import { GdprSection } from "@/components/dashboard/gdpr-section";
 import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Műhely | Dr Föld" }] }),
+  head: () => ({
+    meta: [
+      { title: "Műhely | Dr Föld" },
+      {
+        name: "description",
+        content:
+          "Dr Föld Műhely: szerződésvázlatok, generált dokumentumok, kreditek és előfizetési keret egy helyen.",
+      },
+    ],
+  }),
   component: Dashboard,
 });
 

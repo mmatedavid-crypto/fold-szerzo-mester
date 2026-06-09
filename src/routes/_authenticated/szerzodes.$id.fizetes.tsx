@@ -22,7 +22,16 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/fizetes")({
-  head: () => ({ meta: [{ title: "Fizetés és véglegesítés | Dr Föld" }] }),
+  head: () => ({
+    meta: [
+      { title: "Fizetés és véglegesítés | Dr Föld" },
+      {
+        name: "description",
+        content:
+          "Földbérleti szerződésvázlat véglegesítése elérhető kredit, előfizetési keret vagy új vásárlás alapján.",
+      },
+    ],
+  }),
   component: PayPage,
 });
 

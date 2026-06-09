@@ -15,7 +15,16 @@ const Search = z.object({ doc: z.string().uuid() });
 
 export const Route = createFileRoute("/_authenticated/szerzodes/$id/kesz")({
   validateSearch: (s) => Search.parse(s),
-  head: () => ({ meta: [{ title: "Szerződés elkészült | Dr Föld" }] }),
+  head: () => ({
+    meta: [
+      { title: "Szerződés elkészült | Dr Föld" },
+      {
+        name: "description",
+        content:
+          "A végleges Dr Föld földbérleti szerződés PDF letöltése és dokumentumazonosító ellenőrzése.",
+      },
+    ],
+  }),
   component: DonePage,
 });
 

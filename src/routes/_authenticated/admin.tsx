@@ -67,7 +67,16 @@ const adminData = createServerFn({ method: "GET" })
   });
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "Admin | Dr Föld" }] }),
+  head: () => ({
+    meta: [
+      { title: "Admin műhely | Dr Föld" },
+      {
+        name: "description",
+        content:
+          "Dr Föld admin műhely sablonverziókhoz, klauzulatárhoz, dokumentumlistához és kifüggesztés importhoz.",
+      },
+    ],
+  }),
   beforeLoad: async () => {
     const r = await checkAdmin();
     if (!r.isAdmin) throw redirect({ to: "/dashboard" });
