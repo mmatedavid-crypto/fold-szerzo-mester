@@ -176,8 +176,8 @@ export function ContractEditor({ draft }: { draft: Draft }) {
       </Card>
 
       {/* Step 1: Felek */}
-      <Card className="p-6">
-        <h2 className="font-serif text-xl">1. Felek adatai</h2>
+      <Card className="border-df-border bg-df-card p-6 shadow-sm">
+        <h2 className="font-brand text-2xl font-bold text-df-green">1. Felek adatai</h2>
         <div className="grid md:grid-cols-2 gap-6 mt-4">
           <div className="space-y-3">
             <h3 className="font-medium">Haszonbérbeadó</h3>
@@ -205,7 +205,7 @@ export function ContractEditor({ draft }: { draft: Draft }) {
               </>
             )}
 
-            <div className="pt-3 border-t border-border space-y-3">
+            <div className="space-y-3 border-t border-df-border pt-3">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium">Társtulajdonosok</h4>
                 <Button
@@ -223,13 +223,13 @@ export function ContractEditor({ draft }: { draft: Draft }) {
                 </Button>
               </div>
               {(state.lessor.co_lessors ?? []).length === 0 && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs leading-5 text-df-gray">
                   Ha a földet többen birtokolják, add hozzá a többi tulajdonost a saját
                   tulajdoni hányadukkal. A szerződés mindegyiküket bérbeadóként szerepelteti.
                 </p>
               )}
               {(state.lessor.co_lessors ?? []).map((co, ci) => (
-                <div key={ci} className="border border-border rounded-md p-3 space-y-2">
+                <div key={ci} className="space-y-2 rounded-md border border-df-border bg-white/70 p-3">
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-medium">{ci + 2}. tulajdonos</div>
                     <Button
@@ -344,16 +344,16 @@ export function ContractEditor({ draft }: { draft: Draft }) {
       </Card>
 
       {/* Step 2: Földterület */}
-      <Card className="p-6">
+      <Card className="border-df-border bg-df-card p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="font-serif text-xl">2. Földterület adatai</h2>
+          <h2 className="font-brand text-2xl font-bold text-df-green">2. Földterület adatai</h2>
           <Button variant="outline" size="sm" onClick={() => set("parcels", [...state.parcels, {}])}>
             <Plus className="h-4 w-4 mr-1" />Új parcella
           </Button>
         </div>
         <div className="mt-4 space-y-6">
           {state.parcels.map((p, i) => (
-            <div key={i} className="border border-border rounded-md p-4">
+            <div key={i} className="rounded-md border border-df-border bg-white/70 p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="font-medium">{i + 1}. parcella</div>
                 {state.parcels.length > 1 && (
@@ -405,8 +405,8 @@ export function ContractEditor({ draft }: { draft: Draft }) {
       </Card>
 
       {/* Step 3: Időtartam */}
-      <Card className="p-6">
-        <h2 className="font-serif text-xl">3. Haszonbérleti időtartam</h2>
+      <Card className="border-df-border bg-df-card p-6 shadow-sm">
+        <h2 className="font-brand text-2xl font-bold text-df-green">3. Haszonbérleti időtartam</h2>
         <div className="grid md:grid-cols-2 gap-3 mt-4">
           <div><Label>Kezdő dátum</Label><Input type="date" value={state.term.start_date ?? ""} onChange={(e) => set("term", { ...state.term, start_date: e.target.value })} /></div>
           <div><Label>Befejező dátum</Label><Input type="date" value={state.term.end_date ?? ""} onChange={(e) => set("term", { ...state.term, end_date: e.target.value })} /></div>
@@ -418,8 +418,8 @@ export function ContractEditor({ draft }: { draft: Draft }) {
       </Card>
 
       {/* Step 4: Díj */}
-      <Card className="p-6">
-        <h2 className="font-serif text-xl">4. Haszonbérleti díj</h2>
+      <Card className="border-df-border bg-df-card p-6 shadow-sm">
+        <h2 className="font-brand text-2xl font-bold text-df-green">4. Haszonbérleti díj</h2>
         <div className="grid md:grid-cols-2 gap-3 mt-4">
           <div>
             <Label>Díjmodell</Label>
@@ -475,9 +475,9 @@ export function ContractEditor({ draft }: { draft: Draft }) {
       </Card>
 
       {/* Step 5: Előhaszonbérleti jog */}
-      <Card className="p-6">
-        <h2 className="font-serif text-xl">5. Előhaszonbérleti jog</h2>
-        <p className="text-sm text-muted-foreground mt-1">Vezetett kérdéssor: minden tényhez, amely fennáll, jelöld be a négyzetet.</p>
+      <Card className="border-df-border bg-df-card p-6 shadow-sm">
+        <h2 className="font-brand text-2xl font-bold text-df-green">5. Előhaszonbérleti jog</h2>
+        <p className="mt-1 text-sm leading-6 text-df-gray">Vezetett kérdéssor: minden tényhez, amely fennáll, jelöld be a négyzetet.</p>
         <div className="grid md:grid-cols-2 gap-2 mt-3">
           <CheckRow label="Jogszabályi kivétel áll fenn (nincs előhaszonbérleti jog)" checked={!!state.prelease.no_prelease_exception} onChange={(v) => set("prelease", { ...state.prelease, no_prelease_exception: v })} />
           <CheckRow label="Korábbi haszonbérlő" checked={!!state.prelease.is_former_lessee} onChange={(v) => set("prelease", { ...state.prelease, is_former_lessee: v })} />
@@ -499,8 +499,8 @@ export function ContractEditor({ draft }: { draft: Draft }) {
       </Card>
 
       {/* Step 6: Klauzulák */}
-      <Card className="p-6">
-        <h2 className="font-serif text-xl">6. Speciális klauzula-csomagok</h2>
+      <Card className="border-df-border bg-df-card p-6 shadow-sm">
+        <h2 className="font-brand text-2xl font-bold text-df-green">6. Speciális klauzula-csomagok</h2>
         <div className="grid md:grid-cols-2 gap-2 mt-3">
           {([
             ["general_arable", "Általános szántóföldi csomag"],
@@ -554,7 +554,7 @@ export function ContractEditor({ draft }: { draft: Draft }) {
 
 function CheckRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label className="flex items-start gap-2 text-sm cursor-pointer">
+    <label className="flex cursor-pointer items-start gap-2 rounded-md border border-df-border bg-white/70 px-3 py-2 text-sm text-df-ink transition hover:bg-df-cream/60">
       <Checkbox checked={checked} onCheckedChange={(v) => onChange(!!v)} />
       <span>{label}</span>
     </label>
