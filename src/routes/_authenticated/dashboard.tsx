@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -15,7 +17,7 @@ import {
 import { listMyDocuments, getMyQuota, getDownloadUrl } from "@/lib/contracts/finalize.functions";
 import { listDrafts } from "@/lib/contracts/drafts.functions";
 import { formatDate } from "@/lib/format";
-import { Download, FilePlus2, LogOut } from "lucide-react";
+import { Download, FilePlus2, LogOut, Archive, FileCheck2, Gauge } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GdprSection } from "@/components/dashboard/gdpr-section";
@@ -49,69 +51,81 @@ function Dashboard() {
 
   return (
     <PageShell>
-      <section className="container mx-auto px-4 py-10 max-w-6xl">
-        <div className="flex items-start justify-between flex-wrap gap-3">
+      <section className="container mx-auto max-w-6xl px-4 py-10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl">Műhely</h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              Szerződéseid, vázlataid és kereted egy helyen.
+            <Badge className="border-df-yellow bg-df-yellow/15 text-df-green" variant="outline">
+              Dr Föld Műhely
+            </Badge>
+            <h1 className="mt-4 font-brand text-4xl font-bold leading-tight text-df-green md:text-5xl">
+              A földügyek munkapadja.
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-df-gray md:text-base">
+              Szerződéseid, vázlataid, dokumentumaid és kereted egy helyen. Ha előrébb állsz, ne
+              maradj hátul.
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button asChild>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild className="bg-df-green text-white hover:bg-[#173B2A]">
               <Link to="/szerzodes/uj">
-                <FilePlus2 className="h-4 w-4 mr-1" />
+                <FilePlus2 className="mr-1 h-4 w-4" />
                 Új szerződés
               </Link>
             </Button>
-            <Button variant="ghost" onClick={onSignOut}>
-              <LogOut className="h-4 w-4 mr-1" />
+            <Button
+              variant="outline"
+              className="border-df-border text-df-green"
+              onClick={onSignOut}
+            >
+              <LogOut className="mr-1 h-4 w-4" />
               Kilépés
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3 mt-6">
-          <Card className="p-5">
-            <div className="text-sm text-muted-foreground">Elérhető egyszeri kreditek</div>
-            <div className="text-3xl font-semibold mt-1">{quota.data?.single_credits ?? "—"}</div>
-          </Card>
-          <Card className="p-5">
-            <div className="text-sm text-muted-foreground">Előfizetési keret</div>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <MetricCard
+            icon={<FileCheck2 className="h-5 w-5" />}
+            label="Elérhető egyszeri kreditek"
+            value={quota.data?.single_credits ?? "—"}
+            helper="Fizetett, még felhasználható dokumentumcsomag"
+          />
+          <Card className="border-df-border bg-df-card p-5 shadow-sm">
+            <div className="flex items-center gap-2 text-sm font-semibold text-df-green">
+              <Gauge className="h-5 w-5" />
+              Előfizetési keret
+            </div>
             {quota.data?.subscription ? (
               <>
-                <div className="text-3xl font-semibold mt-1">
+                <div className="mt-2 font-brand text-3xl font-bold text-df-ink">
                   {quota.data.subscription.used} / {quota.data.subscription.total}
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">
+                <div className="mt-1 text-xs text-df-gray">
                   Felhasznált szerződések az éves keretből
                 </div>
               </>
             ) : (
-              <div className="text-sm mt-2 text-muted-foreground">
+              <div className="mt-2 text-sm text-df-gray">
                 Nincs aktív előfizetés.{" "}
-                <Link to="/arak" className="text-primary underline">
+                <Link to="/arak" className="font-semibold text-df-green underline">
                   Előfizetés
                 </Link>
               </div>
             )}
           </Card>
-          <Card className="p-5">
-            <div className="text-sm text-muted-foreground">Korábbi vázlatok</div>
-            <div className="text-3xl font-semibold mt-1">
-              {drafts.data?.filter((d) => d.status !== "finalized").length ?? "—"}
-            </div>
-            <div className="mt-1 text-xs text-muted-foreground">
-              Nyitott szerződés-előkészítések
-            </div>
-          </Card>
+          <MetricCard
+            icon={<Archive className="h-5 w-5" />}
+            label="Nyitott vázlatok"
+            value={drafts.data?.filter((d) => d.status !== "finalized").length ?? "—"}
+            helper="Megkezdett szerződés-előkészítések"
+          />
         </div>
 
-        <h2 className="font-serif text-xl mt-10">Generált dokumentumok</h2>
-        <Card className="mt-3 overflow-x-auto">
+        <h2 className="mt-10 font-brand text-2xl font-bold text-df-green">Generált dokumentumok</h2>
+        <Card className="mt-3 overflow-x-auto border-df-border bg-df-card">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-df-cream/60">
                 <TableHead>Dátum</TableHead>
                 <TableHead>Dok. ID</TableHead>
                 <TableHead>Haszonbérbeadó</TableHead>
@@ -143,9 +157,9 @@ function Dashboard() {
               ))}
               {(!docs.data || docs.data.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={8} className="py-8 text-center text-df-gray">
                     <div className="mx-auto max-w-md">
-                      <div className="font-medium text-foreground">
+                      <div className="font-semibold text-df-ink">
                         Még nincs generált dokumentum.
                       </div>
                       <p className="mt-1 text-sm">
@@ -159,11 +173,11 @@ function Dashboard() {
           </Table>
         </Card>
 
-        <h2 className="font-serif text-xl mt-10">Vázlatok</h2>
-        <Card className="mt-3 overflow-x-auto">
+        <h2 className="mt-10 font-brand text-2xl font-bold text-df-green">Vázlatok</h2>
+        <Card className="mt-3 overflow-x-auto border-df-border bg-df-card">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-df-cream/60">
                 <TableHead>Cím</TableHead>
                 <TableHead>Állapot</TableHead>
                 <TableHead>Frissítve</TableHead>
@@ -190,14 +204,18 @@ function Dashboard() {
               {(!drafts.data ||
                 drafts.data.filter((d) => d.status !== "finalized").length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={4} className="py-8 text-center text-df-gray">
                     <div className="mx-auto max-w-md">
-                      <div className="font-medium text-foreground">Nincs nyitott vázlat.</div>
+                      <div className="font-semibold text-df-ink">Nincs nyitott vázlat.</div>
                       <p className="mt-1 text-sm">
                         Indíts egy földbérleti szerződést, és a Műhely automatikusan menti a
                         vázlatot.
                       </p>
-                      <Button asChild className="mt-4" size="sm">
+                      <Button
+                        asChild
+                        className="mt-4 bg-df-green text-white hover:bg-[#173B2A]"
+                        size="sm"
+                      >
                         <Link to="/szerzodes/uj">
                           <FilePlus2 className="mr-1 h-4 w-4" />
                           Új szerződés indítása
@@ -214,5 +232,28 @@ function Dashboard() {
         <GdprSection />
       </section>
     </PageShell>
+  );
+}
+
+function MetricCard({
+  icon,
+  label,
+  value,
+  helper,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: number | string;
+  helper: string;
+}) {
+  return (
+    <Card className="border-df-border bg-df-card p-5 shadow-sm">
+      <div className="flex items-center gap-2 text-sm font-semibold text-df-green">
+        {icon}
+        {label}
+      </div>
+      <div className="mt-2 font-brand text-3xl font-bold text-df-ink">{value}</div>
+      <div className="mt-1 text-xs text-df-gray">{helper}</div>
+    </Card>
   );
 }
