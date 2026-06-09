@@ -138,7 +138,7 @@ const MODE_COPY: Record<
     empty:
       "Még nincs normalizált bérleti díj árpont. XLSX/PDF csatolmány-feldolgozás után automatikusan megjelennek a megyei értékek.",
     nextStep: "A következő lépés a haszonbérleti szerződés-csatolmányok díjkinyerése.",
-    chartLabel: "Medián Ft/ha/év",
+    chartLabel: "Trimmelt átlag Ft/ha/év",
     tableTitle: "Megyei bérleti díjak",
   },
   sale: {
@@ -150,7 +150,7 @@ const MODE_COPY: Record<
     empty:
       "Még nincs normalizált földár árpont. Az adás-vételi PDF/XLSX csatolmányokból a vételár és terület kinyerése lesz a következő adatlépés.",
     nextStep: "A következő lépés az adás-vételi csatolmányok vételár- és területkinyerése.",
-    chartLabel: "Medián Ft/ha",
+    chartLabel: "Trimmelt átlag Ft/ha",
     tableTitle: "Megyei földárak",
   },
 };
@@ -216,7 +216,7 @@ function PriceCompassPage() {
     queryKey: ["rent-observations-latest"],
     queryFn: async () => {
       const { data, error } = await untypedSupabase
-        .from("notice_rent_observations")
+        .from("notice_rent_observations_trimmed")
         .select(
           "id, county, settlement_clean, publication_date, observed_at, area_ha, cultivation_branch, rent_raw, rent_huf_per_ha_year, confidence, extraction_method",
         )
@@ -244,7 +244,7 @@ function PriceCompassPage() {
     queryKey: ["sale-price-observations-latest"],
     queryFn: async () => {
       const { data, error } = await untypedSupabase
-        .from("notice_sale_price_observations")
+        .from("notice_sale_price_observations_trimmed")
         .select(
           "id, county, settlement_clean, publication_date, observed_at, area_ha, cultivation_branch, price_raw, price_huf_per_ha, confidence, extraction_method",
         )
@@ -285,17 +285,17 @@ function PriceCompassPage() {
   const topChart = useMemo(
     () =>
       filtered
-        .filter((row) => row.median_value != null)
+        .filter((row) => row.avg_value != null)
         .slice(0, 10)
         .map((row) => ({
           county: row.county_name,
-          median: row.median_value,
+          trimmed_avg: row.avg_value,
           sample: row.sample_count,
         })),
     [filtered],
   );
 
-  const maxMedian = Math.max(0, ...stats.map((row) => row.median_value ?? 0));
+  const maxTrimmedAverage = Math.max(0, ...stats.map((row) => row.avg_value ?? 0));
   const totalSamples = stats.reduce((sum, row) => sum + row.sample_count, 0);
   const latestObserved = stats
     .map((row) => row.latest_observed_at)
@@ -384,13 +384,13 @@ function PriceCompassPage() {
           <div className="container mx-auto grid max-w-7xl gap-4 px-4 py-5 md:grid-cols-3">
             <TrustItem
               icon={<BarChart3 className="h-5 w-5" />}
-              title="Megyei medián"
-              text="Országos térképen nem apró településpontokkal zajosítunk."
+              title="Trimmelt megyei átlag"
+              text="A kilógó szélső értékeket kivesszük, mielőtt átlagot számolunk."
             />
             <TrustItem
               icon={<MapPinned className="h-5 w-5" />}
               title="Hőtérkép"
-              text="A színintenzitás az adott megye medián árszintjét mutatja."
+              text="A színintenzitás az adott megye trimmelt átlagos árszintjét mutatja."
             />
             <TrustItem
               icon={<TrendingUp className="h-5 w-5" />}
@@ -406,7 +406,9 @@ function PriceCompassPage() {
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                   <h2 className="font-brand text-2xl font-bold text-df-green">{copy.tableTitle}</h2>
-                  <p className="text-sm text-df-gray">Medián érték, {copy.unit}.</p>
+                  <p className="text-sm text-df-gray">
+                    Trimmelt átlag, szélsőséges értékek nélkül, {copy.unit}.
+                  </p>
                 </div>
                 <div className="relative md:w-72">
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-df-gray" />
@@ -424,7 +426,7 @@ function PriceCompassPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Megye</TableHead>
-                      <TableHead className="text-right">Medián</TableHead>
+                      <TableHead className="text-right">Trimmelt átlag</TableHead>
                       <TableHead className="text-right">Sáv</TableHead>
                       <TableHead className="text-right">Minta</TableHead>
                       <TableHead className="text-right">Frissítés</TableHead>
@@ -435,7 +437,7 @@ function PriceCompassPage() {
                       <TableRow key={row.county_name}>
                         <TableCell className="font-medium">{row.county_name}</TableCell>
                         <TableCell className="text-right">
-                          {formatUnitValue(row.median_value, mode)}
+                          {formatUnitValue(row.avg_value, mode)}
                         </TableCell>
                         <TableCell className="text-right text-xs text-df-gray">
                           {formatRange(row.p25_value, row.p75_value)}
@@ -465,7 +467,7 @@ function PriceCompassPage() {
                 <div>
                   <h2 className="font-brand text-2xl font-bold text-df-green">Országos hőtérkép</h2>
                   <p className="mt-1 text-sm text-df-gray">
-                    Megyei medián {copy.unit}. Sötétebb zöld: magasabb árszint.
+                    Megyei trimmelt átlag {copy.unit}. Sötétebb zöld: magasabb árszint.
                   </p>
                 </div>
                 <Badge variant="outline" className="border-df-yellow text-df-green">
@@ -473,12 +475,12 @@ function PriceCompassPage() {
                 </Badge>
               </div>
 
-              <CountyHeatmap stats={stats} mode={mode} maxMedian={maxMedian} />
+              <CountyHeatmap stats={stats} mode={mode} maxTrimmedAverage={maxTrimmedAverage} />
 
               <div className="mt-5">
-                <h3 className="text-sm font-semibold text-df-green">Top megyei mediánok</h3>
+                <h3 className="text-sm font-semibold text-df-green">Top trimmelt átlagok</h3>
                 <ChartContainer
-                  config={{ median: { label: copy.chartLabel, color: "#1F4D37" } }}
+                  config={{ trimmed_avg: { label: copy.chartLabel, color: "#1F4D37" } }}
                   className="mt-3 h-[240px] w-full"
                 >
                   <BarChart data={topChart}>
@@ -490,7 +492,11 @@ function PriceCompassPage() {
                       tickFormatter={(value) => `${Math.round(Number(value) / 1000)}e`}
                     />
                     <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                    <Bar dataKey="median" fill="var(--color-median)" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="trimmed_avg"
+                      fill="var(--color-trimmed_avg)"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ChartContainer>
               </div>
@@ -530,11 +536,11 @@ function PriceCompassPage() {
 function CountyHeatmap({
   stats,
   mode,
-  maxMedian,
+  maxTrimmedAverage,
 }: {
   stats: CountyStat[];
   mode: CompassMode;
-  maxMedian: number;
+  maxTrimmedAverage: number;
 }) {
   const byCounty = new Map(stats.map((row) => [row.county_name, row]));
 
@@ -546,7 +552,8 @@ function CountyHeatmap({
       >
         {COUNTY_LAYOUT.map((county) => {
           const row = byCounty.get(county.name);
-          const intensity = maxMedian > 0 && row?.median_value ? row.median_value / maxMedian : 0;
+          const intensity =
+            maxTrimmedAverage > 0 && row?.avg_value ? row.avg_value / maxTrimmedAverage : 0;
           return (
             <div
               key={county.name}
@@ -558,11 +565,11 @@ function CountyHeatmap({
                 borderColor: intensity > 0 ? "#C9A44B" : "#E5D8C3",
                 color: intensity > 0.45 ? "#FFFDF7" : "#1A1A1A",
               }}
-              title={`${county.name}: ${formatUnitValue(row?.median_value ?? null, mode)}`}
+              title={`${county.name}: ${formatUnitValue(row?.avg_value ?? null, mode)}`}
             >
               <div className="font-semibold leading-tight">{county.name}</div>
               <div className="mt-1 text-[11px] opacity-90">
-                {row ? formatUnitValue(row.median_value, mode) : "nincs adat"}
+                {row ? formatUnitValue(row.avg_value, mode) : "nincs adat"}
               </div>
               {row && <div className="mt-1 text-[10px] opacity-80">{row.sample_count} minta</div>}
             </div>
