@@ -17,7 +17,17 @@ import {
 import { listMyDocuments, getMyQuota, getDownloadUrl } from "@/lib/contracts/finalize.functions";
 import { listDrafts } from "@/lib/contracts/drafts.functions";
 import { formatDate } from "@/lib/format";
-import { Download, FilePlus2, LogOut, Archive, FileCheck2, Gauge } from "lucide-react";
+import {
+  AlertTriangle,
+  Archive,
+  Download,
+  FileCheck2,
+  FilePlus2,
+  Gauge,
+  Loader2,
+  LogOut,
+  Pencil,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GdprSection } from "@/components/dashboard/gdpr-section";
@@ -87,15 +97,21 @@ function Dashboard() {
           <MetricCard
             icon={<FileCheck2 className="h-5 w-5" />}
             label="Elérhető egyszeri kreditek"
-            value={quota.data?.single_credits ?? "—"}
+            value={quota.isLoading ? "…" : (quota.data?.single_credits ?? "—")}
             helper="Fizetett, még felhasználható dokumentumcsomag"
+            loading={quota.isLoading}
+            error={quota.isError}
           />
           <Card className="border-df-border bg-df-card p-5 shadow-sm">
             <div className="flex items-center gap-2 text-sm font-semibold text-df-green">
               <Gauge className="h-5 w-5" />
               Előfizetési keret
             </div>
-            {quota.data?.subscription ? (
+            {quota.isLoading ? (
+              <MetricLoading text="Keret ellenőrzése…" />
+            ) : quota.isError ? (
+              <MetricError text="Most nem látjuk biztosan a keretedet." />
+            ) : quota.data?.subscription ? (
               <>
                 <div className="mt-2 font-brand text-3xl font-bold text-df-ink">
                   {quota.data.subscription.used} / {quota.data.subscription.total}
@@ -116,8 +132,14 @@ function Dashboard() {
           <MetricCard
             icon={<Archive className="h-5 w-5" />}
             label="Nyitott vázlatok"
-            value={drafts.data?.filter((d) => d.status !== "finalized").length ?? "—"}
+            value={
+              drafts.isLoading
+                ? "…"
+                : (drafts.data?.filter((d) => d.status !== "finalized").length ?? "—")
+            }
             helper="Megkezdett szerződés-előkészítések"
+            loading={drafts.isLoading}
+            error={drafts.isError}
           />
         </div>
 
@@ -137,6 +159,21 @@ function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {docs.isLoading && (
+                <TableRow>
+                  <TableCell colSpan={8} className="py-8 text-center text-df-gray">
+                    <Loader2 className="mr-2 inline h-4 w-4 animate-spin text-df-green" />
+                    Dokumentumok betöltése…
+                  </TableCell>
+                </TableRow>
+              )}
+              {docs.isError && (
+                <TableRow>
+                  <TableCell colSpan={8} className="py-8 text-center text-df-red">
+                    Most nem tudtuk betölteni a generált dokumentumokat.
+                  </TableCell>
+                </TableRow>
+              )}
               {(docs.data ?? []).map((d) => (
                 <TableRow key={d.id}>
                   <TableCell className="text-sm">{formatDate(d.finalized_at as string)}</TableCell>
@@ -155,7 +192,7 @@ function Dashboard() {
                   </TableCell>
                 </TableRow>
               ))}
-              {(!docs.data || docs.data.length === 0) && (
+              {!docs.isLoading && !docs.isError && (!docs.data || docs.data.length === 0) && (
                 <TableRow>
                   <TableCell colSpan={8} className="py-8 text-center text-df-gray">
                     <div className="mx-auto max-w-md">
@@ -185,6 +222,21 @@ function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {drafts.isLoading && (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-8 text-center text-df-gray">
+                    <Loader2 className="mr-2 inline h-4 w-4 animate-spin text-df-green" />
+                    Vázlatok betöltése…
+                  </TableCell>
+                </TableRow>
+              )}
+              {drafts.isError && (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-8 text-center text-df-red">
+                    Most nem tudtuk betölteni a vázlatokat.
+                  </TableCell>
+                </TableRow>
+              )}
               {(drafts.data ?? [])
                 .filter((d) => d.status !== "finalized")
                 .map((d) => (
@@ -193,38 +245,57 @@ function Dashboard() {
                     <TableCell className="text-xs">{d.status}</TableCell>
                     <TableCell className="text-sm">{formatDate(d.updated_at)}</TableCell>
                     <TableCell className="text-right">
-                      <Button asChild size="sm" variant="outline">
-                        <Link to="/szerzodes/$id/ellenorzes" params={{ id: d.id }}>
-                          Folytatás
-                        </Link>
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          asChild
+                          size="sm"
+                          className="bg-df-green text-white hover:bg-[#173B2A]"
+                        >
+                          <Link to="/szerzodes/$id/szerkesztes" params={{ id: d.id }}>
+                            <Pencil className="mr-1 h-3.5 w-3.5" />
+                            Szerkesztés
+                          </Link>
+                        </Button>
+                        <Button
+                          asChild
+                          size="sm"
+                          variant="outline"
+                          className="border-df-green text-df-green"
+                        >
+                          <Link to="/szerzodes/$id/ellenorzes" params={{ id: d.id }}>
+                            Ellenőrzés
+                          </Link>
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
-              {(!drafts.data ||
-                drafts.data.filter((d) => d.status !== "finalized").length === 0) && (
-                <TableRow>
-                  <TableCell colSpan={4} className="py-8 text-center text-df-gray">
-                    <div className="mx-auto max-w-md">
-                      <div className="font-semibold text-df-ink">Nincs nyitott vázlat.</div>
-                      <p className="mt-1 text-sm">
-                        Indíts egy földbérleti szerződést, és a Műhely automatikusan menti a
-                        vázlatot.
-                      </p>
-                      <Button
-                        asChild
-                        className="mt-4 bg-df-green text-white hover:bg-[#173B2A]"
-                        size="sm"
-                      >
-                        <Link to="/szerzodes/uj">
-                          <FilePlus2 className="mr-1 h-4 w-4" />
-                          Új szerződés indítása
-                        </Link>
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
+              {!drafts.isLoading &&
+                !drafts.isError &&
+                (!drafts.data ||
+                  drafts.data.filter((d) => d.status !== "finalized").length === 0) && (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-8 text-center text-df-gray">
+                      <div className="mx-auto max-w-md">
+                        <div className="font-semibold text-df-ink">Nincs nyitott vázlat.</div>
+                        <p className="mt-1 text-sm">
+                          Indíts egy földbérleti szerződést, és a Műhely automatikusan menti a
+                          vázlatot.
+                        </p>
+                        <Button
+                          asChild
+                          className="mt-4 bg-df-green text-white hover:bg-[#173B2A]"
+                          size="sm"
+                        >
+                          <Link to="/szerzodes/uj">
+                            <FilePlus2 className="mr-1 h-4 w-4" />
+                            Új szerződés indítása
+                          </Link>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
             </TableBody>
           </Table>
         </Card>
@@ -240,11 +311,15 @@ function MetricCard({
   label,
   value,
   helper,
+  loading,
+  error,
 }: {
   icon: ReactNode;
   label: string;
   value: number | string;
   helper: string;
+  loading?: boolean;
+  error?: boolean;
 }) {
   return (
     <Card className="border-df-border bg-df-card p-5 shadow-sm">
@@ -252,8 +327,34 @@ function MetricCard({
         {icon}
         {label}
       </div>
-      <div className="mt-2 font-brand text-3xl font-bold text-df-ink">{value}</div>
-      <div className="mt-1 text-xs text-df-gray">{helper}</div>
+      {loading ? (
+        <MetricLoading text="Adat betöltése…" />
+      ) : error ? (
+        <MetricError text="Most nem elérhető." />
+      ) : (
+        <>
+          <div className="mt-2 font-brand text-3xl font-bold text-df-ink">{value}</div>
+          <div className="mt-1 text-xs text-df-gray">{helper}</div>
+        </>
+      )}
     </Card>
+  );
+}
+
+function MetricLoading({ text }: { text: string }) {
+  return (
+    <div className="mt-3 flex items-center gap-2 text-sm text-df-gray">
+      <Loader2 className="h-4 w-4 animate-spin text-df-green" />
+      {text}
+    </div>
+  );
+}
+
+function MetricError({ text }: { text: string }) {
+  return (
+    <div className="mt-3 flex items-center gap-2 text-sm text-df-red">
+      <AlertTriangle className="h-4 w-4" />
+      {text}
+    </div>
   );
 }
