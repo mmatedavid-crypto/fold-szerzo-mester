@@ -158,10 +158,8 @@ function AdminPage() {
         <NoticesImport />
 
         <p className="text-xs text-muted-foreground mt-8">
-          Admin-szerep beállítás: az első adminhoz a production adatbázis SQL editorában futtasd:
-          <code className="ml-1">
-            INSERT INTO public.user_roles(user_id, role) VALUES ('&lt;user-uuid&gt;', 'admin');
-          </code>
+          Az admin hozzáférést csak meglévő admin vagy üzemeltetői beavatkozás tudja engedélyezni.
+          Ha jogosultságot kell módosítani, kezeld azt a belső üzemeltetési folyamat szerint.
         </p>
         <Link to="/dashboard" className="text-sm text-primary underline mt-4 inline-block">
           ← Vissza a műhelybe

@@ -83,3 +83,21 @@ export function subscriptionErrorMessage(error: unknown): string {
 
   return "Az értesítő beállítása most nem sikerült. Kérjük, próbáld újra később.";
 }
+
+export function gdprErrorMessage(error: unknown): string {
+  const message = messageOf(error).toLowerCase();
+
+  if (message.includes("confirm") || message.includes("megerősítés")) {
+    return "A fióktörléshez pontos megerősítés szükséges.";
+  }
+
+  if (
+    message.includes("unauthorized") ||
+    message.includes("permission") ||
+    message.includes("row-level")
+  ) {
+    return "Ehhez a művelethez újra be kell jelentkezned.";
+  }
+
+  return "Az adatvédelmi művelet most nem sikerült. Kérjük, próbáld újra később.";
+}

@@ -9,6 +9,7 @@ import { Download, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { exportMyData, deleteMyAccount } from "@/lib/gdpr/gdpr.functions";
+import { gdprErrorMessage } from "@/lib/user-facing-errors";
 
 export function GdprSection() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export function GdprSection() {
       URL.revokeObjectURL(url);
       toast.success("Adatexport letöltve.");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Export sikertelen.");
+      toast.error(gdprErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -39,7 +40,7 @@ export function GdprSection() {
 
   async function onDelete() {
     if (confirmText !== "TÖRLÉS") {
-      toast.error('Írd be pontosan: TÖRLÉS');
+      toast.error("Írd be pontosan: TÖRLÉS");
       return;
     }
     try {
@@ -49,7 +50,7 @@ export function GdprSection() {
       toast.success("Fiókod törölve.");
       navigate({ to: "/" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Törlés sikertelen.");
+      toast.error(gdprErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -63,8 +64,8 @@ export function GdprSection() {
           <div>
             <div className="font-medium">Adatexport</div>
             <p className="text-sm text-muted-foreground mt-1 max-w-prose">
-              Letöltheted strukturált (JSON) formában az összes rólad tárolt adatot:
-              profil, vázlatok, generált dokumentumok, fizetések, használati napló.
+              Letöltheted strukturált (JSON) formában az összes rólad tárolt adatot: profil,
+              vázlatok, generált dokumentumok, fizetések, használati napló.
             </p>
           </div>
           <Button variant="outline" onClick={onExport} disabled={busy}>
@@ -79,18 +80,13 @@ export function GdprSection() {
             <div className="flex-1">
               <div className="font-medium">Fiók végleges törlése</div>
               <p className="text-sm text-muted-foreground mt-1 max-w-prose">
-                Töröljük a profilodat, vázlataidat, krediteidet és az aktív
-                előfizetésedet. A korábban kibocsátott szerződések és számlák
-                a számviteli kötelezettség (8 év) miatt anonimizált formában
-                megmaradnak. A művelet nem visszavonható.
+                Töröljük a profilodat, vázlataidat, krediteidet és az aktív előfizetésedet. A
+                korábban kibocsátott szerződések és számlák a számviteli kötelezettség (8 év) miatt
+                anonimizált formában megmaradnak. A művelet nem visszavonható.
               </p>
 
               {!confirmOpen ? (
-                <Button
-                  variant="destructive"
-                  className="mt-3"
-                  onClick={() => setConfirmOpen(true)}
-                >
+                <Button variant="destructive" className="mt-3" onClick={() => setConfirmOpen(true)}>
                   Fiók törlése
                 </Button>
               ) : (
