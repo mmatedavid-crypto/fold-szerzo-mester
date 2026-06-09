@@ -23,6 +23,12 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/elfogado-nyilatkozat")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    noticeId: stringSearch(search.noticeId),
+    noticePublicationDate: stringSearch(search.noticePublicationDate),
+    deadlineDate: stringSearch(search.deadlineDate),
+    contractSubject: stringSearch(search.contractSubject),
+  }),
   head: () => ({
     meta: [
       { title: "Elfogadó nyilatkozat előkészítése | Dr Föld" },
@@ -43,11 +49,16 @@ export const Route = createFileRoute("/elfogado-nyilatkozat")({
 });
 
 function AcceptancePage() {
-  const [input, setInput] = useState<AcceptanceInput>({
+  const search = Route.useSearch();
+  const [input, setInput] = useState<AcceptanceInput>(() => ({
+    noticeId: search.noticeId,
+    noticePublicationDate: search.noticePublicationDate,
+    deadlineDate: search.deadlineDate,
+    contractSubject: search.contractSubject,
     submittedAt: today(),
     signatureDate: today(),
     witnesses: [{}, {}],
-  });
+  }));
 
   const composition = useMemo(() => composeAcceptanceStatement(input), [input]);
   const documentText = useMemo(() => renderComposition(composition), [composition]);
@@ -392,6 +403,10 @@ function Field({
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function stringSearch(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value : undefined;
 }
 
 function renderComposition(composition: ReturnType<typeof composeAcceptanceStatement>): string {

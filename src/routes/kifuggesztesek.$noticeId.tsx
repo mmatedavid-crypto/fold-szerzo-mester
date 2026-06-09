@@ -328,7 +328,9 @@ function NoticeDetailPage() {
           {step === 4 && result && (
             <ResultPanel
               result={result}
-              noticeId={n.id}
+              noticeRef={n.source_notice_id ?? n.id}
+              noticePublicationDate={n.publication_date}
+              contractSubject={buildNoticeSubject(n)}
               deadline={deadline}
               partyRank={partyRank}
               onRestart={() => {
@@ -519,13 +521,17 @@ function ProfileFields({
 
 function ResultPanel({
   result,
-  noticeId,
+  noticeRef,
+  noticePublicationDate,
+  contractSubject,
   deadline,
   partyRank,
   onRestart,
 }: {
   result: ReturnType<typeof computeRank>;
-  noticeId: string;
+  noticeRef: string;
+  noticePublicationDate: string | null;
+  contractSubject: string;
   deadline: Date | null;
   partyRank: number | null;
   onRestart: () => void;
@@ -632,7 +638,15 @@ function ResultPanel({
       <div className="flex flex-wrap gap-2 pt-2">
         {stronger === true && (
           <Button asChild className="bg-df-green text-white hover:bg-[#173B2A]">
-            <Link to="/elfogado-nyilatkozat">
+            <Link
+              to="/elfogado-nyilatkozat"
+              search={{
+                noticeId: noticeRef,
+                noticePublicationDate: noticePublicationDate ?? undefined,
+                deadlineDate: deadline ? deadline.toISOString().slice(0, 10) : undefined,
+                contractSubject,
+              }}
+            >
               <FileCheck2 className="h-4 w-4 mr-1" /> Elfogadó nyilatkozatot készítek
             </Link>
           </Button>
@@ -648,4 +662,14 @@ function ResultPanel({
       </p>
     </div>
   );
+}
+
+function buildNoticeSubject(notice: Notice): string {
+  const parts = [
+    notice.settlement,
+    notice.parcel_numbers?.length ? `hrsz. ${notice.parcel_numbers.join(", ")}` : null,
+    notice.notice_type,
+    notice.subject,
+  ].filter(Boolean);
+  return parts.join(" - ");
 }
