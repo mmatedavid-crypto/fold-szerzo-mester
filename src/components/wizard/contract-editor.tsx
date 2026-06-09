@@ -108,6 +108,18 @@ export function ContractEditor({ draft }: { draft: Draft }) {
   }
 
   const cultivationOptions = ["szántó", "rét", "legelő", "gyep", "kert", "szőlő", "gyümölcsös", "erdő", "fásított terület", "nádas", "halastó", "tanya", "vegyes"];
+  const stepCompletion = [
+    Boolean(state.lessor.name?.trim() && state.lessee.name?.trim()),
+    state.parcels.some((p) => p.settlement?.trim() && p.parcel_number?.trim()),
+    Boolean(state.term.start_date && state.term.end_date),
+    Boolean(state.rent.model && state.rent.amount),
+    Object.values(state.prelease).some(Boolean),
+    Object.values(state.clauses).some(Boolean),
+  ];
+  const currentStep = stepCompletion.every(Boolean)
+    ? STEPS.length
+    : stepCompletion.findIndex((done) => !done);
+  const completedSteps = stepCompletion.filter(Boolean).length;
 
   return (
     <div className="space-y-6">
@@ -133,7 +145,14 @@ export function ContractEditor({ draft }: { draft: Draft }) {
           </div>
         </div>
         <div className="space-y-5 p-5 md:p-6">
-          <WizardStepper steps={STEPS} current={0} />
+          <WizardStepper steps={STEPS} current={currentStep} />
+          <div className="rounded-md border border-df-border bg-df-cream/60 p-3 text-sm leading-6 text-df-gray">
+            <span className="font-semibold text-df-green">
+              {completedSteps} / {STEPS.length} rész alapadatai megadva.
+            </span>{" "}
+            Az ellenőrzésnél a Dr Föld külön jelzi, ha kötelező adat hiányzik vagy ügyvédi
+            kontroll javasolt.
+          </div>
           <div className="max-w-xl rounded-md border border-df-border bg-white/70 p-4">
             <Label htmlFor="title" className="text-xs font-bold uppercase tracking-[0.14em] text-df-gray">Szerződés címe belső használatra</Label>
             <Input id="title" className="mt-2 border-df-border bg-white font-semibold text-df-ink" value={state.title} onChange={(e) => set("title", e.target.value)} />
