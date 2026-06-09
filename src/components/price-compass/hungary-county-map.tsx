@@ -264,7 +264,10 @@ export function HungaryCountyMap({
           <div className="flex items-center gap-2 text-[11px] text-df-gray">
             <span
               className="inline-block h-3 w-3 rounded-sm border border-df-border"
-              style={{ background: `url(#${patternId}-nodata) #F6F1E4` }}
+              style={{
+                background:
+                  "repeating-linear-gradient(45deg,#F6F1E4 0 3px,#E1D9C0 3px 4px)",
+              }}
             />
             nincs adat
           </div>
