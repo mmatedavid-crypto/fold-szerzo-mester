@@ -299,7 +299,6 @@ function stripHtml(html: unknown) {
 }
 
 function normalizeRent(text: string, areaHa: number | null) {
-  // placeholder marker
   const perHa = text.match(/([0-9][0-9.,\s]*)\s*(?:-|\.)?\s*ft\s*\/\s*ha\s*\/?\s*(év|ev)?/i);
   if (perHa) {
     const value = parseHungarianNumber(perHa[1]);
@@ -351,6 +350,28 @@ function normalizeSalePrice(text: string, areaHa: number | null) {
     };
   }
   return { priceRaw: null, priceTotalHuf: null, priceHufPerHa: null };
+}
+
+function detectDocumentType(text: string): "haszonberlet" | "adasvetel" | null {
+  if (!text) return null;
+  const t = text.toLowerCase();
+  const leaseHits =
+    (t.match(/haszonb[ée]rleti szerz[őo]d[ée]s/g)?.length ?? 0) * 3 +
+    (t.match(/f[öo]ldhaszonb[ée]rlet/g)?.length ?? 0) * 3 +
+    (t.match(/haszonb[ée]rleti d[íi]j/g)?.length ?? 0) * 2 +
+    (t.match(/haszonb[ée]rbead[óo]/g)?.length ?? 0) * 2 +
+    (t.match(/haszonb[ée]rl[őo]/g)?.length ?? 0) * 1 +
+    (t.match(/haszonb[ée]r(?:let)?(?:re|[ée]re)/g)?.length ?? 0) * 1;
+  const saleHits =
+    (t.match(/ad[áa]sv[ée]teli szerz[őo]d[ée]s/g)?.length ?? 0) * 3 +
+    (t.match(/v[ée]tel[áa]r/g)?.length ?? 0) * 3 +
+    (t.match(/el[őo]v[áa]s[áa]rl[áa]si/g)?.length ?? 0) * 2 +
+    (t.match(/\belad[óo]\b/g)?.length ?? 0) * 1 +
+    (t.match(/\bvev[őo]\b/g)?.length ?? 0) * 1;
+  if (leaseHits === 0 && saleHits === 0) return null;
+  if (leaseHits >= saleHits + 2) return "haszonberlet";
+  if (saleHits >= leaseHits + 2) return "adasvetel";
+  return null;
 }
 
 function extractAreaHa(text: string) {
