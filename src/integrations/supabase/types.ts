@@ -500,6 +500,24 @@ export type Database = {
           },
         ]
       }
+      hu_settlements: {
+        Row: {
+          county: string
+          name: string
+          name_norm: string
+        }
+        Insert: {
+          county: string
+          name: string
+          name_norm: string
+        }
+        Update: {
+          county?: string
+          name?: string
+          name_norm?: string
+        }
+        Relationships: []
+      }
       legal_template_versions: {
         Row: {
           created_at: string
