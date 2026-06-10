@@ -9,7 +9,13 @@ function isAuthorized(request: Request): boolean {
     process.env.CRON_SECRET,
     process.env.SUPABASE_PUBLISHABLE_KEY,
     process.env.SUPABASE_ANON_KEY,
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    process.env.VITE_SUPABASE_ANON_KEY,
   ].filter((v): v is string => Boolean(v));
+  console.log("[extract-prices] auth check", {
+    providedPrefix: provided.slice(0, 12),
+    allowedPrefixes: allowed.map((v) => v.slice(0, 12)),
+  });
   return allowed.includes(provided);
 }
 
