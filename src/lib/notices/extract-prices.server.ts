@@ -97,17 +97,31 @@ export async function extractPriceBatch(limit = 15): Promise<ExtractBatchResult>
         if (chosenRent && chosenSale) break;
       }
 
-      const category = String(
+      const rssCategory = String(
         notice.normalized_notice_category || notice.notice_type || ""
       ).toLowerCase();
+      const combinedText = useful.map((t) => t.text).join("\n");
+      const detectedType = detectDocumentType(combinedText);
+      const effectiveCategory = detectedType ?? rssCategory;
 
       const patch: Record<string, any> = { last_fetched_at: new Date().toISOString() };
       if (!notice.area_ha && chosenAreaHa) patch.area_ha = chosenAreaHa;
       if (settlement && !notice.settlement) patch.settlement = settlement;
       if (cultivationBranch && !notice.cultivation_branch) patch.cultivation_branch = cultivationBranch;
+      if (
+        detectedType &&
+        notice.normalized_notice_category !== detectedType
+      ) {
+        patch.normalized_notice_category = detectedType;
+      }
 
-      const wantRent = chosenRent && (category.includes("haszon") || !chosenSale);
-      const wantSale = chosenSale && (category.includes("adas") || category.includes("adás") || !chosenRent);
+      const isLease = effectiveCategory.includes("haszon");
+      const isSale =
+        effectiveCategory.includes("adas") || effectiveCategory.includes("adás");
+      // Strict: when document type is known, only allow the matching field.
+      // Unknown: fall back to whichever signal we extracted.
+      const wantRent = chosenRent && (isLease || (!isSale && !isLease));
+      const wantSale = chosenSale && (isSale || (!isSale && !isLease));
 
       if (wantRent && chosenRent) {
         patch.rent_raw = rentRaw ?? null;
@@ -336,6 +350,28 @@ function normalizeSalePrice(text: string, areaHa: number | null) {
     };
   }
   return { priceRaw: null, priceTotalHuf: null, priceHufPerHa: null };
+}
+
+function detectDocumentType(text: string): "haszonberlet" | "adasvetel" | null {
+  if (!text) return null;
+  const t = text.toLowerCase();
+  const leaseHits =
+    (t.match(/haszonb[ée]rleti szerz[őo]d[ée]s/g)?.length ?? 0) * 3 +
+    (t.match(/f[öo]ldhaszonb[ée]rlet/g)?.length ?? 0) * 3 +
+    (t.match(/haszonb[ée]rleti d[íi]j/g)?.length ?? 0) * 2 +
+    (t.match(/haszonb[ée]rbead[óo]/g)?.length ?? 0) * 2 +
+    (t.match(/haszonb[ée]rl[őo]/g)?.length ?? 0) * 1 +
+    (t.match(/haszonb[ée]r(?:let)?(?:re|[ée]re)/g)?.length ?? 0) * 1;
+  const saleHits =
+    (t.match(/ad[áa]sv[ée]teli szerz[őo]d[ée]s/g)?.length ?? 0) * 3 +
+    (t.match(/v[ée]tel[áa]r/g)?.length ?? 0) * 3 +
+    (t.match(/el[őo]v[áa]s[áa]rl[áa]si/g)?.length ?? 0) * 2 +
+    (t.match(/\belad[óo]\b/g)?.length ?? 0) * 1 +
+    (t.match(/\bvev[őo]\b/g)?.length ?? 0) * 1;
+  if (leaseHits === 0 && saleHits === 0) return null;
+  if (leaseHits >= saleHits + 2) return "haszonberlet";
+  if (saleHits >= leaseHits + 2) return "adasvetel";
+  return null;
 }
 
 function extractAreaHa(text: string) {
