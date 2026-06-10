@@ -101,10 +101,15 @@ export async function syncFromRss(): Promise<{ fetched: number; upserted: number
   return syncFromApi({ incremental: true });
 }
 
-const TYPE_LABEL: Record<string, string> = {
-  foldelovasarlasos: "Adás-vétel",
-  foldhivatali: "Haszonbérlet",
+const CATEGORY_LABEL: Record<string, string> = {
+  adasvetel: "Adás-vétel",
+  haszonberlet: "Haszonbérlet",
 };
+
+// Csak ezeket a kategóriákat tartjuk meg – földhivatali adatrendezés,
+// megosztási eljárás stb. nem érdekes az ár-iránytű és a felhasználók
+// számára.
+const ALLOWED_CATEGORIES = new Set(["adasvetel", "haszonberlet"]);
 
 type ApiRow = {
   id: number;
@@ -164,10 +169,13 @@ async function fetchPage(
 
 function mapRow(r: ApiRow) {
   const { settlement, parcels } = parseSubjectParts(r.targy ?? "");
-  const typeLabel = TYPE_LABEL[r.hirdetmenyTipusNev ?? ""] ?? r.hirdetmenyTipusNev ?? "Egyéb";
   const pub = r.kifuggesztesNapja ? new Date(r.kifuggesztesNapja).toISOString().slice(0, 10) : null;
   const deadline = r.lejaratNapja ? new Date(r.lejaratNapja).toISOString().slice(0, 10) : null;
   const normalizedCategory = classifyNoticeCategory(r.hirdetmenyTipusNev, r.targy);
+  const typeLabel =
+    (normalizedCategory && CATEGORY_LABEL[normalizedCategory]) ??
+    r.hirdetmenyTipusNev ??
+    "Egyéb";
   return {
     source: "hirdetmenyek.gov.hu",
     source_notice_id: String(r.id),
@@ -207,7 +215,13 @@ export async function syncFromApi(
 
   async function flush(rows: ApiRow[]) {
     if (rows.length === 0) return;
-    const payload = rows.map(mapRow);
+    const payload = rows
+      .map(mapRow)
+      .filter((row) => ALLOWED_CATEGORIES.has(row.normalized_notice_category ?? ""));
+    if (payload.length === 0) {
+      fetched += rows.length;
+      return;
+    }
     const { error } = await supabaseAdmin
       .from("notices")
       .upsert(payload, { onConflict: "source,source_notice_id" });
