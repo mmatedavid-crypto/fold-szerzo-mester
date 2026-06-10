@@ -7,13 +7,22 @@ import { toast } from "sonner";
 import { parseNoticesXlsx } from "@/lib/notices/parse";
 import { importNotices } from "@/lib/notices/import.functions";
 import { syncNoticesFromRss } from "@/lib/notices/sync.functions";
-import { Upload, RefreshCw } from "lucide-react";
+import { extractNoticePrices } from "@/lib/notices/extract.functions";
+import { Upload, RefreshCw, Wand2 } from "lucide-react";
 
 export function NoticesImport() {
   const importFn = useServerFn(importNotices);
   const syncFn = useServerFn(syncNoticesFromRss);
+  const extractFn = useServerFn(extractNoticePrices);
   const [busy, setBusy] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [extracting, setExtracting] = useState(false);
+  const [extractStats, setExtractStats] = useState<{
+    processed: number;
+    rent: number;
+    sale: number;
+    updated: number;
+  } | null>(null);
   const [preview, setPreview] = useState<{ count: number; sample: string[] } | null>(null);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -70,6 +79,44 @@ export function NoticesImport() {
         <span className="text-xs leading-5 text-df-gray">
           hirdetmenyek.gov.hu/rss — naponta automatikusan is fut.
         </span>
+        <Button
+          variant="outline"
+          className="border-df-green text-df-green"
+          size="sm"
+          disabled={extracting}
+          onClick={async () => {
+            setExtracting(true);
+            setExtractStats({ processed: 0, rent: 0, sale: 0, updated: 0 });
+            try {
+              const totals = { processed: 0, rent: 0, sale: 0, updated: 0 };
+              // Run several batches in a row to chew through the backlog.
+              for (let i = 0; i < 8; i++) {
+                const r = await extractFn({ data: { limit: 25 } });
+                totals.processed += r.candidates ?? 0;
+                totals.rent += r.rentObservations ?? 0;
+                totals.sale += r.saleObservations ?? 0;
+                totals.updated += r.updatedNotices ?? 0;
+                setExtractStats({ ...totals });
+                if (!r.candidates) break;
+              }
+              toast.success(
+                `Árkinyerés kész: ${totals.updated} hirdetmény, ${totals.rent} bérleti + ${totals.sale} adás-vétel megfigyelés.`,
+              );
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : "Hiba történt");
+            } finally {
+              setExtracting(false);
+            }
+          }}
+        >
+          <Wand2 className={`h-4 w-4 mr-1 ${extracting ? "animate-pulse" : ""}`} />
+          {extracting ? "Árak kinyerése…" : "Árak kinyerése (8×25)"}
+        </Button>
+        {extractStats && (
+          <span className="text-xs leading-5 text-df-gray">
+            {extractStats.processed} feldolgozva · {extractStats.rent} bérleti · {extractStats.sale} adás-vétel
+          </span>
+        )}
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <label className="inline-flex items-center gap-2 cursor-pointer">
