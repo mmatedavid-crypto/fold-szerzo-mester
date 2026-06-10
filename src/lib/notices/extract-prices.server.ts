@@ -299,6 +299,7 @@ function stripHtml(html: unknown) {
 }
 
 function normalizeRent(text: string, areaHa: number | null) {
+  // placeholder marker
   const perHa = text.match(/([0-9][0-9.,\s]*)\s*(?:-|\.)?\s*ft\s*\/\s*ha\s*\/?\s*(év|ev)?/i);
   if (perHa) {
     const value = parseHungarianNumber(perHa[1]);
