@@ -10,6 +10,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { CLAUSE_LIBRARY } from "./clauses";
 import { LEASE_CLAUSE_VERSION } from "./ruleset";
@@ -67,10 +68,7 @@ export interface ClauseReviewSummary {
   isApproved: boolean;
 }
 
-const checkLawyer = async (
-  supabase: { from: (t: string) => { select: (q: string) => { eq: (k: string, v: string) => { eq: (k: string, v: string) => { maybeSingle: () => Promise<{ data: unknown }> } } } } },
-  userId: string,
-) => {
+const checkLawyer = async (supabase: SupabaseClient, userId: string) => {
   const { data } = await supabase
     .from("user_roles")
     .select("role")
@@ -124,7 +122,7 @@ export const submitClauseReview = createServerFn({ method: "POST" })
     if (!CLAUSE_LIBRARY.some((c) => c.id === data.clauseId)) {
       throw new Error("Ismeretlen klauzula azonosító.");
     }
-    const isLawyer = await checkLawyer(supabase as never, userId);
+    const isLawyer = await checkLawyer(supabase as unknown as SupabaseClient, userId);
     if (!isLawyer) {
       throw new Error("Csak ügyvéd szerepkörrel jelentkezett felhasználó adhat le lektorálást.");
     }
@@ -160,7 +158,7 @@ export const submitClauseReview = createServerFn({ method: "POST" })
  * aktuális `LEASE_CLAUSE_VERSION`-re. Ha üres tömböt ad vissza, generálható.
  */
 export async function getUnapprovedClauseIds(
-  supabaseClient: { from: (t: string) => { select: (q: string) => { eq: (k: string, v: string) => Promise<{ data: unknown; error: { message: string } | null }> } } },
+  supabaseClient: SupabaseClient,
   requiredClauseIds: string[],
 ): Promise<string[]> {
   if (requiredClauseIds.length === 0) return [];
