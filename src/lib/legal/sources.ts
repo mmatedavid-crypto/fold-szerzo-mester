@@ -160,3 +160,24 @@ export function formatSourceRef(ref: SourceRef): string {
   if (!src) return ref.sourceId;
   return ref.section ? `${src.shortName} ${ref.section}` : src.shortName;
 }
+
+/**
+ * Visszaadja a letöltött jogszabály §-szakasz részleteit, amelyeket a
+ * szabálymotor és a klauzula-katalógus hivatkozási bizonyítékként használ.
+ * A `versionHash` rögzíti, melyik szövegváltozatból származnak.
+ */
+export function getSourceExcerpts(sourceId: string) {
+  const s = SNIPPETS[sourceId];
+  if (!s) return null;
+  return {
+    versionHash: s.versionHash,
+    retrievedAt: s.retrievedAt,
+    snippets: s.snippets,
+  };
+}
+
+export function findSourceExcerpt(sourceId: string, section: string) {
+  const data = getSourceExcerpts(sourceId);
+  if (!data) return null;
+  return data.snippets.find((s) => s.section === section) ?? null;
+}
