@@ -143,6 +143,22 @@ function AdminPage() {
           />
         </div>
 
+        <Card className="mt-6 border-df-border bg-df-card p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="font-semibold text-df-ink">Ügyvédi klauzula-lektorálás</div>
+              <p className="mt-1 text-sm text-df-gray">
+                A haszonbérleti szerződés 22 klauzulájához ügyvédi jóváhagyás szükséges.
+                Amíg egy szükséges klauzula nincs jóváhagyva az aktuális verzióra,
+                a generátor nem készít aláírható tervezetet.
+              </p>
+            </div>
+            <Button asChild>
+              <Link to="/admin/klauzulak">Lektorálás megnyitása</Link>
+            </Button>
+          </div>
+        </Card>
+
         <SectionTitle title="Sablonverziók" text="Aktív jogi sablonok és érvényességi állapotuk." />
         <Card className="mt-3 overflow-x-auto border-df-border bg-df-card">
           <Table>
