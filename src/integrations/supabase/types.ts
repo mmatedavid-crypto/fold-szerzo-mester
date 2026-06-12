@@ -176,6 +176,48 @@ export type Database = {
           },
         ]
       }
+      clause_reviews: {
+        Row: {
+          checklist: Json
+          clause_id: string
+          clause_version: string
+          comment: string | null
+          created_at: string
+          decision: string
+          id: string
+          reviewed_at: string
+          reviewer_id: string
+          reviewer_name: string | null
+          risk_level: string
+        }
+        Insert: {
+          checklist?: Json
+          clause_id: string
+          clause_version: string
+          comment?: string | null
+          created_at?: string
+          decision: string
+          id?: string
+          reviewed_at?: string
+          reviewer_id: string
+          reviewer_name?: string | null
+          risk_level: string
+        }
+        Update: {
+          checklist?: Json
+          clause_id?: string
+          clause_version?: string
+          comment?: string | null
+          created_at?: string
+          decision?: string
+          id?: string
+          reviewed_at?: string
+          reviewer_id?: string
+          reviewer_name?: string | null
+          risk_level?: string
+        }
+        Relationships: []
+      }
       clauses: {
         Row: {
           active: boolean
@@ -1274,6 +1316,10 @@ export type Database = {
         Returns: boolean
       }
       infer_hu_county: { Args: { input: string }; Returns: string }
+      is_clause_approved: {
+        Args: { _clause_id: string; _clause_version: string }
+        Returns: boolean
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
