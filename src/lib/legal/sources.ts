@@ -31,6 +31,29 @@ export interface LegalSource {
 }
 
 const ADDED_AT = "2026-06-12";
+const RETRIEVED_AT = "2026-06-12";
+
+type SnippetEntry = {
+  shortName: string;
+  versionHash: string;
+  retrievedAt: string;
+  byteLength: number;
+  textLength: number;
+  sectionCount: number;
+  snippetCount: number;
+  snippets: Array<{ section: string | null; text: string }>;
+};
+
+const SNIPPETS = snippets as Record<string, SnippetEntry>;
+
+function meta(id: string) {
+  const s = SNIPPETS[id];
+  return {
+    retrievedAt: s ? s.retrievedAt : null,
+    versionHash: s ? s.versionHash : null,
+    verificationStatus: (s ? "verified" : "source_added_pending_fetch") as SourceVerificationStatus,
+  };
+}
 
 export const LEGAL_SOURCES_V2: LegalSource[] = [
   {
