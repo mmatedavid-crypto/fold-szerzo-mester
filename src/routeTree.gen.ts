@@ -35,6 +35,7 @@ import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksSyncNoticesRouteImport } from './routes/api/public/hooks/sync-notices'
 import { Route as ApiPublicHooksSendWeeklyDigestRouteImport } from './routes/api/public/hooks/send-weekly-digest'
 import { Route as ApiPublicHooksExtractPricesRouteImport } from './routes/api/public/hooks/extract-prices'
+import { Route as ApiPublicCronSourceFreshnessRouteImport } from './routes/api/public/cron/source-freshness'
 import { Route as AuthenticatedSzerzodesIdSzerkesztesRouteImport } from './routes/_authenticated/szerzodes.$id.szerkesztes'
 import { Route as AuthenticatedSzerzodesIdKeszRouteImport } from './routes/_authenticated/szerzodes.$id.kesz'
 import { Route as AuthenticatedSzerzodesIdFizetesRouteImport } from './routes/_authenticated/szerzodes.$id.fizetes'
@@ -176,6 +177,12 @@ const ApiPublicHooksExtractPricesRoute =
     path: '/api/public/hooks/extract-prices',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronSourceFreshnessRoute =
+  ApiPublicCronSourceFreshnessRouteImport.update({
+    id: '/api/public/cron/source-freshness',
+    path: '/api/public/cron/source-freshness',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedSzerzodesIdSzerkesztesRoute =
   AuthenticatedSzerzodesIdSzerkesztesRouteImport.update({
     id: '/szerzodes/$id/szerkesztes',
@@ -226,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
@@ -290,6 +299,7 @@ export interface FileRoutesById {
   '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/_authenticated/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/_authenticated/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
+    | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
+    | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
@@ -386,6 +398,7 @@ export interface FileRouteTypes {
     | '/_authenticated/szerzodes/$id/fizetes'
     | '/_authenticated/szerzodes/$id/kesz'
     | '/_authenticated/szerzodes/$id/szerkesztes'
+    | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
@@ -411,6 +424,7 @@ export interface RootRouteChildren {
   RegisztracioRoute: typeof RegisztracioRoute
   KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
   KifuggesztesekIndexRoute: typeof KifuggesztesekIndexRoute
+  ApiPublicCronSourceFreshnessRoute: typeof ApiPublicCronSourceFreshnessRoute
   ApiPublicHooksExtractPricesRoute: typeof ApiPublicHooksExtractPricesRoute
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
@@ -602,6 +616,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksExtractPricesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/source-freshness': {
+      id: '/api/public/cron/source-freshness'
+      path: '/api/public/cron/source-freshness'
+      fullPath: '/api/public/cron/source-freshness'
+      preLoaderRoute: typeof ApiPublicCronSourceFreshnessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/szerzodes/$id/szerkesztes': {
       id: '/_authenticated/szerzodes/$id/szerkesztes'
       path: '/szerzodes/$id/szerkesztes'
@@ -687,6 +708,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisztracioRoute: RegisztracioRoute,
   KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
   KifuggesztesekIndexRoute: KifuggesztesekIndexRoute,
+  ApiPublicCronSourceFreshnessRoute: ApiPublicCronSourceFreshnessRoute,
   ApiPublicHooksExtractPricesRoute: ApiPublicHooksExtractPricesRoute,
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
