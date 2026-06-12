@@ -1,9 +1,17 @@
 /**
  * Jogforrás-katalógus a haszonbérleti generátor szabálymotorjához.
  * AI nem dönt jogszabályból — minden alkalmazandó szabály ezekre a forrásokra hivatkozik.
- * Az automatikus letöltés / NJT-fetch nincs megoldva; minden forrás induló státusza
- * `source_added_pending_fetch`, és ügyvédi review-ra vár.
+ * A források a net.jogtar.hu Hatályos Jogszabályok Gyűjteményéből 2026-06-12-én
+ * letöltésre és feldolgozásra kerültek. Minden forráshoz tárolunk
+ * `versionHash`-t (a letöltött HTML SHA-256 első 16 karaktere) és kinyert
+ * §-szakasz-részleteket (lásd `sources-snippets.json`). A `verified` státusz
+ * azt jelenti, hogy az adott forrásszöveg ezzel a hash-sel rögzítve van;
+ * a szabálymotor a `getSourceExcerpts()` helperen keresztül tud rá hivatkozni.
+ * Ügyvédi review továbbra is szükséges minden új klauzula-szöveghez —
+ * a hash csak az alapszöveg azonosíthatóságát garantálja, nem a jogi értelmezést.
  */
+
+import snippets from "./sources-snippets.json";
 
 export type SourceVerificationStatus =
   | "source_added_pending_fetch"
@@ -24,6 +32,28 @@ export interface LegalSource {
 
 const ADDED_AT = "2026-06-12";
 
+type SnippetEntry = {
+  shortName: string;
+  versionHash: string;
+  retrievedAt: string;
+  byteLength: number;
+  textLength: number;
+  sectionCount: number;
+  snippetCount: number;
+  snippets: Array<{ section: string | null; text: string }>;
+};
+
+const SNIPPETS = snippets as Record<string, SnippetEntry>;
+
+function meta(id: string) {
+  const s = SNIPPETS[id];
+  return {
+    retrievedAt: s ? s.retrievedAt : null,
+    versionHash: s ? s.versionHash : null,
+    verificationStatus: (s ? "verified" : "source_added_pending_fetch") as SourceVerificationStatus,
+  };
+}
+
 export const LEGAL_SOURCES_V2: LegalSource[] = [
   {
     id: "fftv",
@@ -31,10 +61,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "2013. évi CXXII. törvény",
     shortName: "Földforgalmi tv.",
     sourceUrl: "https://njt.hu/jogszabaly/2013-122-00-00",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("fftv"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "fetv",
@@ -43,10 +71,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "2013. évi CCXII. törvény",
     shortName: "Fétv.",
     sourceUrl: "https://njt.hu/jogszabaly/2013-212-00-00",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("fetv"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "korm-474-2013",
@@ -55,10 +81,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "474/2013. (XII. 12.) Korm. rendelet",
     shortName: "474/2013. Korm. r.",
     sourceUrl: "https://njt.hu/jogszabaly/2013-474-20-22",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("korm-474-2013"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "korm-356-2007",
@@ -66,10 +90,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "356/2007. (XII. 23.) Korm. rendelet",
     shortName: "356/2007. Korm. r.",
     sourceUrl: "https://njt.hu/jogszabaly/2007-356-20-22",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("korm-356-2007"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "ptk",
@@ -77,10 +99,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "2013. évi V. törvény",
     shortName: "Ptk.",
     sourceUrl: "https://njt.hu/jogszabaly/2013-5-00-00",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("ptk"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "pp",
@@ -88,10 +108,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "2016. évi CXXX. törvény",
     shortName: "Pp.",
     sourceUrl: "https://njt.hu/jogszabaly/2016-130-00-00",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("pp"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "tfvt",
@@ -99,10 +117,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "2007. évi CXXIX. törvény",
     shortName: "Termőföldvédelmi tv.",
     sourceUrl: "https://njt.hu/jogszabaly/2007-129-00-00",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("tfvt"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "evt",
@@ -110,10 +126,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "2009. évi XXXVII. törvény",
     shortName: "Erdőtörvény",
     sourceUrl: "https://njt.hu/jogszabaly/2009-37-00-00",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("evt"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "tvtv",
@@ -121,10 +135,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "1996. évi LIII. törvény",
     shortName: "Tvtv.",
     sourceUrl: "https://njt.hu/jogszabaly/1996-53-00-00",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("tvtv"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
   {
     id: "korm-275-2004",
@@ -132,10 +144,8 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     actNumber: "275/2004. (X. 8.) Korm. rendelet",
     shortName: "Natura 2000 Korm. r.",
     sourceUrl: "https://njt.hu/jogszabaly/2004-275-20-22",
-    retrievedAt: null,
-    versionHash: null,
+    ...meta("korm-275-2004"),
     checkedAt: ADDED_AT,
-    verificationStatus: "source_added_pending_fetch",
   },
 ];
 
@@ -149,4 +159,25 @@ export function formatSourceRef(ref: SourceRef): string {
   const src = getSource(ref.sourceId);
   if (!src) return ref.sourceId;
   return ref.section ? `${src.shortName} ${ref.section}` : src.shortName;
+}
+
+/**
+ * Visszaadja a letöltött jogszabály §-szakasz részleteit, amelyeket a
+ * szabálymotor és a klauzula-katalógus hivatkozási bizonyítékként használ.
+ * A `versionHash` rögzíti, melyik szövegváltozatból származnak.
+ */
+export function getSourceExcerpts(sourceId: string) {
+  const s = SNIPPETS[sourceId];
+  if (!s) return null;
+  return {
+    versionHash: s.versionHash,
+    retrievedAt: s.retrievedAt,
+    snippets: s.snippets,
+  };
+}
+
+export function findSourceExcerpt(sourceId: string, section: string) {
+  const data = getSourceExcerpts(sourceId);
+  if (!data) return null;
+  return data.snippets.find((s) => s.section === section) ?? null;
 }
