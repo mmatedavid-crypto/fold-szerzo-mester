@@ -8,6 +8,8 @@ import {
   LEGAL_RULESET_VERSION,
 } from "@/lib/legal/ruleset";
 import { companyLegalDisclaimer, companyLegalLine } from "@/lib/company";
+import { evaluateDraft, summaryForPdf } from "@/lib/legal/engine";
+import { STATUS_LABEL } from "@/lib/legal/status";
 
 type Clause = { clause_key: string; title: string; text: string; sort_order: number };
 
@@ -182,6 +184,13 @@ export function composeContract(
       companyLegalDisclaimer,
       companyLegalLine,
     ].join("\n"),
+  });
+
+  // Új motor: státusz + workflow checklist
+  const evaluation = evaluateDraft(draft);
+  sections.push({
+    title: `Státusz és eljárási checklist — ${STATUS_LABEL[evaluation.status]}`,
+    text: summaryForPdf(evaluation),
   });
   return { title: "TERMŐFÖLD HASZONBÉRLETI SZERZŐDÉS", sections };
 }
