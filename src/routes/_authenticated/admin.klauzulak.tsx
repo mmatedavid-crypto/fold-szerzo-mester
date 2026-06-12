@@ -26,7 +26,8 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, AlertTriangle, Clock, XCircle, ScrollText } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertTriangle, Clock, XCircle, ScrollText, Loader2, RefreshCw, Link2 } from "lucide-react";
+import { checkSourceFreshness, type FreshnessResult } from "@/lib/legal/sourceFreshness.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/klauzulak")({
   component: AdminKlauzulakPage,
@@ -297,7 +298,88 @@ function AdminKlauzulakPage() {
           onSubmitted={() => qc.invalidateQueries({ queryKey: ["clause-reviews"] })}
         />
       )}
+      <div className="mt-10">
+        <SourceFreshnessPanel />
+      </div>
       </div>
     </PageShell>
+  );
+}
+
+function SourceFreshnessPanel() {
+  const run = useServerFn(checkSourceFreshness);
+  const [busy, setBusy] = useState(false);
+  const [results, setResults] = useState<FreshnessResult[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function go() {
+    setBusy(true);
+    setErr(null);
+    try {
+      setResults(await run());
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card className="p-5">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div>
+          <h2 className="text-lg font-semibold">Jogforrás-frissesség</h2>
+          <p className="text-sm text-muted-foreground">
+            Újra letölti az NJT-források HTML-jét, és összeveti a tárolt SHA‑256 hash-sel.
+            Ha bármelyik forrás megváltozott, az érintett klauzulákat újra le kell lektorálni.
+          </p>
+        </div>
+        <Button onClick={go} disabled={busy} size="sm">
+          {busy ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
+          Most ellenőrzés
+        </Button>
+      </div>
+      {err && <p className="text-sm text-destructive">{err}</p>}
+      {results && (
+        <div className="space-y-2">
+          {results.map((r) => {
+            const tone =
+              r.status === "unchanged"
+                ? "border-emerald-300 bg-emerald-50"
+                : r.status === "changed"
+                ? "border-amber-400 bg-amber-50"
+                : r.status === "unreachable"
+                ? "border-destructive/50 bg-destructive/5"
+                : "border-df-border bg-muted/40";
+            const label =
+              r.status === "unchanged"
+                ? "Változatlan"
+                : r.status === "changed"
+                ? "MEGVÁLTOZOTT — ügyvédi review kell"
+                : r.status === "unreachable"
+                ? "Nem elérhető"
+                : "Soha nem volt letöltve";
+            return (
+              <div key={r.id} className={`rounded border p-3 text-sm ${tone}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="font-medium">{r.shortName}</div>
+                  <Badge variant="outline">{label}</Badge>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 break-all">
+                  <a href={r.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 underline">
+                    <Link2 className="h-3 w-3" />{r.sourceUrl}
+                  </a>
+                </div>
+                <div className="text-xs mt-1 grid sm:grid-cols-2 gap-x-4">
+                  <div>Tárolt hash: <code>{r.storedHash ?? "—"}</code>{r.storedAt ? ` (${r.storedAt})` : ""}</div>
+                  <div>Jelenlegi hash: <code>{r.currentHash ?? "—"}</code>{r.byteLength ? ` (${r.byteLength} B)` : ""}</div>
+                </div>
+                {r.message && <div className="text-xs text-destructive mt-1">{r.message}</div>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
   );
 }
