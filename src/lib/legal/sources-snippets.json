@@ -1,0 +1,100 @@
+{
+  "fftv": {
+    "shortName": "Földforgalmi tv.",
+    "versionHash": "5961069760e7dba6",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 465067,
+    "textLength": 209181,
+    "snippetCount": 0,
+    "snippets": []
+  },
+  "fetv": {
+    "shortName": "Fétv.",
+    "versionHash": "7f08e07d26107b41",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 543518,
+    "textLength": 235928,
+    "snippetCount": 0,
+    "snippets": []
+  },
+  "korm-474-2013": {
+    "shortName": "474/2013. Korm. r.",
+    "versionHash": "02b1ca83d3f93c2f",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 120399,
+    "textLength": 37798,
+    "snippetCount": 1,
+    "snippets": [
+      "474/2013. (XII. 12.) Korm. rendelet az elővásárlási és előhaszonbérleti jog gyakorlása érdekében az adás-vételi és a haszonbérleti szerződés hirdetményi úton történő közlésére vonatkozó eljárási szabályokról - Hatályos Jogszabályok Gyűjteménye"
+    ]
+  },
+  "korm-356-2007": {
+    "shortName": "356/2007. Korm. r.",
+    "versionHash": "b3d8655c6e24a24a",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 254627,
+    "textLength": 96239,
+    "snippetCount": 1,
+    "snippets": [
+      "356/2007. (XII. 23.) Korm. rendelet a földhasználati nyilvántartás részletes szabályairól - Hatályos Jogszabályok Gyűjteménye"
+    ]
+  },
+  "ptk": {
+    "shortName": "Ptk.",
+    "versionHash": "9bd8d1b1d97031de",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 2294573,
+    "textLength": 1082874,
+    "snippetCount": 0,
+    "snippets": []
+  },
+  "pp": {
+    "shortName": "Pp.",
+    "versionHash": "b24a8fd58fbcd291",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 1383439,
+    "textLength": 670767,
+    "snippetCount": 0,
+    "snippets": []
+  },
+  "tfvt": {
+    "shortName": "Termőföldvédelmi tv.",
+    "versionHash": "c8f7e6e982c2535e",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 515241,
+    "textLength": 216500,
+    "snippetCount": 0,
+    "snippets": []
+  },
+  "evt": {
+    "shortName": "Erdőtörvény",
+    "versionHash": "6a2e44fe2b0821fe",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 762420,
+    "textLength": 317604,
+    "snippetCount": 0,
+    "snippets": []
+  },
+  "tvtv": {
+    "shortName": "Tvtv.",
+    "versionHash": "8ec8641443475adb",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 376860,
+    "textLength": 161990,
+    "snippetCount": 1,
+    "snippets": [
+      "A „természetvédelmi kezelési, növényegészségügyi vagy erdővédelmi okból, az Evt. 27. § (3) bekezdésében foglalt kivétellel” szövegrészt megsemmisítette: 14/2020. (VII. 6.) AB határozat 3. Hatálytalan: 2020. VII. 7-től"
+    ]
+  },
+  "korm-275-2004": {
+    "shortName": "Natura 2000 Korm. r.",
+    "versionHash": "e77afed6800eb128",
+    "retrievedAt": "2026-06-12",
+    "byteLength": 951437,
+    "textLength": 174464,
+    "snippetCount": 1,
+    "snippets": [
+      "275/2004. (X. 8.) Korm. rendelet az európai közösségi jelentőségű természetvédelmi rendeltetésű területekről - Hatályos Jogszabályok Gyűjteménye"
+    ]
+  }
+}
