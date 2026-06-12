@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { updateDraft } from "@/lib/contracts/drafts.functions";
 import type { Draft, Parcel, Lessor, Lessee, Rent, Term, PreLease, ClausesSelection } from "@/lib/contracts/types";
 import { WizardStepper } from "./wizard-stepper";
+import { ParcelHrszCheck } from "./parcel-hrsz-check";
 import { toast } from "sonner";
 import { AlertTriangle, ArrowRight, FileText, Plus, Save, ShieldCheck, Trash2 } from "lucide-react";
 
