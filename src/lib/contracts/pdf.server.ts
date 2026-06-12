@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
 import QRCode from "qrcode";
 import { company, companyLegalDisclaimerAscii, companyLegalLineAscii } from "@/lib/company";
 
@@ -70,7 +70,7 @@ export async function renderContractPdf(input: PdfInput): Promise<Uint8Array> {
       size: 38,
       font: fontBold,
       color: rgb(0.85, 0.35, 0.35),
-      rotate: { type: "degrees", angle: 35 } as unknown as { type: "degrees"; angle: number },
+      rotate: degrees(35),
       opacity: 0.25,
     });
   };
