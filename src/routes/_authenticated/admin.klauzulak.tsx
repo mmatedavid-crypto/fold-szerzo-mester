@@ -26,9 +26,8 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, AlertTriangle, Clock, XCircle, ScrollText } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertTriangle, Clock, XCircle, ScrollText, Loader2, RefreshCw, Link2 } from "lucide-react";
 import { checkSourceFreshness, type FreshnessResult } from "@/lib/legal/sourceFreshness.functions";
-import { Loader2, RefreshCw, Link2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/klauzulak")({
   component: AdminKlauzulakPage,
