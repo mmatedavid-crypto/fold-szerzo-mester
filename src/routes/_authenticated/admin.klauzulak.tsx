@@ -224,15 +224,20 @@ function AdminKlauzulakPage() {
   const pending = total - approved;
 
   return (
-    <PageShell
-      title="Klauzula-lektorálás"
-      description="Ügyvédi jóváhagyás a haszonbérleti szerződés klauzula-katalógusához. Amíg egy klauzulához nincs jóváhagyott review, az érintett szerződés nem generálható."
-    >
-      <div className="mb-4">
+    <PageShell>
+      <div className="container mx-auto py-8 max-w-5xl">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold">Klauzula-lektorálás</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Ügyvédi jóváhagyás a haszonbérleti szerződés klauzula-katalógusához. Amíg egy klauzulához
+            nincs jóváhagyott review, az érintett szerződés nem generálható.
+          </p>
+        </div>
+        <div className="mb-4">
         <Button asChild variant="ghost" size="sm">
           <Link to="/admin"><ArrowLeft className="h-4 w-4 mr-1" /> Vissza az adminra</Link>
         </Button>
-      </div>
+        </div>
 
       <div className="grid sm:grid-cols-3 gap-3 mb-6">
         <Card className="p-4">
@@ -292,6 +297,7 @@ function AdminKlauzulakPage() {
           onSubmitted={() => qc.invalidateQueries({ queryKey: ["clause-reviews"] })}
         />
       )}
+      </div>
     </PageShell>
   );
 }
