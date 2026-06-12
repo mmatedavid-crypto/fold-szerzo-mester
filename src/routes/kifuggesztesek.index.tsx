@@ -306,15 +306,9 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [settlement, setSettlement] = useState<string>("");
-  const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const sub = useServerFn(subscribeToSettlement);
-
-  const options = useMemo(() => {
-    const f = filter.trim().toLowerCase();
-    const base = f ? settlements.filter((s) => s.toLowerCase().includes(f)) : settlements;
-    return base.slice(0, 50);
-  }, [settlements, filter]);
 
   async function submit() {
     if (!email || !settlement) {
@@ -392,32 +386,60 @@ function SubscribeBanner({ settlements }: { settlements: string[] }) {
               <div>
                 <label
                   className="text-xs font-semibold uppercase tracking-[0.12em] text-df-gray"
-                  htmlFor="settlement-filter"
+                  htmlFor="settlement-combobox"
                 >
                   Település
                 </label>
-                <Input
-                  id="settlement-filter"
-                  placeholder="Keresés..."
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="mb-2"
-                />
-                <Select value={settlement} onValueChange={setSettlement}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Válassz települést" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {options.length === 0 && (
-                      <div className="p-2 text-xs text-df-gray">Nincs találat</div>
-                    )}
-                    {options.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {s}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="settlement-combobox"
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={pickerOpen}
+                      className="w-full justify-between border-df-border bg-white font-normal text-df-ink hover:bg-white"
+                    >
+                      {settlement || "Kezdd el gépelni a település nevét..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-[--radix-popover-trigger-width] p-0"
+                    align="start"
+                  >
+                    <Command
+                      filter={(value, search) =>
+                        value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
+                      }
+                    >
+                      <CommandInput placeholder="Település keresése..." />
+                      <CommandList>
+                        <CommandEmpty>Nincs ilyen település.</CommandEmpty>
+                        <CommandGroup>
+                          {settlements.map((s) => (
+                            <CommandItem
+                              key={s}
+                              value={s}
+                              onSelect={(val) => {
+                                setSettlement(val === settlement ? "" : val);
+                                setPickerOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  settlement === s ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {s}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               <p className="rounded-md border border-df-border bg-df-cream/60 p-3 text-xs leading-5 text-df-gray">
                 A feliratkozással elfogadod a heti értesítő küldését. Bármikor leiratkozhatsz az
