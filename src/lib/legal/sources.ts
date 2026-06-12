@@ -31,7 +31,6 @@ export interface LegalSource {
 }
 
 const ADDED_AT = "2026-06-12";
-const RETRIEVED_AT = "2026-06-12";
 
 type SnippetEntry = {
   shortName: string;
