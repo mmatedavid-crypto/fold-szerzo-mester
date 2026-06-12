@@ -64,6 +64,21 @@ function AcceptancePage() {
     };
   });
 
+  const [myRankNo, setMyRankNo] = useState<string>("");
+  const [lesseeRankNo, setLesseeRankNo] = useState<string>("");
+  const [lesseeRankBasis, setLesseeRankBasis] = useState<string>("");
+
+  const rankWarning = useMemo(() => {
+    const mine = Number.parseInt(myRankNo, 10);
+    const theirs = Number.parseInt(lesseeRankNo, 10);
+    if (!Number.isFinite(mine) || !Number.isFinite(theirs)) return null;
+    if (theirs < mine)
+      return `A kifüggesztett bérlő (${theirs}. ranghely) erősebb ranghelyen áll, mint te (${mine}. ranghely). Az elfogadó nyilatkozat benyújtása ilyenkor nem vezet eredményre — előbb ellenőrizd a jogalapot a Ranghely kalkulátorral.`;
+    if (theirs === mine)
+      return `Azonos ranghelyen vagytok a kifüggesztett bérlővel (${mine}.). Ilyenkor a sorrenden belüli alkategóriák és az igazolások döntenek — érdemes ügyvéddel egyeztetni.`;
+    return null;
+  }, [myRankNo, lesseeRankNo]);
+
   const composition = useMemo(() => composeAcceptanceStatement(input), [input]);
   const documentText = useMemo(() => renderComposition(composition), [composition]);
 
@@ -288,6 +303,61 @@ function AcceptancePage() {
                 }
               />
             </Field>
+          </Card>
+
+          <Card className="border-df-border bg-df-card p-5 shadow-sm">
+            <h2 className="font-brand text-2xl font-bold text-df-green">
+              3/a. Ranghely-összevetés
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-df-gray">
+              Add meg a saját törvényi ranghelyed sorszámát és a kifüggesztésben szereplő bérlő
+              ranghelyét. Ha a kifüggesztett bérlő erősebb (kisebb sorszám), figyelmeztetést
+              mutatunk.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Field label="Saját ranghely sorszáma">
+                <Input
+                  type="number"
+                  min={1}
+                  value={myRankNo}
+                  onChange={(event) => setMyRankNo(event.target.value)}
+                  placeholder="pl. 3"
+                />
+              </Field>
+              <Field label="Kifüggesztett bérlő ranghely sorszáma">
+                <Input
+                  type="number"
+                  min={1}
+                  value={lesseeRankNo}
+                  onChange={(event) => setLesseeRankNo(event.target.value)}
+                  placeholder="pl. 2"
+                />
+              </Field>
+            </div>
+            <Field label="Kifüggesztett bérlő jogalapja (ha ismert)" className="mt-4">
+              <Input
+                value={lesseeRankBasis}
+                onChange={(event) => setLesseeRankBasis(event.target.value)}
+                placeholder="pl. földműves szomszéd"
+              />
+            </Field>
+            {rankWarning && (
+              <div className="mt-4 flex gap-3 rounded-md border border-df-red/50 bg-df-red/10 p-4">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-df-red" />
+                <div className="text-sm leading-6 text-df-ink">
+                  <div className="font-semibold text-df-red">Figyelem — gyengébb ranghely</div>
+                  <p className="mt-1">{rankWarning}</p>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="mt-3 border-df-green text-df-green"
+                  >
+                    <Link to="/ranghely-kalkulator">Ellenőrzöm a Ranghely kalkulátorral</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
 
           <Card className="border-df-border bg-df-card p-5 shadow-sm">
