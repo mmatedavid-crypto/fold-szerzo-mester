@@ -5,6 +5,8 @@ import { computeRiskReport, coreFieldsFingerprint, joinLessorNames } from "./log
 import type { Draft } from "./types";
 import { company } from "@/lib/company";
 import { LEGAL_RULESET_VERSION, LEASE_CLAUSE_VERSION } from "@/lib/legal/ruleset";
+import { evaluateDraft } from "@/lib/legal/engine";
+import { isBlockingStatus, needsWatermark, WATERMARK_TEXT } from "@/lib/legal/status";
 
 function makeDocNumber(seqHint: string): string {
   const year = new Date().getFullYear();
@@ -50,6 +52,14 @@ export const finalizeContract = createServerFn({ method: "POST" })
     if (!risk.can_finalize)
       throw new Error("Hiányzó kötelező adatok — a véglegesítés nem indítható.");
 
+    // Determinisztikus motor — workflow státusz nem blokkol, csak HIANYOS / SPECIALIS igen.
+    const evaluation = evaluateDraft(draft);
+    if (isBlockingStatus(evaluation.status)) {
+      throw new Error(
+        `A draft státusza ${evaluation.status} — aláírható tervezet nem készíthető. Először orvosold a blokkoló pontokat.`,
+      );
+    }
+
     // Load active template + clauses
     const { data: tpl, error: tplErr } = await supabaseAdmin
       .from("legal_template_versions")
@@ -87,6 +97,7 @@ export const finalizeContract = createServerFn({ method: "POST" })
       title: composed.title,
       sections: composed.sections,
       verificationUrl,
+      watermark: needsWatermark(evaluation.status) ? WATERMARK_TEXT : undefined,
     });
     const documentHash = await sha256Hex(pdfBytes);
 

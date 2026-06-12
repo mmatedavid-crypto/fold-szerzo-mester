@@ -10,6 +10,8 @@ import type {
   Lessee,
 } from "./types";
 import { auditLeaseDraftAgainstRuleset } from "@/lib/legal/ruleset";
+import { evaluateDraft } from "@/lib/legal/engine";
+import { isBlockingStatus } from "@/lib/legal/status";
 
 function req(value: unknown): boolean {
   if (value == null) return false;
@@ -355,6 +357,41 @@ export function computeRiskReport(
     });
   }
 
+  // Új determinisztikus szabálymotor — a meglévő riport fölé rétegezve.
+  const evaluation = evaluateDraft(draft as Draft);
+  for (const b of evaluation.blockers) {
+    items.push({
+      id: `engine_${b.ruleId}`,
+      category: "jogszabalyi_motor",
+      level: "hianyzo_kotelezo",
+      message: `${b.title} (${b.sourceRefs.join("; ")})`,
+    });
+  }
+  for (const s of evaluation.specialCases) {
+    items.push({
+      id: `engine_${s.ruleId}`,
+      category: "jogszabalyi_motor",
+      level: "jogi_ellenorzes",
+      message: `Speciális ügy: ${s.title} (${s.sourceRefs.join("; ")})`,
+    });
+  }
+  for (const w of evaluation.warnings) {
+    items.push({
+      id: `engine_${w.ruleId}`,
+      category: "jogszabalyi_motor",
+      level: "figyelmeztetes",
+      message: `${w.title} (${w.sourceRefs.join("; ")})`,
+    });
+  }
+  for (const p of evaluation.placeholders) {
+    items.push({
+      id: `placeholder_${p.field}`,
+      category: "jogszabalyi_motor",
+      level: "hianyzo_kotelezo",
+      message: `Placeholder: ${p.message} (${p.field})`,
+    });
+  }
+
   // Add a "rendben" placeholder if no findings
   if (items.length === 0)
     items.push({
@@ -365,7 +402,8 @@ export function computeRiskReport(
         "Minden alapadat rendben van. A végleges szerződés a fizetés/keret felhasználása után készül el.",
     });
 
-  const blocking = items.some((i) => i.level === "hianyzo_kotelezo");
+  const blocking =
+    items.some((i) => i.level === "hianyzo_kotelezo") || isBlockingStatus(evaluation.status);
   return { items, can_finalize: !blocking };
 }
 
