@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { updateDraft } from "@/lib/contracts/drafts.functions";
 import type { Draft, Parcel, Lessor, Lessee, Rent, Term, PreLease, ClausesSelection } from "@/lib/contracts/types";
 import { WizardStepper } from "./wizard-stepper";
+import { ParcelHrszCheck } from "./parcel-hrsz-check";
 import { toast } from "sonner";
 import { AlertTriangle, ArrowRight, FileText, Plus, Save, ShieldCheck, Trash2 } from "lucide-react";
 
@@ -398,6 +399,13 @@ export function ContractEditor({ draft }: { draft: Draft }) {
                 <CheckRow label="Közös tulajdon" checked={!!p.common_ownership} onChange={(v) => updParcel(i, { common_ownership: v })} />
                 <CheckRow label="Használati megosztás" checked={!!p.existing_use_order} onChange={(v) => updParcel(i, { existing_use_order: v })} />
                 <CheckRow label="Haszonélvezeti jog" checked={!!p.usufruct_right} onChange={(v) => updParcel(i, { usufruct_right: v })} />
+              </div>
+              <div className="mt-3 grid md:grid-cols-3 gap-3">
+                <ParcelHrszCheck
+                  settlement={p.settlement}
+                  lotNumber={p.parcel_number}
+                  onPickSuggestion={(lot) => updParcel(i, { parcel_number: lot })}
+                />
               </div>
             </div>
           ))}
