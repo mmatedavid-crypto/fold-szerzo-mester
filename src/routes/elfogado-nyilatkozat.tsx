@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -88,21 +88,22 @@ function AcceptancePage() {
   }
 
   // Lakcím komponensek → claimantAddress szinkronban
-  useMemo(() => {
+  useEffect(() => {
     const parts: string[] = [];
     if (addrZip) parts.push(addrZip);
     if (addrSettlement) parts.push(addrSettlement);
     const first = parts.join(" ");
     const combined = [first, addrStreet].filter((s) => s.trim()).join(", ");
-    setInput((current) => ({ ...current, claimantAddress: combined }));
-    return combined;
+    setInput((current) =>
+      current.claimantAddress === combined ? current : { ...current, claimantAddress: combined },
+    );
   }, [addrSettlement, addrZip, addrStreet]);
 
   // Jogalapok kiválasztva → derived mezők
   const proofs = useMemo(() => proofsForRanks(selectedRanks), [selectedRanks]);
   const strongest = useMemo(() => strongestRankSummary(selectedRanks), [selectedRanks]);
 
-  useMemo(() => {
+  useEffect(() => {
     const opts = RANK_OPTIONS.filter((o) => selectedRanks.includes(o.id));
     const rankBasis = opts.map((o) => o.label).join("; ") || undefined;
     const rankLegalRef = opts.map((o) => o.legalRef).join("; ") || undefined;
@@ -115,7 +116,6 @@ function AcceptancePage() {
       rankOrder,
       attachedProofs: attachedProofs.length ? attachedProofs : current.attachedProofs,
     }));
-    return null;
   }, [selectedRanks, proofs, strongest]);
 
   function toggleRank(id: RankId) {
