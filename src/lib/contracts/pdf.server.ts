@@ -246,5 +246,9 @@ export async function renderContractPdf(input: PdfInput): Promise<Uint8Array> {
 
   drawFooter(page);
 
+  if (input.watermark) {
+    for (const p of pdf.getPages()) drawWatermark(p);
+  }
+
   return pdf.save();
 }
