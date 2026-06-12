@@ -116,7 +116,6 @@ function NoticesPage() {
       if (!s) return true;
       const hay = [
         cleanSettlement(n.settlement),
-        n.municipality,
         n.subject,
         (n.parcel_numbers ?? []).join(" "),
         n.source_notice_id,
