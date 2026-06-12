@@ -7,6 +7,8 @@ import { company } from "@/lib/company";
 import { LEGAL_RULESET_VERSION, LEASE_CLAUSE_VERSION } from "@/lib/legal/ruleset";
 import { evaluateDraft } from "@/lib/legal/engine";
 import { isBlockingStatus, needsWatermark, WATERMARK_TEXT } from "@/lib/legal/status";
+import { getUnapprovedClauseIds } from "@/lib/legal/clauseReviews.functions";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 function makeDocNumber(seqHint: string): string {
   const year = new Date().getFullYear();
@@ -57,6 +59,18 @@ export const finalizeContract = createServerFn({ method: "POST" })
     if (isBlockingStatus(evaluation.status)) {
       throw new Error(
         `A draft státusza ${evaluation.status} — aláírható tervezet nem készíthető. Először orvosold a blokkoló pontokat.`,
+      );
+    }
+
+    // Ügyvédi lektorálás kapu: minden szükséges klauzulához kell legyen approved review.
+    const requiredClauseIds = evaluation.requiredClauses.map((c) => c.id);
+    const unapproved = await getUnapprovedClauseIds(
+      supabase as unknown as SupabaseClient,
+      requiredClauseIds,
+    );
+    if (unapproved.length > 0) {
+      throw new Error(
+        `A szerződés nem generálható: az alábbi klauzulákra még nincs ügyvédi jóváhagyás: ${unapproved.join(", ")}. Kérjük, vegye fel a kapcsolatot az üzemeltetővel.`,
       );
     }
 
