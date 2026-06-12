@@ -69,18 +69,21 @@ async function sendToLawyers(html: string, text: string, subject: string): Promi
   }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: lawyers, error } = await supabaseAdmin
+  const { data: roles, error: rolesErr } = await supabaseAdmin
     .from("user_roles")
-    .select("user_id, users_profile:users_profile!inner(email, name)")
+    .select("user_id")
     .eq("role", "lawyer");
-  if (error) return { sent: 0, errors: [error.message] };
+  if (rolesErr) return { sent: 0, errors: [rolesErr.message] };
+  const ids = (roles ?? []).map((r) => r.user_id);
+  if (!ids.length) return { sent: 0, errors: ["No lawyers configured"] };
 
+  const { data: profiles, error: profErr } = await supabaseAdmin
+    .from("users_profile")
+    .select("email")
+    .in("user_id", ids);
+  if (profErr) return { sent: 0, errors: [profErr.message] };
   const emails = Array.from(
-    new Set(
-      (lawyers ?? [])
-        .map((l: { users_profile: { email: string | null } | null }) => l.users_profile?.email)
-        .filter((e: string | null | undefined): e is string => !!e),
-    ),
+    new Set((profiles ?? []).map((p) => p.email).filter((e): e is string => !!e)),
   );
   if (!emails.length) return { sent: 0, errors: ["No lawyers configured"] };
 
