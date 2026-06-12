@@ -147,6 +147,26 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     ...meta("korm-275-2004"),
     checkedAt: ADDED_AT,
   },
+  {
+    id: "fvm-109-1999",
+    title:
+      "A földhasználati nyilvántartás részletes szabályairól szóló kormányrendelet végrehajtásához kapcsolódó FVM formanyomtatványokról (földhasználati bejelentés)",
+    actNumber: "109/1999. (XII. 29.) FVM rendelet",
+    shortName: "109/1999. FVM r.",
+    sourceUrl: "https://njt.hu/jogszabaly/1999-109-22-22",
+    ...meta("fvm-109-1999"),
+    checkedAt: ADDED_AT,
+  },
+  {
+    id: "fm-47-2014",
+    title:
+      "A közös tulajdonban álló mezőgazdasági földek használati megosztásáról szóló megállapodás formai és tartalmi követelményeiről",
+    actNumber: "47/2014. (XI. 7.) FM rendelet",
+    shortName: "47/2014. FM r.",
+    sourceUrl: "https://njt.hu/jogszabaly/2014-47-22-22",
+    ...meta("fm-47-2014"),
+    checkedAt: ADDED_AT,
+  },
 ];
 
 export function getSource(id: string): LegalSource | undefined {
