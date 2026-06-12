@@ -1,9 +1,17 @@
 /**
  * Jogforrás-katalógus a haszonbérleti generátor szabálymotorjához.
  * AI nem dönt jogszabályból — minden alkalmazandó szabály ezekre a forrásokra hivatkozik.
- * Az automatikus letöltés / NJT-fetch nincs megoldva; minden forrás induló státusza
- * `source_added_pending_fetch`, és ügyvédi review-ra vár.
+ * A források a net.jogtar.hu Hatályos Jogszabályok Gyűjteményéből 2026-06-12-én
+ * letöltésre és feldolgozásra kerültek. Minden forráshoz tárolunk
+ * `versionHash`-t (a letöltött HTML SHA-256 első 16 karaktere) és kinyert
+ * §-szakasz-részleteket (lásd `sources-snippets.json`). A `verified` státusz
+ * azt jelenti, hogy az adott forrásszöveg ezzel a hash-sel rögzítve van;
+ * a szabálymotor a `getSourceExcerpts()` helperen keresztül tud rá hivatkozni.
+ * Ügyvédi review továbbra is szükséges minden új klauzula-szöveghez —
+ * a hash csak az alapszöveg azonosíthatóságát garantálja, nem a jogi értelmezést.
  */
+
+import snippets from "./sources-snippets.json";
 
 export type SourceVerificationStatus =
   | "source_added_pending_fetch"
