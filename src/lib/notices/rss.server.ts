@@ -65,10 +65,22 @@ function parseMunicipality(desc: string): string | null {
 }
 
 function toIsoFromPubDate(s: string | null): string | null {
+  return toBudapestDate(s);
+}
+
+// A forrás (hirdetmenyek.gov.hu) éjféli magyar időpontokat ad UTC-ben
+// (pl. 2026-06-11T22:00Z = június 12. 00:00 magyar idő). UTC-s levágás
+// helyett Europe/Budapest szerinti naptári napra konvertálunk.
+function toBudapestDate(s: string | null | undefined): string | null {
   if (!s) return null;
   const d = new Date(s);
   if (isNaN(d.getTime())) return null;
-  return d.toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Budapest",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
 }
 
 export function parseRss(xml: string): RssNotice[] {
@@ -169,8 +181,8 @@ async function fetchPage(
 
 function mapRow(r: ApiRow) {
   const { settlement, parcels } = parseSubjectParts(r.targy ?? "");
-  const pub = r.kifuggesztesNapja ? new Date(r.kifuggesztesNapja).toISOString().slice(0, 10) : null;
-  const deadline = r.lejaratNapja ? new Date(r.lejaratNapja).toISOString().slice(0, 10) : null;
+  const pub = toBudapestDate(r.kifuggesztesNapja);
+  const deadline = toBudapestDate(r.lejaratNapja);
   const normalizedCategory = classifyNoticeCategory(r.hirdetmenyTipusNev, r.targy);
   const typeLabel =
     (normalizedCategory && CATEGORY_LABEL[normalizedCategory]) ??
