@@ -11,6 +11,8 @@ export type PdfInput = {
   title: string;
   sections: { title: string; text: string }[];
   verificationUrl: string;
+  /** Ha van, minden lapra diagonális szürke vízjel kerül. */
+  watermark?: string;
 };
 
 const PAGE_W = 595.28;
@@ -59,6 +61,19 @@ export async function renderContractPdf(input: PdfInput): Promise<Uint8Array> {
   let page = pdf.addPage([PAGE_W, PAGE_H]);
   let y = PAGE_H - MARGIN;
   const contentW = PAGE_W - MARGIN * 2;
+
+  const drawWatermark = (p: import("pdf-lib").PDFPage) => {
+    if (!input.watermark) return;
+    p.drawText(input.watermark, {
+      x: 60,
+      y: PAGE_H / 2,
+      size: 38,
+      font: fontBold,
+      color: rgb(0.85, 0.35, 0.35),
+      rotate: { type: "degrees", angle: 35 } as unknown as { type: "degrees"; angle: number },
+      opacity: 0.25,
+    });
+  };
 
   const drawFooter = (p: import("pdf-lib").PDFPage) => {
     p.drawLine({
