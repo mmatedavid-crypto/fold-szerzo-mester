@@ -1,93 +1,77 @@
-# Ranghely kalkulátor újraépítés — Dr Föld
+## Cél
 
-Cél: a jelenlegi hosszú, wizard-szerű kalkulátort lecseréljük egy **gyors, mobilbarát, chip-alapú** összehasonlító eszközre. „Bejelölöm, mi ő. Bejelölöm, mi vagyok én. Dr Föld megmondja, ki áll előrébb."
+A meglévő `composeContract` + `computeRiskReport` + `finalizeContract` láncot NEM cseréljük. Föléje húzunk öt új réteget, és a meglévő logika ezeket hívja meg.
 
-## Felhasználói élmény
+Hard stop: új generátor NEM készül. A `src/lib/contracts/compose.server.ts`, `logic.ts`, `finalize.functions.ts`, `pdf.server.ts` változatlanul marad, csak a kimeneteit terjesztjük ki / kapuzzuk.
 
-**Két mód, ugyanaz a motor:**
-1. **Gyors kalkulátor** (alapértelmezett, `/ranghely-kalkulator`) — egy oldal, négy kompakt blokk, sticky eredmény jobbra (desktop) / alulra (mobil).
-2. **Kérdezz-felelek** (toggle: „Nem tudom, mit válasszak — kérdezzen a Dr Föld") — max 6 nagy gombos képernyő.
+## Új modulok (mind `lawyer_review_required` alapstátusszal)
 
-**Oldalcím:** „Ki áll előrébb a haszonbérleti rangsorban?"
-**Alcím:** „Válaszd ki, mi igaz a kifüggesztett bérlőre és mi igaz rád. Dr Föld megmutatja, kinek lehet erősebb előhaszonbérleti ranghelye."
-**Kampány:** „Ravasz a gazda: nézd meg, hol állsz a sorban."
+```text
+src/lib/legal/
+  sources.ts          → legalSources katalógus (NJT linkek)
+  rules.ts            → legalRules objektumok (16 szabály)
+  clauses.ts          → clauseLibrary (22 klauzulamodul, csak ezekből épülhet)
+  placeholders.ts     → placeholder-detektor regexek + ellenőrző fn
+  status.ts           → státusz-enum + export-kapu
+  engine.ts           → szabálymotor: draft → { status, blockers, warnings, requiredClauses, checklist }
+  audit.ts            → smoke teszt-készlet (11 forgatókönyv)
+```
 
-## Oldalfelépítés (Gyors kalkulátor)
+### 1. `sources.ts` — jogforrás-katalógus
+10 forrás: 2013/CXXII (Földforgalmi tv.), 2013/CCXII (Fétv.), 474/2013. Korm. r., 356/2007. Korm. r., 2013/V (Ptk.), 2016/CXXX (Pp.), 2007/CXXIX (termőföld védelme), 2009/XXXVII (erdőtörvény), 1996/LIII (természetvédelmi), 275/2004. Korm. r. (Natura 2000).
+Mező-séma: `id`, `title`, `actNumber`, `shortName`, `sourceUrl` (NJT), `retrievedAt`, `versionHash`, `verificationStatus: 'lawyer_review_required' | 'source_added_pending_fetch' | 'verified'`.
+Automatikus letöltés nem garantált → minden forrás induláskor `source_added_pending_fetch`.
 
-**A. Föld** — kompakt kártya
-- Ügylet (Haszonbérlet / Adásvétel disabled)
-- Föld típusa: **Termőföld** / **Erdő / fásított terület** (nem „Nem erdő")
-- Művelési ág dropdown (szántó, rét/legelő/gyep, kert, szőlő, gyümölcsös, rizstelep, nádas/halastó/egyéb, erdő, nem tudom)
-- Közös tulajdon (igen/nem/nem tudom)
-- Accordion „Haladó földadatok": vegyes alrészlet + melyik nagyobb, tulajdonostárs harmadiknak ad, egybefoglalt haszonbér, borszőlő/hegyközség
+### 2. `rules.ts` — szabálymotor szabályai
+16 szabály a kérés szerint (alap haszonbérlet, két tanús magánokirat, haszonbérlő jogosultság, földműves/termelőszervezet, időtartam 1–20 év, díj, természetbeni mennyiség, előhaszonbérleti ranghely, jegyzői közzététel, hatósági jóváhagyás, földhasználati nyilvántartás, közös tulajdon, több hrsz, erdő stop, Natura/védett, talajvédelem, alhaszonbérlet, placeholder-validáció).
+Séma: `id`, `title`, `sourceRefs[]`, `appliesWhen(draft)`, `requiredFacts[]`, `requiredClauses[]`, `riskLevel`, `blocksFinalizationWhen(draft)`, `auditQuestions[]`, `reviewStatus`.
+AI nem dönt: a motor csak ezeket alkalmazza.
 
-**B. Kifüggesztett bérlő** — nagy „Kiválasztom gyorsan" dropdown preset listával → kiválasztott chipek → „+ Másik jogcím hozzáadása" gomb nyit kompakt csoportos chip-választót (Alap / Hely és kapcsolat / Korábbi használat / Tulajdon / Erős speciális / Csoporton belüli előny / Akadályok). NEM 40-item legal checklist by default.
+### 3. `clauses.ts` — klauzulakönyvtár
+22 előre definiált modul (felek, földterület, közös tulajdon, időtartam, pénzbeli/természetbeni díj, fizetési határidő, jogosultsági nyilatkozat, földműves/termelőszervezet nyilatkozat, ranghely nyilatkozat, jegyzői/hatósági/földhasználati workflow, művelési-talajvédelmi kötelezettség, alhaszonbérlet tiltás, birtokbaadás, megszűnés, két tanús aláírási blokk, mellékletek).
+Séma: `id`, `title`, `bodyTemplate`, `sourceRefs[]`, `requiredFacts[]`, `appliesWhen(draft)`, `riskLevel`, `reviewStatus`.
+`composeContract` mostantól ezekből választ — a meglévő DB-klauzulák a könyvtárhoz mappelve maradnak fallbackként.
 
-**C. Te** — ugyanaz mint B, első személyben. „Nem vagyok biztos benne" gomb → Kérdezz-felelek mód.
+### 4. `placeholders.ts` — placeholder-detektor
+Regex-lista: `[\.\.\.]`, `…`, `TODO`, `FIXME`, üres dátum/összeg/hrsz/AK/tanú, "megegyezés szerint", "később pontosítandó". Függvény: `detectPlaceholders(text|draft) → PlaceholderHit[]`.
 
-**D. Eredmény** — sticky badge-stílusú panel
-- Empty state: „Pipálj be pár dolgot" (NEM negatív eredmény)
-- 6 result type, mindegyik saját badge + szöveg + CTA:
-  1. `user_stronger`: „TE ÁLLHATSZ ELŐRÉBB" → „Elfogadó nyilatkozatot készítek" (primary)
-  2. `same_rank`: „AZONOS RANGHELY" → „Elfogadó nyilatkozat előkészítése" + warning
-  3. `user_weaker`: „A BÉRLŐ ÁLLHAT ELŐRÉBB" → „Mi hiányozhat nálad?" lista, no paid CTA
-  4. `lessee_unknown`: „A BÉRLŐ RANGHELYE NEM ISMERT" → user legerősebb + CTA warninggel
-  5. `incomplete_special`: „HIÁNYOS ERŐS JOGCÍM" → „Hiányzó feltételek bepipálása"
-  6. `no_valid`: „NEM LÁTSZIK BIZTOS JOGCÍM"
-  7. `exception`: „KIVÉTEL LEHET" (tranzakciós kivétel esetén, no primary CTA)
-- Proof checklist 3 kategóriában (Alap / Jogcímtől függő / Jogi ellenőrzés) + „Igazolási lista másolása" gomb
-- Expandable „Jogszabályi háttér" csak releváns hivatkozásokkal
+### 5. `status.ts` + `engine.ts` — státuszgép és export-kapu
+Státuszok pontosan: `HIANYOS_TERVEZET`, `SPECIALIS_UGY_STOP`, `JEGYZOI_KOZZETETELRE_VAR`, `HATOSAGI_JOVAHAGYASRA_VAR`, `ALAIHATONAK_TUNO_TERVEZET`. Tiltott címkék fixen blokkolva (`JOGILAG_HIBATLAN`, `AI_APPROVED`, stb.) — típusszinten kizárva.
 
-## Logikai motor változások
+`evaluateDraft(draft)` → `{ status, blockers, warnings, requiredClauses, checklist, missingFacts, placeholders }`.
 
-`src/lib/rank/leaseRankDefinitions.ts`, `leaseRankEngine.ts`, `leaseRankComparison.ts`, `proofRequirements.ts` finomítása + új `rankPresets.ts` (chip-presetek és dropdown opciók).
+Kapu szabályok:
+- jegyzői közzététel NEM blokkolja a generálást → státusz + checklist + PDF intro szöveg
+- hatósági jóváhagyás NEM blokkolja → státusz + checklist + figyelmeztetés
+- bármi a 11-es stop-rule listából → `HIANYOS_TERVEZET` vagy `SPECIALIS_UGY_STOP` + vízjeles PDF "HIÁNYOS TERVEZET – NEM ALÁÍRHATÓ"
+- minden zöld + teljes két tanú + nincs placeholder → `ALAIHATONAK_TUNO_TERVEZET`
 
-**Főbb pontosítások:**
-- Termőföld (non_forest) main groups: G10 (volt haszonbérlő + 46.§(3) speciálisok) → G20 (földműves tulajdonostárs) → G30 helybeli szomszéd → G40 helybeli → G50 20km → G60 helybeli szervezet szomszéd → G70 helybeli szervezet → G80 20km szervezet
-- Erdő (forest): külön ranghelyek, nem-erdő speciálisok itt nem érvényesek
-- Vegyes parcella: nagyobb terület határoz; ismeretlen → bizonytalanság
-- **Intra-group**: CSMT/ŐCSG > Fiatal > Sima — csak ugyanazon csoporton belül, természetes személy farmer-csoportokra. Nem ugrik főcsoportot. Szervezetekre nem alkalmazandó.
-- **Speciális top-rank feltételek** szigorúbb validálással (állattartó: helyben lakó + takarmány cél + állatsűrűség + 3 év; bio/öko csak szántó/kert/szőlő/gyümölcsös + helyben lakó + öko cél; kertészet csak kert/szőlő/gyümölcsös; szaporítóanyag csak szántó; öntözés szántó/szőlő/gyümölcsös/kert + ≥50% öntözhető + számviteli érték a futamidő feléig)
-- **„Jelenlegi földhasználó" rank törölve** — csak proof condition
-- **„Közeli hozzátartozó" checkbox törölve** a party kártyáról — tranzakciós kivételbe kerül („Ritkább kivételek" blokk a Föld kártya alján vagy külön Exceptions panelben)
-- Volt haszonbérlő: 3 éves közvetlen használat feltétel, ha nincs/unknown → incomplete
+## Beépítés a meglévő láncba (minimális invazív)
 
-## Kivételek
+1. `src/lib/contracts/logic.ts` `computeRiskReport` végén meghív `evaluateDraft` és belekeveri a blokkereket/figyelmeztetéseket a `RiskReport`-ba (új `category: 'jogszabalyi_motor'`).
+2. `src/lib/contracts/compose.server.ts`: a végén checklist-szekció (jegyzői/hatósági workflow), és ha státusz nem `ALAIHATONAK_TUNO_TERVEZET`, watermark-instrukciót küld a PDF-rendernek.
+3. `src/lib/contracts/pdf.server.ts`: új paraméter `watermark?: string`. Ha jelen van → minden lapra diagonális szürke "HIÁNYOS TERVEZET – NEM ALÁÍRHATÓ" felirat.
+4. `src/lib/contracts/finalize.functions.ts`: a `risk.can_finalize` ellenőrzés helyett `evaluateDraft(draft).status`-t nézi. Ha `HIANYOS_TERVEZET` vagy `SPECIALIS_UGY_STOP` és placeholder van → hibát dob. Ha workflow-státusz vagy aláírhatónak tűnő → engedi, vízjel csak adat-hiánynál.
+5. `RiskReport` típus változatlan, csak új mezőkkel bővül (`status`, `checklist`) — UI a meglévő `_authenticated/szerzodes.$id.ellenorzes.tsx` lapon kiegészülve mutatja a státusz-badge-et és a workflow checklist-et.
 
-Külön „Ritkább kivételek" blokk (collapsed): hozzátartozói láncolat, gazdaságátadás, MgTermSzerv+tag, erdőbirtokossági társulat+tag, tanya, CSMT+tag, öntözéses tv. Ha bármelyik bejelölt → eredmény „KIVÉTEL LEHET", nincs primary CTA.
+## Audit / smoke
 
-## CTA flow
+`src/lib/legal/audit.ts` 11 fixture-t futtat (egyszerű magánszemély, hiányzó tanúk, nem földműves kivétel nélkül, hibás időtartam, természetbeni bér mennyiség nélkül, ranghely bizonyíték nélkül, közös tulajdon, erdő stop, Natura, jegyzői közzététel nem-stop, hatósági jóváhagyás workflow, placeholder smoke). Egyszerű `runAudit()` fn JSON riportot ad. Vitest fájl: `src/lib/legal/audit.test.ts` minden esetre.
 
-`user_stronger` / `same_rank` → snapshot mentés (sessionStorage + opcionálisan szerver), redirect `/elfogado-nyilatkozat/uj?fromRankCalculation={id}` átadva: landContext, statuses, strongest ranks, comparison, references, proofs, warnings.
+## Mit NEM csinálunk most
 
-## Brand / footer
+- Nem töltünk le NJT-tartalmakat (forrás `source_added_pending_fetch` marad — manuális ügyvédi review kell).
+- Nem írunk át UI-t a `foldberleti-szerzodes.tsx` űrlapon — csak az ellenőrző oldal kap státusz-badge-et.
+- Nem nyúlunk az `acceptance` (elfogadó nyilatkozat) lánchoz.
+- Nem érintjük a DB sémát.
 
-- „Dr Föld" mindenhol a kalkulátorban (nem „Földbérleti Szerződés")
-- Footer-ben és dokumentumokban `drfold.hu` referencia a `foldberletiszerzodes.hu` helyett (`src/components/layout/site-footer.tsx`)
+## Záró riport (a kód végén `runAudit()` futtatás)
 
-## Érintett fájlok
+- 10 forrás regisztrálva, mind `source_added_pending_fetch`
+- 16 szabály regisztrálva, mind `lawyer_review_required`
+- 22 klauzulamodul + sourceRefs-szel összekötve
+- 11 stop-rule aktív + placeholder smoke
+- Jegyzői közzététel és hatósági jóváhagyás workflow-státusz (NEM blokkoló) — auditban igazolt
+- Vízjeles PDF csak hiányos/speciális ügynél
 
-**Frissítés:**
-- `src/routes/ranghely-kalkulator.tsx` — új layout, két mód toggle
-- `src/components/rank/LandContextCard.tsx` — Termőföld label, művelési ág bővítés, haladó accordion
-- `src/components/rank/PartyStatusCard.tsx` — chip-alapú UI, preset dropdown, csoportos hozzáadó
-- `src/components/rank/ResultPanel.tsx` — empty state, új result type-ok, proof copy, jogszabályi háttér
-- `src/components/rank/ExceptionsCollapsible.tsx` — tranzakciós kivételek
-- `src/lib/rank/leaseRankDefinitions.ts` — finomítások, „jelenlegi földhasználó" törlése
-- `src/lib/rank/leaseRankEngine.ts` — incomplete special detektálás, exception handling
-- `src/lib/rank/leaseRankComparison.ts` — új comparison típusok (lessee_unknown, incomplete_special, exception)
-- `src/lib/rank/leaseTypes.ts` — close_relative mező eltávolítva, tranzakciós exception mezők
-- `src/lib/rank/proofRequirements.ts` — Hely/Korábbi/Tulajdon csoportosítás
-- `src/components/layout/site-footer.tsx` — drfold.hu
-
-**Új:**
-- `src/lib/rank/rankPresets.ts` — preset dropdown opciók, chip csoportok
-- `src/components/rank/GuidedFlow.tsx` — Kérdezz-felelek mód (max 6 lépés)
-- `src/components/rank/ResultBadge.tsx` — stamp/badge komponens
-
-**Nem érintünk:**
-- elfogadó nyilatkozat generátor, payment, dashboard, admin, PDF, dokumentum-ellenőrzés, notice integráció
-
-## Tesztek
-
-A 10 megadott eset manuális verifikációja a preview-ban a build után.
+OK?
