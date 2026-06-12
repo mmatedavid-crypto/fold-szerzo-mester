@@ -29,6 +29,7 @@ import { Route as KifuggesztesekNoticeIdRouteImport } from './routes/kifuggeszte
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedSzerzodesUjRouteImport } from './routes/_authenticated/szerzodes.uj'
+import { Route as AuthenticatedAdminKlauzulakRouteImport } from './routes/_authenticated/admin.klauzulak'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 import { Route as ApiPublicHooksSyncNoticesRouteImport } from './routes/api/public/hooks/sync-notices'
@@ -139,6 +140,12 @@ const AuthenticatedSzerzodesUjRoute =
     path: '/szerzodes/uj',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminKlauzulakRoute =
+  AuthenticatedAdminKlauzulakRouteImport.update({
+    id: '/klauzulak',
+    path: '/klauzulak',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -209,10 +216,11 @@ export interface FileRoutesByFullPath {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
+  '/admin/klauzulak': typeof AuthenticatedAdminKlauzulakRoute
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
@@ -239,10 +247,11 @@ export interface FileRoutesByTo {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek': typeof KifuggesztesekIndexRoute
+  '/admin/klauzulak': typeof AuthenticatedAdminKlauzulakRoute
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
@@ -271,10 +280,11 @@ export interface FileRoutesById {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
+  '/_authenticated/admin/klauzulak': typeof AuthenticatedAdminKlauzulakRoute
   '/_authenticated/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
   '/_authenticated/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek/'
+    | '/admin/klauzulak'
     | '/szerzodes/uj'
     | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/fizetes'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek'
+    | '/admin/klauzulak'
     | '/szerzodes/uj'
     | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/fizetes'
@@ -368,6 +380,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek/'
+    | '/_authenticated/admin/klauzulak'
     | '/_authenticated/szerzodes/uj'
     | '/_authenticated/szerzodes/$id/ellenorzes'
     | '/_authenticated/szerzodes/$id/fizetes'
@@ -547,6 +560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSzerzodesUjRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/klauzulak': {
+      id: '/_authenticated/admin/klauzulak'
+      path: '/klauzulak'
+      fullPath: '/admin/klauzulak'
+      preLoaderRoute: typeof AuthenticatedAdminKlauzulakRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -613,8 +633,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminKlauzulakRoute: typeof AuthenticatedAdminKlauzulakRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminKlauzulakRoute: AuthenticatedAdminKlauzulakRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSzerzodesUjRoute: typeof AuthenticatedSzerzodesUjRoute
   AuthenticatedSzerzodesIdEllenorzesRoute: typeof AuthenticatedSzerzodesIdEllenorzesRoute
@@ -624,7 +655,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSzerzodesUjRoute: AuthenticatedSzerzodesUjRoute,
   AuthenticatedSzerzodesIdEllenorzesRoute:
