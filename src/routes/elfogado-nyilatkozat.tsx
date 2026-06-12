@@ -299,6 +299,27 @@ function AcceptancePage() {
                   onChange={(event) => update("claimantTaxId", event.target.value)}
                 />
               </Field>
+              <Field label="Születési név (ha eltér)">
+                <Input
+                  value={input.claimantBirthName ?? ""}
+                  onChange={(event) => update("claimantBirthName", event.target.value)}
+                  placeholder="csak akkor töltsd ki, ha eltér a mostani nevedtől"
+                />
+              </Field>
+              <Field label="Nyilvántartási szám / cégjegyzékszám">
+                <Input
+                  value={input.claimantRegistryNumber ?? ""}
+                  onChange={(event) => update("claimantRegistryNumber", event.target.value)}
+                  placeholder="földműves: nyilvántartási szám · szervezet: cégjegyzékszám"
+                />
+              </Field>
+              <Field label="Képviselő neve és minősége (szervezet esetén)">
+                <Input
+                  value={input.claimantRepresentative ?? ""}
+                  onChange={(event) => update("claimantRepresentative", event.target.value)}
+                  placeholder="pl. Kiss János ügyvezető"
+                />
+              </Field>
             </div>
 
             <div className="mt-6">
