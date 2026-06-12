@@ -21,6 +21,15 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { HuDatePicker } from "@/components/ui/hu-date-picker";
+import { SettlementCombobox, zipsForSettlement } from "@/components/ui/settlement-combobox";
+import {
+  RANK_OPTIONS,
+  proofsForRanks,
+  strongestRankSummary,
+} from "@/lib/rank/proofsFromRanks";
+import type { RankId } from "@/lib/rank/leaseRankDefinitions";
 
 export const Route = createFileRoute("/elfogado-nyilatkozat")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -64,20 +73,54 @@ function AcceptancePage() {
     };
   });
 
-  const [myRankNo, setMyRankNo] = useState<string>("");
-  const [lesseeRankNo, setLesseeRankNo] = useState<string>("");
-  const [lesseeRankBasis, setLesseeRankBasis] = useState<string>("");
+  const [selectedRanks, setSelectedRanks] = useState<RankId[]>([]);
 
-  const rankWarning = useMemo(() => {
-    const mine = Number.parseInt(myRankNo, 10);
-    const theirs = Number.parseInt(lesseeRankNo, 10);
-    if (!Number.isFinite(mine) || !Number.isFinite(theirs)) return null;
-    if (theirs < mine)
-      return `A kifüggesztett bérlő (${theirs}. ranghely) erősebb ranghelyen áll, mint te (${mine}. ranghely). Az elfogadó nyilatkozat benyújtása ilyenkor nem vezet eredményre — előbb ellenőrizd a jogalapot a Ranghely kalkulátorral.`;
-    if (theirs === mine)
-      return `Azonos ranghelyen vagytok a kifüggesztett bérlővel (${mine}.). Ilyenkor a sorrenden belüli alkategóriák és az igazolások döntenek — érdemes ügyvéddel egyeztetni.`;
+  // Lakcím komponensek külön (egyesítve mennek a claimantAddress-be)
+  const [addrSettlement, setAddrSettlement] = useState<string>("");
+  const [addrZip, setAddrZip] = useState<string>("");
+  const [addrStreet, setAddrStreet] = useState<string>("");
+
+  // Település választáskor automatikusan ajánljunk irányítószámot
+  function handleAddrSettlement(name: string) {
+    setAddrSettlement(name);
+    const zips = zipsForSettlement(name);
+    if (zips.length && !addrZip) setAddrZip(zips[0]);
+  }
+
+  // Lakcím komponensek → claimantAddress szinkronban
+  useMemo(() => {
+    const parts: string[] = [];
+    if (addrZip) parts.push(addrZip);
+    if (addrSettlement) parts.push(addrSettlement);
+    const first = parts.join(" ");
+    const combined = [first, addrStreet].filter((s) => s.trim()).join(", ");
+    setInput((current) => ({ ...current, claimantAddress: combined }));
+    return combined;
+  }, [addrSettlement, addrZip, addrStreet]);
+
+  // Jogalapok kiválasztva → derived mezők
+  const proofs = useMemo(() => proofsForRanks(selectedRanks), [selectedRanks]);
+  const strongest = useMemo(() => strongestRankSummary(selectedRanks), [selectedRanks]);
+
+  useMemo(() => {
+    const opts = RANK_OPTIONS.filter((o) => selectedRanks.includes(o.id));
+    const rankBasis = opts.map((o) => o.label).join("; ") || undefined;
+    const rankLegalRef = opts.map((o) => o.legalRef).join("; ") || undefined;
+    const rankOrder = strongest ? strongest.label : undefined;
+    const attachedProofs = proofs.map((p) => p.label);
+    setInput((current) => ({
+      ...current,
+      rankBasis,
+      rankLegalRef,
+      rankOrder,
+      attachedProofs: attachedProofs.length ? attachedProofs : current.attachedProofs,
+    }));
     return null;
-  }, [myRankNo, lesseeRankNo]);
+  }, [selectedRanks, proofs, strongest]);
+
+  function toggleRank(id: RankId) {
+    setSelectedRanks((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
+  }
 
   const composition = useMemo(() => composeAcceptanceStatement(input), [input]);
   const documentText = useMemo(() => renderComposition(composition), [composition]);
@@ -186,17 +229,15 @@ function AcceptancePage() {
                 />
               </Field>
               <Field label="Közzététel kezdő napja">
-                <Input
-                  type="date"
-                  value={input.noticePublicationDate ?? ""}
-                  onChange={(event) => update("noticePublicationDate", event.target.value)}
+                <HuDatePicker
+                  value={input.noticePublicationDate}
+                  onChange={(v) => update("noticePublicationDate", v)}
                 />
               </Field>
               <Field label="Jogvesztő határidő utolsó napja">
-                <Input
-                  type="date"
-                  value={input.deadlineDate ?? ""}
-                  onChange={(event) => update("deadlineDate", event.target.value)}
+                <HuDatePicker
+                  value={input.deadlineDate}
+                  onChange={(v) => update("deadlineDate", v)}
                 />
               </Field>
               <Field label="Benyújtás helye / címzettje">
@@ -211,8 +252,16 @@ function AcceptancePage() {
               <Textarea
                 value={input.contractSubject ?? ""}
                 onChange={(event) => update("contractSubject", event.target.value)}
-                placeholder="Település, helyrajzi szám, haszonbérleti szerződés rövid azonosítása"
+                placeholder={
+                  "Példa: Gyomaendrőd külterület 0123/4 hrsz., 12,3456 ha szántó, haszonbérleti szerződés Példa János (Gyomaendrőd) és XY Kft. között, 5 éves futamidőre, évi 60.000 Ft/ha bérleti díjjal."
+                }
+                rows={4}
               />
+              <p className="mt-2 text-xs leading-5 text-df-gray">
+                Írd le a kifüggesztett szerződést úgy, hogy egyértelműen
+                azonosítható legyen: település, helyrajzi szám, terület, művelési
+                ág, szerződő felek, futamidő, díj.
+              </p>
             </Field>
           </Card>
 
@@ -225,23 +274,17 @@ function AcceptancePage() {
                   onChange={(event) => update("claimantName", event.target.value)}
                 />
               </Field>
-              <Field label="Lakcím / székhely">
-                <Input
-                  value={input.claimantAddress ?? ""}
-                  onChange={(event) => update("claimantAddress", event.target.value)}
-                />
-              </Field>
               <Field label="Születési hely">
-                <Input
-                  value={input.claimantBirthPlace ?? ""}
-                  onChange={(event) => update("claimantBirthPlace", event.target.value)}
+                <SettlementCombobox
+                  value={input.claimantBirthPlace}
+                  onChange={(v) => update("claimantBirthPlace", v)}
                 />
               </Field>
               <Field label="Születési idő">
-                <Input
-                  type="date"
-                  value={input.claimantBirthDate ?? ""}
-                  onChange={(event) => update("claimantBirthDate", event.target.value)}
+                <HuDatePicker
+                  value={input.claimantBirthDate}
+                  onChange={(v) => update("claimantBirthDate", v)}
+                  placeholder="éééé. hh. nn."
                 />
               </Field>
               <Field label="Anyja neve">
@@ -257,105 +300,131 @@ function AcceptancePage() {
                 />
               </Field>
             </div>
+
+            <div className="mt-6">
+              <Label className="mb-2 block text-sm font-semibold text-df-ink">Lakcím / székhely</Label>
+              <div className="grid gap-4 sm:grid-cols-[1fr,140px]">
+                <div>
+                  <Label className="mb-1 block text-xs text-df-gray">Település</Label>
+                  <SettlementCombobox value={addrSettlement} onChange={handleAddrSettlement} />
+                </div>
+                <div>
+                  <Label className="mb-1 block text-xs text-df-gray">Irányítószám</Label>
+                  <Input
+                    value={addrZip}
+                    onChange={(e) => setAddrZip(e.target.value)}
+                    placeholder="pl. 5500"
+                    maxLength={4}
+                    inputMode="numeric"
+                  />
+                </div>
+              </div>
+              <div className="mt-3">
+                <Label className="mb-1 block text-xs text-df-gray">Utca, házszám (tanya esetén tanya száma)</Label>
+                <Input
+                  value={addrStreet}
+                  onChange={(e) => setAddrStreet(e.target.value)}
+                  placeholder="pl. Kossuth utca 12. vagy III. tanya 7."
+                />
+              </div>
+              {input.claimantAddress && (
+                <p className="mt-2 text-xs text-df-gray">
+                  Teljes cím: <span className="font-medium text-df-ink">{input.claimantAddress}</span>
+                </p>
+              )}
+            </div>
           </Card>
 
           <Card className="border-df-border bg-df-card p-5 shadow-sm">
             <h2 className="font-brand text-2xl font-bold text-df-green">
               3. Jogalap és igazolások
             </h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Field label="Megjelölt jogalap">
-                <Input
-                  value={input.rankBasis ?? ""}
-                  onChange={(event) => update("rankBasis", event.target.value)}
-                  placeholder="pl. helyben lakó szomszéd"
-                />
-              </Field>
-              <Field label="Törvény szerinti ranghely">
-                <Input
-                  value={input.rankOrder ?? ""}
-                  onChange={(event) => update("rankOrder", event.target.value)}
-                  placeholder="pl. Földforgalmi tv. 46. § szerinti sorrend"
-                />
-              </Field>
-            </div>
-            <Field label="Törvényi hivatkozás" className="mt-4">
-              <Input
-                value={input.rankLegalRef ?? ""}
-                onChange={(event) => update("rankLegalRef", event.target.value)}
-                placeholder="pl. Földforgalmi tv. 46. § ..."
-              />
-            </Field>
-            <Field label="Csatolt igazolások, soronként egy" className="mt-4">
-              <Textarea
-                value={(input.attachedProofs ?? []).join("\n")}
-                onChange={(event) =>
-                  update(
-                    "attachedProofs",
-                    event.target.value
-                      .split("\n")
-                      .map((line) => line.trim())
-                      .filter(Boolean),
-                  )
-                }
-                placeholder={
-                  "Földműves nyilvántartási igazolás\nLakcímigazolás\nFöldhasználati lap"
-                }
-              />
-            </Field>
-          </Card>
-
-          <Card className="border-df-border bg-df-card p-5 shadow-sm">
-            <h2 className="font-brand text-2xl font-bold text-df-green">
-              3/a. Ranghely-összevetés
-            </h2>
             <p className="mt-2 text-sm leading-6 text-df-gray">
-              Add meg a saját törvényi ranghelyed sorszámát és a kifüggesztésben szereplő bérlő
-              ranghelyét. Ha a kifüggesztett bérlő erősebb (kisebb sorszám), figyelmeztetést
-              mutatunk.
+              Jelöld be a saját jogalapodat — <strong>többet is választhatsz</strong>, ha több
+              címen vagy jogosult. A rendszer kiszámolja a törvény szerinti ranghelyedet és
+              összeállítja, milyen okiratokat kell csatolnod.
             </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Field label="Saját ranghely sorszáma">
-                <Input
-                  type="number"
-                  min={1}
-                  value={myRankNo}
-                  onChange={(event) => setMyRankNo(event.target.value)}
-                  placeholder="pl. 3"
-                />
-              </Field>
-              <Field label="Kifüggesztett bérlő ranghely sorszáma">
-                <Input
-                  type="number"
-                  min={1}
-                  value={lesseeRankNo}
-                  onChange={(event) => setLesseeRankNo(event.target.value)}
-                  placeholder="pl. 2"
-                />
-              </Field>
+            <div className="mt-4 space-y-5">
+              {(["non_forest", "forest"] as const).map((branch) => {
+                const opts = RANK_OPTIONS.filter((o) => o.branch === branch);
+                if (!opts.length) return null;
+                return (
+                  <div key={branch}>
+                    <div className="mb-2 text-xs font-bold uppercase tracking-wider text-df-gray">
+                      {branch === "forest" ? "Erdő" : "Nem erdő (szántó, kert, szőlő, gyümölcsös, rét, legelő stb.)"}
+                    </div>
+                    <div className="grid gap-2">
+                      {opts.map((opt) => {
+                        const checked = selectedRanks.includes(opt.id);
+                        return (
+                          <label
+                            key={opt.id}
+                            className={`flex cursor-pointer items-start gap-3 rounded-md border p-3 transition-colors ${
+                              checked
+                                ? "border-df-green bg-df-green/5"
+                                : "border-df-border bg-white hover:bg-df-cream/50"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={checked}
+                              onCheckedChange={() => toggleRank(opt.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-df-ink">{opt.label}</span>
+                                <span className="rounded bg-df-cream px-1.5 py-0.5 text-[10px] font-bold text-df-green">
+                                  {opt.group}. csoport
+                                </span>
+                              </div>
+                              <div className="mt-0.5 text-xs text-df-gray">{opt.legalRef}</div>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <Field label="Kifüggesztett bérlő jogalapja (ha ismert)" className="mt-4">
-              <Input
-                value={lesseeRankBasis}
-                onChange={(event) => setLesseeRankBasis(event.target.value)}
-                placeholder="pl. földműves szomszéd"
-              />
-            </Field>
-            {rankWarning && (
-              <div className="mt-4 flex gap-3 rounded-md border border-df-red/50 bg-df-red/10 p-4">
-                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-df-red" />
-                <div className="text-sm leading-6 text-df-ink">
-                  <div className="font-semibold text-df-red">Figyelem — gyengébb ranghely</div>
-                  <p className="mt-1">{rankWarning}</p>
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="outline"
-                    className="mt-3 border-df-green text-df-green"
-                  >
-                    <Link to="/ranghely-kalkulator">Ellenőrzöm a Ranghely kalkulátorral</Link>
-                  </Button>
+
+            {selectedRanks.length > 0 && (
+              <div className="mt-5 rounded-md border border-df-green/40 bg-df-green/5 p-4">
+                <div className="flex items-start gap-2">
+                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-df-green" />
+                  <div className="text-sm leading-6 text-df-ink">
+                    <div className="font-semibold text-df-green">
+                      Törvény szerinti ranghelyed: {strongest?.label ?? "—"}
+                    </div>
+                    <p className="mt-1 text-df-gray">
+                      Ezt automatikusan beillesztjük a nyilatkozatba a jogalap megnevezésével és
+                      a hivatkozott jogszabállyal együtt.
+                    </p>
+                  </div>
                 </div>
+              </div>
+            )}
+
+            {proofs.length > 0 && (
+              <div className="mt-4">
+                <Label className="mb-2 block text-sm font-semibold text-df-ink">
+                  Csatolandó igazolások — ezeket fogja kérni a hatóság
+                </Label>
+                <ul className="space-y-1.5 rounded-md border border-df-border bg-white p-3">
+                  {proofs.map((p) => (
+                    <li key={p.id} className="flex items-start gap-2 text-sm text-df-ink">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-df-green" />
+                      <span>
+                        {p.label}
+                        {p.category !== "kotelezo" && (
+                          <span className="ml-2 text-[10px] uppercase text-df-gray">
+                            {p.category === "jogcim_fuggo" ? "ha alkalmazandó" : "jogi ellenőrzés"}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </Card>
@@ -364,10 +433,9 @@ function AcceptancePage() {
             <h2 className="font-brand text-2xl font-bold text-df-green">4. Keltezés és tanúk</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <Field label="Benyújtás napja">
-                <Input
-                  type="date"
-                  value={input.submittedAt ?? ""}
-                  onChange={(event) => update("submittedAt", event.target.value)}
+                <HuDatePicker
+                  value={input.submittedAt}
+                  onChange={(v) => update("submittedAt", v)}
                 />
               </Field>
               <Field label="Keltezés helye">
@@ -377,10 +445,9 @@ function AcceptancePage() {
                 />
               </Field>
               <Field label="Keltezés napja">
-                <Input
-                  type="date"
-                  value={input.signatureDate ?? ""}
-                  onChange={(event) => update("signatureDate", event.target.value)}
+                <HuDatePicker
+                  value={input.signatureDate}
+                  onChange={(v) => update("signatureDate", v)}
                 />
               </Field>
             </div>
