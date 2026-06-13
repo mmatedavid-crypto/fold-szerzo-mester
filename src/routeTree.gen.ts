@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as RanghelyKalkulatorRouteImport } from './routes/ranghely-kalkulator'
 import { Route as LeiratkozasRouteImport } from './routes/leiratkozas'
@@ -45,6 +46,11 @@ import { Route as AuthenticatedSzerzodesIdKeszRouteImport } from './routes/_auth
 import { Route as AuthenticatedSzerzodesIdFizetesRouteImport } from './routes/_authenticated/szerzodes.$id.fizetes'
 import { Route as AuthenticatedSzerzodesIdEllenorzesRouteImport } from './routes/_authenticated/szerzodes.$id.ellenorzes'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisztracioRoute = RegisztracioRouteImport.update({
   id: '/regisztracio',
   path: '/regisztracio',
@@ -249,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -361,6 +370,7 @@ export interface FileRouteTypes {
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
+    | '/unsubscribe'
     | '/admin'
     | '/dashboard'
     | '/email/unsubscribe'
@@ -397,6 +407,7 @@ export interface FileRouteTypes {
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
+    | '/unsubscribe'
     | '/admin'
     | '/dashboard'
     | '/email/unsubscribe'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
+    | '/unsubscribe'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/email/unsubscribe'
@@ -472,6 +484,7 @@ export interface RootRouteChildren {
   LeiratkozasRoute: typeof LeiratkozasRoute
   RanghelyKalkulatorRoute: typeof RanghelyKalkulatorRoute
   RegisztracioRoute: typeof RegisztracioRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
   KifuggesztesekIndexRoute: typeof KifuggesztesekIndexRoute
@@ -488,6 +501,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/regisztracio': {
       id: '/regisztracio'
       path: '/regisztracio'
@@ -788,6 +808,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeiratkozasRoute: LeiratkozasRoute,
   RanghelyKalkulatorRoute: RanghelyKalkulatorRoute,
   RegisztracioRoute: RegisztracioRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
   KifuggesztesekIndexRoute: KifuggesztesekIndexRoute,
