@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as RegisztracioRouteImport } from './routes/regisztracio'
 import { Route as RanghelyKalkulatorRouteImport } from './routes/ranghely-kalkulator'
 import { Route as LeiratkozasRouteImport } from './routes/leiratkozas'
@@ -26,10 +27,14 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KifuggesztesekIndexRouteImport } from './routes/kifuggesztesek.index'
 import { Route as KifuggesztesekNoticeIdRouteImport } from './routes/kifuggesztesek.$noticeId'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AuthenticatedSzerzodesUjRouteImport } from './routes/_authenticated/szerzodes.uj'
 import { Route as AuthenticatedAdminKlauzulakRouteImport } from './routes/_authenticated/admin.klauzulak'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 import { Route as ApiPublicHooksSyncNoticesRouteImport } from './routes/api/public/hooks/sync-notices'
@@ -41,6 +46,11 @@ import { Route as AuthenticatedSzerzodesIdKeszRouteImport } from './routes/_auth
 import { Route as AuthenticatedSzerzodesIdFizetesRouteImport } from './routes/_authenticated/szerzodes.$id.fizetes'
 import { Route as AuthenticatedSzerzodesIdEllenorzesRouteImport } from './routes/_authenticated/szerzodes.$id.ellenorzes'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisztracioRoute = RegisztracioRouteImport.update({
   id: '/regisztracio',
   path: '/regisztracio',
@@ -125,6 +135,11 @@ const KifuggesztesekNoticeIdRoute = KifuggesztesekNoticeIdRouteImport.update({
   path: '/kifuggesztesek/$noticeId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -134,6 +149,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSzerzodesUjRoute =
   AuthenticatedSzerzodesUjRouteImport.update({
@@ -146,6 +166,18 @@ const AuthenticatedAdminKlauzulakRoute =
     id: '/klauzulak',
     path: '/klauzulak',
     getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
@@ -223,12 +255,15 @@ export interface FileRoutesByFullPath {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
   '/admin/klauzulak': typeof AuthenticatedAdminKlauzulakRoute
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
@@ -239,6 +274,8 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -255,12 +292,15 @@ export interface FileRoutesByTo {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek': typeof KifuggesztesekIndexRoute
   '/admin/klauzulak': typeof AuthenticatedAdminKlauzulakRoute
   '/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
@@ -271,6 +311,8 @@ export interface FileRoutesByTo {
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -289,12 +331,15 @@ export interface FileRoutesById {
   '/leiratkozas': typeof LeiratkozasRoute
   '/ranghely-kalkulator': typeof RanghelyKalkulatorRoute
   '/regisztracio': typeof RegisztracioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
   '/_authenticated/admin/klauzulak': typeof AuthenticatedAdminKlauzulakRoute
   '/_authenticated/szerzodes/uj': typeof AuthenticatedSzerzodesUjRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/szerzodes/$id/ellenorzes': typeof AuthenticatedSzerzodesIdEllenorzesRoute
   '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/_authenticated/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
@@ -305,6 +350,8 @@ export interface FileRoutesById {
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -323,12 +370,15 @@ export interface FileRouteTypes {
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
+    | '/unsubscribe'
     | '/admin'
     | '/dashboard'
+    | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek/'
     | '/admin/klauzulak'
     | '/szerzodes/uj'
+    | '/lovable/email/suppression'
     | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
@@ -339,6 +389,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -355,12 +407,15 @@ export interface FileRouteTypes {
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
+    | '/unsubscribe'
     | '/admin'
     | '/dashboard'
+    | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek'
     | '/admin/klauzulak'
     | '/szerzodes/uj'
+    | '/lovable/email/suppression'
     | '/szerzodes/$id/ellenorzes'
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
@@ -371,6 +426,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -388,12 +445,15 @@ export interface FileRouteTypes {
     | '/leiratkozas'
     | '/ranghely-kalkulator'
     | '/regisztracio'
+    | '/unsubscribe'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek/'
     | '/_authenticated/admin/klauzulak'
     | '/_authenticated/szerzodes/uj'
+    | '/lovable/email/suppression'
     | '/_authenticated/szerzodes/$id/ellenorzes'
     | '/_authenticated/szerzodes/$id/fizetes'
     | '/_authenticated/szerzodes/$id/kesz'
@@ -404,6 +464,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -422,18 +484,30 @@ export interface RootRouteChildren {
   LeiratkozasRoute: typeof LeiratkozasRoute
   RanghelyKalkulatorRoute: typeof RanghelyKalkulatorRoute
   RegisztracioRoute: typeof RegisztracioRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
   KifuggesztesekIndexRoute: typeof KifuggesztesekIndexRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicCronSourceFreshnessRoute: typeof ApiPublicCronSourceFreshnessRoute
   ApiPublicHooksExtractPricesRoute: typeof ApiPublicHooksExtractPricesRoute
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
   ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/regisztracio': {
       id: '/regisztracio'
       path: '/regisztracio'
@@ -553,6 +627,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KifuggesztesekNoticeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -567,6 +648,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/szerzodes/uj': {
       id: '/_authenticated/szerzodes/uj'
       path: '/szerzodes/uj'
@@ -580,6 +668,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/klauzulak'
       preLoaderRoute: typeof AuthenticatedAdminKlauzulakRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -706,14 +808,19 @@ const rootRouteChildren: RootRouteChildren = {
   LeiratkozasRoute: LeiratkozasRoute,
   RanghelyKalkulatorRoute: RanghelyKalkulatorRoute,
   RegisztracioRoute: RegisztracioRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
   KifuggesztesekIndexRoute: KifuggesztesekIndexRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicCronSourceFreshnessRoute: ApiPublicCronSourceFreshnessRoute,
   ApiPublicHooksExtractPricesRoute: ApiPublicHooksExtractPricesRoute,
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
   ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,4 +1,5 @@
 import { cleanSettlement } from "@/lib/notices/clean";
+import { enqueueTransactionalEmail } from "@/lib/email/enqueue.server";
 
 type Notice = {
   id: string;
@@ -19,104 +20,12 @@ type Subscription = {
   expires_at: string;
 };
 
-const PUBLIC_SITE = process.env.PUBLIC_SITE_URL ?? "https://drfold.hu";
-
-function htmlEscape(s: string): string {
-  return s.replace(
-    /[&<>"']/g,
-    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
-  );
-}
-
-function renderEmail(
-  sub: Subscription,
-  notices: Notice[],
-): { subject: string; html: string; text: string } {
-  const subject = `Heti kifüggesztések – ${sub.settlement_clean} (${notices.length} aktuális)`;
-  const unsubUrl = `${PUBLIC_SITE}/leiratkozas?token=${encodeURIComponent(sub.unsubscribe_token)}`;
-  const rows = notices
-    .map((n) => {
-      const parcels = (n.parcel_numbers ?? []).join(", ") || "—";
-      const type = n.notice_type ?? "—";
-      const pubDate = n.publication_date
-        ? new Date(n.publication_date).toLocaleDateString("hu-HU")
-        : "—";
-      const deadline = n.deadline_date
-        ? new Date(n.deadline_date).toLocaleDateString("hu-HU")
-        : "—";
-      const link = n.original_detail_url
-        ? `<a href="${htmlEscape(n.original_detail_url)}" style="color:#0a6;">Hirdetmény megnyitása</a>`
-        : "—";
-      return `<tr>
-        <td style="padding:8px;border-bottom:1px solid #eee;font-size:13px;">${pubDate}</td>
-        <td style="padding:8px;border-bottom:1px solid #eee;font-size:13px;">${deadline}</td>
-        <td style="padding:8px;border-bottom:1px solid #eee;font-size:13px;">${htmlEscape(parcels)}</td>
-        <td style="padding:8px;border-bottom:1px solid #eee;font-size:13px;">${htmlEscape(type)}</td>
-        <td style="padding:8px;border-bottom:1px solid #eee;font-size:13px;">${link}</td>
-      </tr>`;
-    })
-    .join("");
-
-  const html = `<!doctype html>
-<html><body style="font-family:Arial,sans-serif;background:#fff;color:#222;padding:24px;">
-  <h2 style="font-family:Georgia,serif;">Heti kifüggesztések – ${htmlEscape(sub.settlement_clean)}</h2>
-  <p style="color:#555;">Az alábbi listában az ${htmlEscape(sub.settlement_clean)} településen aktuálisan kifüggesztett termőföld hirdetmények szerepelnek (${notices.length} db).</p>
-  ${
-    notices.length === 0
-      ? `<p style="padding:12px;background:#f5f5f5;border-radius:6px;">Ezen a héten nincs aktuális kifüggesztés ezen a településen.</p>`
-      : `<table style="border-collapse:collapse;width:100%;margin-top:12px;">
-        <thead><tr style="background:#f7f7f7;text-align:left;">
-          <th style="padding:8px;font-size:12px;">Közzététel</th>
-          <th style="padding:8px;font-size:12px;">Határidő</th>
-          <th style="padding:8px;font-size:12px;">Hrsz.</th>
-          <th style="padding:8px;font-size:12px;">Típus</th>
-          <th style="padding:8px;font-size:12px;">Link</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-       </table>`
-  }
-  <p style="margin-top:24px;color:#888;font-size:12px;">
-    Előfizetésed lejár: ${new Date(sub.expires_at).toLocaleDateString("hu-HU")}.<br/>
-    <a href="${unsubUrl}" style="color:#888;">Leiratkozás</a>
-  </p>
-</body></html>`;
-
-  const text =
-    `Heti kifüggesztések – ${sub.settlement_clean}\n\n${notices.length} aktuális kifüggesztés.\n\n` +
-    notices
-      .map(
-        (n) =>
-          `- közzététel: ${n.publication_date ?? ""}; határidő: ${n.deadline_date ?? ""}; hrsz.: ${(n.parcel_numbers ?? []).join(", ")}; ${n.notice_type ?? ""}; ${n.original_detail_url ?? ""}`,
-      )
-      .join("\n") +
-    `\n\nLeiratkozás: ${unsubUrl}`;
-
-  return { subject, html, text };
-}
-
-async function sendResendEmail(
-  to: string,
-  subject: string,
-  html: string,
-  text: string,
-): Promise<void> {
-  const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-  const RESEND_API_KEY = process.env.RESEND_API_KEY;
-  if (!LOVABLE_API_KEY || !RESEND_API_KEY)
-    throw new Error("Missing LOVABLE_API_KEY or RESEND_API_KEY");
-  const from = process.env.NOTICES_FROM_EMAIL ?? "Dr Föld értesítő <hello@drfold.hu>";
-  const res = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      "X-Connection-Api-Key": RESEND_API_KEY,
-    },
-    body: JSON.stringify({ from, to: [to], subject, html, text }),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Resend send failed [${res.status}]: ${body}`);
+function fmtDate(d: string | null): string {
+  if (!d) return "—";
+  try {
+    return new Date(d).toLocaleDateString("hu-HU");
+  } catch {
+    return d;
   }
 }
 
@@ -178,8 +87,24 @@ export async function sendWeeklyDigest(): Promise<{
   for (const sub of list) {
     const notices = buckets.get(sub.settlement_clean) ?? [];
     try {
-      const { subject, html, text } = renderEmail(sub, notices);
-      await sendResendEmail(sub.email, subject, html, text);
+      const result = await enqueueTransactionalEmail({
+        templateName: "weekly-digest",
+        recipientEmail: sub.email,
+        idempotencyKey: `weekly-digest-${sub.id}-${new Date().toISOString().slice(0, 10)}`,
+        fromLabel: "Dr Föld értesítő",
+        templateData: {
+          settlement: sub.settlement_clean,
+          expiresAt: fmtDate(sub.expires_at),
+          notices: notices.map((n) => ({
+            parcels: (n.parcel_numbers ?? []).join(", ") || "—",
+            type: n.notice_type ?? "—",
+            pubDate: fmtDate(n.publication_date),
+            deadline: fmtDate(n.deadline_date),
+            url: n.original_detail_url ?? "",
+          })),
+        },
+      });
+      if (result.status === "error") throw new Error(result.error);
       await supabaseAdmin
         .from("notice_subscriptions")
         .update({ last_sent_at: new Date().toISOString() })
