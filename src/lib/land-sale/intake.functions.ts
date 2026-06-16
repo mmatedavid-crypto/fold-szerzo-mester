@@ -2,13 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { company } from "@/lib/company";
 
-const ROLE_LABELS: Record<string, string> = {
-  seller: "Eladó",
-  buyer: "Vevő",
-  both: "Mindkettő (közvetítés)",
-  other: "Egyéb",
-};
-
 const schema = z.object({
   fullName: z.string().trim().min(2, "Add meg a teljes neved.").max(120),
   email: z.string().trim().email("Érvényes e-mail címet adj meg.").max(255),
