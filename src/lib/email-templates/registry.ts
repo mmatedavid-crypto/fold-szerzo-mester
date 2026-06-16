@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import { template as weeklyDigest } from './weekly-digest'
 import { template as legalSourceFreshness } from './legal-source-freshness'
+import { template as landSaleIntake } from './land-sale-intake'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -22,4 +23,5 @@ export interface TemplateEntry {
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'weekly-digest': weeklyDigest,
   'legal-source-freshness': legalSourceFreshness,
+  'land-sale-intake': landSaleIntake,
 }

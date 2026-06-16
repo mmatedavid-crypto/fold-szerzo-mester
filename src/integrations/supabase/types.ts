@@ -560,6 +560,75 @@ export type Database = {
         }
         Relationships: []
       }
+      land_sale_intakes: {
+        Row: {
+          area_ha: number | null
+          assigned_lawyer_email: string | null
+          counterparty_contact: string | null
+          counterparty_name: string | null
+          created_at: string
+          cultivation_branch: string | null
+          email: string
+          full_name: string
+          id: string
+          notes: string | null
+          parcel_numbers: string | null
+          phone: string | null
+          preferred_contact: string | null
+          price_huf: number | null
+          role_in_deal: string
+          settlement: string | null
+          source_ip: string | null
+          status: string
+          submitter_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          area_ha?: number | null
+          assigned_lawyer_email?: string | null
+          counterparty_contact?: string | null
+          counterparty_name?: string | null
+          created_at?: string
+          cultivation_branch?: string | null
+          email: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          parcel_numbers?: string | null
+          phone?: string | null
+          preferred_contact?: string | null
+          price_huf?: number | null
+          role_in_deal: string
+          settlement?: string | null
+          source_ip?: string | null
+          status?: string
+          submitter_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area_ha?: number | null
+          assigned_lawyer_email?: string | null
+          counterparty_contact?: string | null
+          counterparty_name?: string | null
+          created_at?: string
+          cultivation_branch?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          parcel_numbers?: string | null
+          phone?: string | null
+          preferred_contact?: string | null
+          price_huf?: number | null
+          role_in_deal?: string
+          settlement?: string | null
+          source_ip?: string | null
+          status?: string
+          submitter_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       legal_template_versions: {
         Row: {
           created_at: string
