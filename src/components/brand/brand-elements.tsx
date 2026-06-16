@@ -62,14 +62,17 @@ export function SelectableChip({
   children,
   selected,
   className,
+  onClick,
 }: {
   children: ReactNode;
   selected?: boolean;
   className?: string;
+  onClick?: () => void;
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className={cn(
         "inline-flex min-h-10 items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-semibold transition-colors",
         selected
