@@ -3,6 +3,8 @@ export const company = {
   domain: "drfold.hu",
   websiteUrl: "https://drfold.hu",
   contactEmail: "hello@drfold.hu",
+  lawyerEmail: "szarkaadam@szarkaadam.hu",
+  lawyerName: "Dr. Szarka Ádám",
   legalName: "Precíziós Agrokémia Zrt.",
   fullLegalName: "Precíziós Agrokémia Zártkörűen Működő Részvénytársaság",
   registeredSeat: "2636 Tésa, Ady Endre utca 11.",
