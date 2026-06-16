@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { enqueueTransactionalEmail } from "@/lib/email/enqueue.server";
 import { company } from "@/lib/company";
 
 const ROLE_LABELS: Record<string, string> = {
@@ -68,38 +67,7 @@ export const submitLandSaleIntake = createServerFn({ method: "POST" })
       throw new Error(error?.message ?? "Nem sikerült rögzíteni a megkeresést.");
     }
 
-    const fmtPrice = (n: number | null) =>
-      n === null ? undefined : n.toLocaleString("hu-HU");
-    const fmtArea = (n: number | null) =>
-      n === null ? undefined : n.toLocaleString("hu-HU");
-
-    await enqueueTransactionalEmail({
-      templateName: "land-sale-intake",
-      recipientEmail: company.lawyerEmail,
-      idempotencyKey: `land-sale-intake:${inserted.id}`,
-      fromLabel: "Dr Föld űrlap",
-      templateData: {
-        fullName: data.fullName,
-        email: data.email,
-        phone: cleanStr(data.phone as string | undefined) ?? undefined,
-        roleLabel: ROLE_LABELS[data.roleInDeal] ?? data.roleInDeal,
-        settlement: cleanStr(data.settlement as string | undefined) ?? undefined,
-        parcelNumbers: cleanStr(data.parcelNumbers as string | undefined) ?? undefined,
-        areaHa: fmtArea(cleanNum(data.areaHa as number | "" | undefined)),
-        cultivationBranch:
-          cleanStr(data.cultivationBranch as string | undefined) ?? undefined,
-        priceHuf: fmtPrice(cleanNum(data.priceHuf as number | "" | undefined)),
-        counterpartyName:
-          cleanStr(data.counterpartyName as string | undefined) ?? undefined,
-        counterpartyContact:
-          cleanStr(data.counterpartyContact as string | undefined) ?? undefined,
-        preferredContact:
-          cleanStr(data.preferredContact as string | undefined) ?? undefined,
-        notes: cleanStr(data.notes as string | undefined) ?? undefined,
-        intakeId: inserted.id,
-        submittedAt: new Date(inserted.created_at).toLocaleString("hu-HU"),
-      },
-    });
-
+    // Jutalékos modell miatt egyelőre NEM küldünk automatikus értesítőt az ügyvédnek.
+    // A megkeresés rögzítve van az adatbázisban, az admin felületről lehet kezelni.
     return { ok: true as const, intakeId: inserted.id };
   });
