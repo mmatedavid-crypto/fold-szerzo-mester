@@ -25,6 +25,19 @@ export function authErrorMessage(error: unknown): string {
     return "Túl sok próbálkozás történt rövid idő alatt. Várj egy kicsit, majd próbáld újra.";
   }
 
+  if (
+    message.includes("weak_password") ||
+    message.includes("weak password") ||
+    message.includes("pwned") ||
+    (message.includes("password") && (message.includes("known") || message.includes("guess")))
+  ) {
+    return "Ez a jelszó szerepel ismert adatszivárgásokban, ezért nem fogadható el. Válassz egy egyedibb, hosszabb jelszót (legalább 10 karakter, kis- és nagybetű, szám, jel).";
+  }
+
+  if (message.includes("invalid") && message.includes("email")) {
+    return "Az e-mail cím formátuma nem megfelelő. Nézd át, majd próbáld újra.";
+  }
+
   return "Most nem sikerült a fiókművelet. Kérjük, próbáld újra pár perc múlva.";
 }
 
