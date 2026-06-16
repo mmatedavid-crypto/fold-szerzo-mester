@@ -8,11 +8,28 @@ import { Menu, X } from "lucide-react";
 export function SiteHeader() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLawyer, setIsLawyer] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
+    const loadRoles = async (userId: string | undefined) => {
+      if (!userId) {
+        setIsLawyer(false);
+        return;
+      }
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .in("role", ["lawyer", "admin"]);
+      setIsLawyer(!!(data && data.length > 0));
+    };
+    supabase.auth.getSession().then(({ data }) => {
+      setAuthed(!!data.session);
+      loadRoles(data.session?.user.id);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setAuthed(!!session);
+      loadRoles(session?.user.id);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -43,6 +60,14 @@ export function SiteHeader() {
           <Link to="/fold-adas-vetel" className="hover:text-df-green">
             Adásvétel
           </Link>
+          {isLawyer && (
+            <Link
+              to="/admin/klauzulak"
+              className="rounded-md border border-df-green/40 bg-df-green/10 px-3 py-1 text-df-green hover:bg-df-green/15"
+            >
+              Ügyvéd admin
+            </Link>
+          )}
         </nav>
         <div className="flex items-center gap-2">
           {authed ? (
@@ -95,6 +120,15 @@ export function SiteHeader() {
             <Link to="/fold-adas-vetel" onClick={() => setMenuOpen(false)}>
               Adásvétel
             </Link>
+            {isLawyer && (
+              <Link
+                to="/admin/klauzulak"
+                onClick={() => setMenuOpen(false)}
+                className="text-df-green"
+              >
+                Ügyvéd admin
+              </Link>
+            )}
             <Link to={authed ? "/dashboard" : "/belepes"} onClick={() => setMenuOpen(false)}>
               {authed ? "Műhely" : "Belépés"}
             </Link>
