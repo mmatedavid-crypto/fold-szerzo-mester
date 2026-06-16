@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -157,20 +158,91 @@ export function FeatureCard(props: Parameters<typeof ServiceCard>[0] & { kicker?
 }
 
 export function RankPreview() {
-  const chips = [
-    ["Termőföld", true],
-    ["Erdő", false],
-    ["Gyep", false],
-    ["Kivett terület", false],
-    ["Helyben lakó szomszéd", true],
-    ["Helyi gazdálkodó", false],
-    ["Földműves végzettség", false],
-    ["Fiatal gazda", false],
-    ["Bio / öko", true],
-    ["Állattartó", false],
-    ["Integrátor", false],
-    ["Egyéb körülmény", false],
-  ] as const;
+  type ChipKind = "landType" | "rank";
+  type Chip = { id: string; label: string; kind: ChipKind; weight: number };
+  const LAND_TYPES: Chip[] = [
+    { id: "szanto", label: "Termőföld", kind: "landType", weight: 0 },
+    { id: "erdo", label: "Erdő", kind: "landType", weight: 0 },
+    { id: "gyep", label: "Gyep", kind: "landType", weight: 0 },
+    { id: "kivett", label: "Kivett terület", kind: "landType", weight: 0 },
+  ];
+  const RANK_CHIPS: Chip[] = [
+    { id: "szomszed", label: "Helyben lakó szomszéd", kind: "rank", weight: 3 },
+    { id: "helyi", label: "Helyi gazdálkodó", kind: "rank", weight: 2 },
+    { id: "vegzettseg", label: "Földműves végzettség", kind: "rank", weight: 1 },
+    { id: "fiatal", label: "Fiatal gazda", kind: "rank", weight: 1 },
+    { id: "bio", label: "Bio / öko", kind: "rank", weight: 1 },
+    { id: "allat", label: "Állattartó", kind: "rank", weight: 1 },
+    { id: "integrator", label: "Integrátor", kind: "rank", weight: 1 },
+    { id: "egyeb", label: "Egyéb körülmény", kind: "rank", weight: 0 },
+  ];
+  const allChips = [...LAND_TYPES, ...RANK_CHIPS];
+
+  const [selected, setSelected] = useState<Set<string>>(
+    () => new Set(["szanto", "szomszed", "bio"]),
+  );
+
+  const toggle = (chip: Chip) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (chip.kind === "landType") {
+        const hasIt = next.has(chip.id);
+        LAND_TYPES.forEach((c) => next.delete(c.id));
+        if (!hasIt) next.add(chip.id);
+      } else if (next.has(chip.id)) {
+        next.delete(chip.id);
+      } else {
+        next.add(chip.id);
+      }
+      return next;
+    });
+  };
+
+  const result = useMemo(() => {
+    const landType = LAND_TYPES.find((c) => selected.has(c.id));
+    if (landType?.id === "kivett") {
+      return {
+        headline: "Nem haszonbérelhető föld.",
+        sub: "Kivett területre a haszonbérleti rangsor nem értelmezhető.",
+        rank: "—",
+        tone: "muted" as const,
+      };
+    }
+    const score = RANK_CHIPS.reduce(
+      (sum, c) => (selected.has(c.id) ? sum + c.weight : sum),
+      0,
+    );
+    if (score >= 5) {
+      return {
+        headline: "Nagy eséllyel az élmezőnyben vagy.",
+        sub: "Több erős jogcímed is van — érdemes elfogadó nyilatkozatot készíteni.",
+        rank: "1–2. hely",
+        tone: "strong" as const,
+      };
+    }
+    if (score >= 3) {
+      return {
+        headline: "Jó eséllyel előrébb állhatsz.",
+        sub: "Van legalább egy erős jogcímed, érdemes a teljes kalkulátort lefuttatni.",
+        rank: "2–3. hely",
+        tone: "ok" as const,
+      };
+    }
+    if (score >= 1) {
+      return {
+        headline: "Lehet esélyed, de szoros lehet.",
+        sub: "Az igazolható jogcímeket érdemes előkészíteni.",
+        rank: "3–5. hely",
+        tone: "weak" as const,
+      };
+    }
+    return {
+      headline: "Egyelőre nincs erős jogcím.",
+      sub: "Válassz ki minden olyan körülményt, ami rád igaz.",
+      rank: "Sorrend végén",
+      tone: "muted" as const,
+    };
+  }, [selected]);
 
   return (
     <section className="container mx-auto px-4 py-10">
@@ -179,21 +251,48 @@ export function RankPreview() {
           <h2 className="font-brand text-3xl font-bold text-df-ink">
             Ranghely kalkulátor – előnézet
           </h2>
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {chips.map(([label, selected]) => (
-              <SelectableChip key={label} selected={selected}>
-                {label}
-              </SelectableChip>
-            ))}
+          <p className="mt-2 text-sm text-df-gray">
+            Kattints a rád igaz körülményekre — az eredmény oldalt azonnal frissül.
+          </p>
+          <div className="mt-6">
+            <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-df-gray">
+              Földtípus
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {LAND_TYPES.map((chip) => (
+                <SelectableChip
+                  key={chip.id}
+                  selected={selected.has(chip.id)}
+                  onClick={() => toggle(chip)}
+                >
+                  {chip.label}
+                </SelectableChip>
+              ))}
+            </div>
+            <div className="mt-5 text-[11px] font-bold uppercase tracking-[0.18em] text-df-gray">
+              Rád igaz jogcímek
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {RANK_CHIPS.map((chip) => (
+                <SelectableChip
+                  key={chip.id}
+                  selected={selected.has(chip.id)}
+                  onClick={() => toggle(chip)}
+                >
+                  {chip.label}
+                </SelectableChip>
+              ))}
+            </div>
           </div>
         </div>
         <div className="df-dark-card rounded-lg p-7 text-df-card">
           <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-df-yellow">
             Előzetes eredmény
           </div>
-          <div className="mt-4 font-brand text-2xl font-bold">Nagy eséllyel előrébb állsz.</div>
+          <div className="mt-4 font-brand text-2xl font-bold">{result.headline}</div>
+          <div className="mt-3 text-sm text-df-cream">{result.sub}</div>
           <div className="mt-5 text-sm text-df-cream">Becsült rangsor pozíció</div>
-          <div className="mt-1 font-brand text-4xl font-bold text-df-yellow">2–3. hely</div>
+          <div className="mt-1 font-brand text-4xl font-bold text-df-yellow">{result.rank}</div>
           <BrandButton asChild variant="secondary" className="mt-7 w-full bg-df-card">
             <Link to="/ranghely-kalkulator">
               Teljes kalkulátor megnyitása <ArrowRight className="h-4 w-4" />
