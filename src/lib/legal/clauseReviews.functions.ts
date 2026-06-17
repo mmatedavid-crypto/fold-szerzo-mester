@@ -15,44 +15,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { CLAUSE_LIBRARY } from "./clauses";
 import { LEASE_CLAUSE_VERSION } from "./ruleset";
 
-export const REVIEW_CHECKLIST_QUESTIONS = [
-  {
-    id: "sources_current",
-    label:
-      "A klauzulában hivatkozott jogszabályhelyek (§-ok) a jelenleg hatályos szöveget tükrözik?",
-  },
-  {
-    id: "text_accurate",
-    label:
-      "A klauzula szövege jogilag pontosan tükrözi az alapul vett jogszabályi előírást?",
-  },
-  {
-    id: "no_legal_risk",
-    label:
-      "A klauzula nem tartalmaz olyan megfogalmazást, ami jogi kockázatot vagy értelmezési vitát okozhat?",
-  },
-  {
-    id: "completeness",
-    label:
-      "A klauzula minden szükséges adatot/feltételt megkövetel (nem hagy joghézagot)?",
-  },
-  {
-    id: "form_signable",
-    label:
-      "A klauzula formailag beilleszthető egy két tanúval aláírható, teljes bizonyító erejű magánokiratba?",
-  },
-] as const;
-
-export type ReviewChecklistAnswer = "yes" | "no";
-export type ReviewChecklist = Record<string, ReviewChecklistAnswer>;
-
 export interface ClauseReviewRow {
   id: string;
   clause_id: string;
   clause_version: string;
-  decision: "approved" | "rejected" | "needs_changes";
+  decision: "approved" | "rejected";
   risk_level: "low" | "medium" | "high";
-  checklist: ReviewChecklist;
   comment: string | null;
   reviewer_name: string | null;
   reviewed_at: string;
@@ -108,10 +76,11 @@ export const listClausesForReview = createServerFn({ method: "GET" })
 
 const submitInput = z.object({
   clauseId: z.string().min(1).max(100),
-  decision: z.enum(["approved", "rejected", "needs_changes"]),
-  riskLevel: z.enum(["low", "medium", "high"]),
-  checklist: z.record(z.string().min(1).max(50), z.enum(["yes", "no"])),
+  decision: z.enum(["approved", "rejected"]),
   comment: z.string().max(2000).optional().nullable(),
+}).refine((v) => v.decision === "approved" || (v.comment && v.comment.trim().length > 0), {
+  message: "Elutasításhoz rövid indoklás szükséges.",
+  path: ["comment"],
 });
 
 export const submitClauseReview = createServerFn({ method: "POST" })
@@ -140,8 +109,8 @@ export const submitClauseReview = createServerFn({ method: "POST" })
         clause_id: data.clauseId,
         clause_version: LEASE_CLAUSE_VERSION,
         decision: data.decision,
-        risk_level: data.riskLevel,
-        checklist: data.checklist,
+        risk_level: "low",
+        checklist: {},
         comment: data.comment ?? null,
         reviewer_id: userId,
         reviewer_name: reviewerName,
