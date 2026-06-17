@@ -90,7 +90,7 @@ const Email = ({ checkedAt = "", items = [] }: Props) => {
           <Hr style={{ margin: "24px 0", borderColor: "#eee" }} />
           <Text style={{ color: "#666", fontSize: "12px" }}>
             Részletek és lektorálás:{" "}
-            <Link href="https://drfold.hu/admin/klauzulak">drfold.hu/admin/klauzulak</Link>
+            <Link href="https://drfold.hu/klauzula-jovahagyasok">drfold.hu/klauzula-jovahagyasok</Link>
           </Text>
         </Container>
       </Body>
