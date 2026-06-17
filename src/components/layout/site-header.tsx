@@ -70,6 +70,15 @@ export function SiteHeader() {
           )}
         </nav>
         <div className="flex items-center gap-2">
+          {isLawyer && (
+            <Button
+              asChild
+              size="sm"
+              className="bg-df-green text-white hover:bg-df-green/90"
+            >
+              <Link to="/admin/klauzulak">Ügyvéd admin</Link>
+            </Button>
+          )}
           {authed ? (
             <Button
               asChild
