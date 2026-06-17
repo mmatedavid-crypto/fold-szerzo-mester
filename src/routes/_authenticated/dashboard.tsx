@@ -32,6 +32,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GdprSection } from "@/components/dashboard/gdpr-section";
 import { contractFlowErrorMessage } from "@/lib/user-facing-errors";
+import { useEffect, useState } from "react";
+import { listClausesForReview } from "@/lib/legal/clauseReviews.functions";
+import { ScrollText } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -53,6 +56,34 @@ function Dashboard() {
   const quota = useQuery({ queryKey: ["my-quota"], queryFn: () => getMyQuota() });
   const drafts = useQuery({ queryKey: ["my-drafts"], queryFn: () => listDrafts() });
   const dl = useServerFn(getDownloadUrl);
+  const listClauses = useServerFn(listClausesForReview);
+
+  const [isLawyer, setIsLawyer] = useState(false);
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      const uid = data.session?.user.id;
+      if (!uid) return;
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid)
+        .in("role", ["lawyer", "admin"]);
+      if (!cancel) setIsLawyer(!!(roles && roles.length > 0));
+    })();
+    return () => {
+      cancel = true;
+    };
+  }, []);
+
+  const lawyerClauses = useQuery({
+    queryKey: ["lawyer-pending-clauses"],
+    queryFn: () => listClauses(),
+    enabled: isLawyer,
+  });
+  const pendingCount =
+    lawyerClauses.data?.filter((c) => !c.isApproved).length ?? 0;
 
   async function onDownload(id: string) {
     try {
@@ -101,6 +132,36 @@ function Dashboard() {
             </Button>
           </div>
         </div>
+
+        {isLawyer && (
+          <Card className="mt-6 border-df-green/40 bg-df-green/5 p-5 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="rounded-md bg-df-green/15 p-2 text-df-green">
+                  <ScrollText className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="font-brand text-lg font-bold text-df-green">
+                    Klauzula jóváhagyások (ügyvédi nézet)
+                  </div>
+                  <p className="text-sm text-df-gray">
+                    {lawyerClauses.isLoading
+                      ? "Klauzulák betöltése…"
+                      : pendingCount > 0
+                        ? `${pendingCount} klauzula vár lektorálásra a jelenlegi verzióban.`
+                        : "Minden klauzula jóváhagyva a jelenlegi verzióban."}
+                  </p>
+                </div>
+              </div>
+              <Button asChild className="bg-df-green text-white hover:bg-[#173B2A]">
+                <Link to="/admin/klauzulak">
+                  Megnyitom a jóváhagyásokat
+                  {pendingCount > 0 ? ` (${pendingCount})` : ""}
+                </Link>
+              </Button>
+            </div>
+          </Card>
+        )}
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <MetricCard
