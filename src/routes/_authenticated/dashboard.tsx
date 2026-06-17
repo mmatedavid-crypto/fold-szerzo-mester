@@ -154,7 +154,7 @@ function Dashboard() {
                 </div>
               </div>
               <Button asChild className="bg-df-green text-white hover:bg-[#173B2A]">
-                <Link to="/admin/klauzulak">
+                <Link to="/klauzula-jovahagyasok">
                   Megnyitom a jóváhagyásokat
                   {pendingCount > 0 ? ` (${pendingCount})` : ""}
                 </Link>
