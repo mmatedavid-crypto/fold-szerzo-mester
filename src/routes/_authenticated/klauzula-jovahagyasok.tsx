@@ -46,7 +46,7 @@ function StatusBadge({ summary }: { summary: ClauseReviewSummary }) {
     return <Badge variant="outline" className="gap-1"><Clock className="h-3 w-3" /> Jóváhagyandó</Badge>;
   }
   if (summary.latestReview.decision === "approved") {
-    return <Badge className="gap-1 bg-df-green hover:bg-df-green"><CheckCircle2 className="h-3 w-3" /> Jóváhagyva</Badge>;
+    return <Badge className="gap-1 bg-df-green text-df-card hover:bg-df-green"><CheckCircle2 className="h-3 w-3" /> Jóváhagyva</Badge>;
   }
   if (summary.latestReview.decision === "rejected") {
     return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" /> Elutasítva</Badge>;
@@ -256,7 +256,7 @@ function ClauseApprovalsPage() {
                     </div>
                   )}
                 </div>
-                <Button className="bg-df-green text-white hover:bg-[#173B2A]" onClick={() => setActive(clause)}>
+                <Button className="bg-df-green text-df-card hover:bg-primary" onClick={() => setActive(clause)}>
                   Lektorálás
                 </Button>
               </div>
