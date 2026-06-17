@@ -62,7 +62,7 @@ export function SiteHeader() {
           </Link>
           {isLawyer && (
             <Link
-              to="/admin/klauzulak"
+              to="/klauzula-jovahagyasok"
               className="rounded-md border border-df-green/40 bg-df-green/10 px-3 py-1 text-df-green hover:bg-df-green/15"
             >
               Klauzula jóváhagyások
@@ -76,7 +76,7 @@ export function SiteHeader() {
               size="sm"
               className="bg-df-green text-white hover:bg-df-green/90"
             >
-              <Link to="/admin/klauzulak">Klauzula jóváhagyások</Link>
+              <Link to="/klauzula-jovahagyasok">Klauzula jóváhagyások</Link>
             </Button>
           )}
           {authed ? (
@@ -131,7 +131,7 @@ export function SiteHeader() {
             </Link>
             {isLawyer && (
               <Link
-                to="/admin/klauzulak"
+                to="/klauzula-jovahagyasok"
                 onClick={() => setMenuOpen(false)}
                 className="text-df-green"
               >

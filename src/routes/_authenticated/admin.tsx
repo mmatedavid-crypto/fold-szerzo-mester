@@ -154,7 +154,7 @@ function AdminPage() {
               </p>
             </div>
             <Button asChild>
-              <Link to="/admin/klauzulak">Lektorálás megnyitása</Link>
+              <Link to="/klauzula-jovahagyasok">Lektorálás megnyitása</Link>
             </Button>
           </div>
         </Card>

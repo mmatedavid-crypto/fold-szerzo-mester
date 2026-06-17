@@ -28,6 +28,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as KifuggesztesekIndexRouteImport } from './routes/kifuggesztesek.index'
 import { Route as KifuggesztesekNoticeIdRouteImport } from './routes/kifuggesztesek.$noticeId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as AuthenticatedKlauzulaJovahagyasokRouteImport } from './routes/_authenticated/klauzula-jovahagyasok'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -140,6 +141,12 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedKlauzulaJovahagyasokRoute =
+  AuthenticatedKlauzulaJovahagyasokRouteImport.update({
+    id: '/klauzula-jovahagyasok',
+    path: '/klauzula-jovahagyasok',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -258,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/klauzula-jovahagyasok': typeof AuthenticatedKlauzulaJovahagyasokRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
@@ -295,6 +303,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/klauzula-jovahagyasok': typeof AuthenticatedKlauzulaJovahagyasokRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek': typeof KifuggesztesekIndexRoute
@@ -334,6 +343,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/klauzula-jovahagyasok': typeof AuthenticatedKlauzulaJovahagyasokRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
@@ -373,6 +383,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/admin'
     | '/dashboard'
+    | '/klauzula-jovahagyasok'
     | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek/'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/admin'
     | '/dashboard'
+    | '/klauzula-jovahagyasok'
     | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek'
@@ -448,6 +460,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/klauzula-jovahagyasok'
     | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek/'
@@ -634,6 +647,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/klauzula-jovahagyasok': {
+      id: '/_authenticated/klauzula-jovahagyasok'
+      path: '/klauzula-jovahagyasok'
+      fullPath: '/klauzula-jovahagyasok'
+      preLoaderRoute: typeof AuthenticatedKlauzulaJovahagyasokRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -770,6 +790,7 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedKlauzulaJovahagyasokRoute: typeof AuthenticatedKlauzulaJovahagyasokRoute
   AuthenticatedSzerzodesUjRoute: typeof AuthenticatedSzerzodesUjRoute
   AuthenticatedSzerzodesIdEllenorzesRoute: typeof AuthenticatedSzerzodesIdEllenorzesRoute
   AuthenticatedSzerzodesIdFizetesRoute: typeof AuthenticatedSzerzodesIdFizetesRoute
@@ -780,6 +801,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedKlauzulaJovahagyasokRoute:
+    AuthenticatedKlauzulaJovahagyasokRoute,
   AuthenticatedSzerzodesUjRoute: AuthenticatedSzerzodesUjRoute,
   AuthenticatedSzerzodesIdEllenorzesRoute:
     AuthenticatedSzerzodesIdEllenorzesRoute,
