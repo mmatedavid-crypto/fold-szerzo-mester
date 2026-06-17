@@ -65,7 +65,7 @@ export function SiteHeader() {
               to="/admin/klauzulak"
               className="rounded-md border border-df-green/40 bg-df-green/10 px-3 py-1 text-df-green hover:bg-df-green/15"
             >
-              Ügyvéd admin
+              Klauzula jóváhagyások
             </Link>
           )}
         </nav>
@@ -76,7 +76,7 @@ export function SiteHeader() {
               size="sm"
               className="bg-df-green text-white hover:bg-df-green/90"
             >
-              <Link to="/admin/klauzulak">Ügyvéd admin</Link>
+              <Link to="/admin/klauzulak">Klauzula jóváhagyások</Link>
             </Button>
           )}
           {authed ? (
@@ -135,7 +135,7 @@ export function SiteHeader() {
                 onClick={() => setMenuOpen(false)}
                 className="text-df-green"
               >
-                Ügyvéd admin
+                Klauzula jóváhagyások
               </Link>
             )}
             <Link to={authed ? "/dashboard" : "/belepes"} onClick={() => setMenuOpen(false)}>
