@@ -210,9 +210,14 @@ function ClauseApprovalsPage() {
               Elutasítás esetén rövid indoklás szükséges, amely alapján a rendszer javítást tud készíteni.
             </p>
           </div>
-          <Button asChild variant="outline" className="border-df-green text-df-green">
-            <Link to="/dashboard">Vissza a műhelybe</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" className="border-df-green text-df-green">
+              <Link to="/klauzula-szerkesztes">Klauzula szerkesztő</Link>
+            </Button>
+            <Button asChild variant="outline" className="border-df-green text-df-green">
+              <Link to="/dashboard">Vissza a műhelybe</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-4">

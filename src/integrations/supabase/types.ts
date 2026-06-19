@@ -176,6 +176,39 @@ export type Database = {
           },
         ]
       }
+      clause_overrides: {
+        Row: {
+          body_template: string | null
+          clause_id: string
+          created_at: string
+          source_refs: Json
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+          updated_by_name: string | null
+        }
+        Insert: {
+          body_template?: string | null
+          clause_id: string
+          created_at?: string
+          source_refs?: Json
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          updated_by_name?: string | null
+        }
+        Update: {
+          body_template?: string | null
+          clause_id?: string
+          created_at?: string
+          source_refs?: Json
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          updated_by_name?: string | null
+        }
+        Relationships: []
+      }
       clause_reviews: {
         Row: {
           checklist: Json
