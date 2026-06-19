@@ -28,6 +28,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as KifuggesztesekIndexRouteImport } from './routes/kifuggesztesek.index'
 import { Route as KifuggesztesekNoticeIdRouteImport } from './routes/kifuggesztesek.$noticeId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as AuthenticatedKlauzulaSzerkesztesRouteImport } from './routes/_authenticated/klauzula-szerkesztes'
 import { Route as AuthenticatedKlauzulaJovahagyasokRouteImport } from './routes/_authenticated/klauzula-jovahagyasok'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -141,6 +142,12 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedKlauzulaSzerkesztesRoute =
+  AuthenticatedKlauzulaSzerkesztesRouteImport.update({
+    id: '/klauzula-szerkesztes',
+    path: '/klauzula-szerkesztes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedKlauzulaJovahagyasokRoute =
   AuthenticatedKlauzulaJovahagyasokRouteImport.update({
     id: '/klauzula-jovahagyasok',
@@ -266,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/klauzula-jovahagyasok': typeof AuthenticatedKlauzulaJovahagyasokRoute
+  '/klauzula-szerkesztes': typeof AuthenticatedKlauzulaSzerkesztesRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
@@ -304,6 +312,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/klauzula-jovahagyasok': typeof AuthenticatedKlauzulaJovahagyasokRoute
+  '/klauzula-szerkesztes': typeof AuthenticatedKlauzulaSzerkesztesRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek': typeof KifuggesztesekIndexRoute
@@ -344,6 +353,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/klauzula-jovahagyasok': typeof AuthenticatedKlauzulaJovahagyasokRoute
+  '/_authenticated/klauzula-szerkesztes': typeof AuthenticatedKlauzulaSzerkesztesRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/kifuggesztesek/$noticeId': typeof KifuggesztesekNoticeIdRoute
   '/kifuggesztesek/': typeof KifuggesztesekIndexRoute
@@ -384,6 +394,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/klauzula-jovahagyasok'
+    | '/klauzula-szerkesztes'
     | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek/'
@@ -422,6 +433,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/klauzula-jovahagyasok'
+    | '/klauzula-szerkesztes'
     | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek'
@@ -461,6 +473,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/klauzula-jovahagyasok'
+    | '/_authenticated/klauzula-szerkesztes'
     | '/email/unsubscribe'
     | '/kifuggesztesek/$noticeId'
     | '/kifuggesztesek/'
@@ -647,6 +660,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/klauzula-szerkesztes': {
+      id: '/_authenticated/klauzula-szerkesztes'
+      path: '/klauzula-szerkesztes'
+      fullPath: '/klauzula-szerkesztes'
+      preLoaderRoute: typeof AuthenticatedKlauzulaSzerkesztesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/klauzula-jovahagyasok': {
       id: '/_authenticated/klauzula-jovahagyasok'
       path: '/klauzula-jovahagyasok'
@@ -791,6 +811,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedKlauzulaJovahagyasokRoute: typeof AuthenticatedKlauzulaJovahagyasokRoute
+  AuthenticatedKlauzulaSzerkesztesRoute: typeof AuthenticatedKlauzulaSzerkesztesRoute
   AuthenticatedSzerzodesUjRoute: typeof AuthenticatedSzerzodesUjRoute
   AuthenticatedSzerzodesIdEllenorzesRoute: typeof AuthenticatedSzerzodesIdEllenorzesRoute
   AuthenticatedSzerzodesIdFizetesRoute: typeof AuthenticatedSzerzodesIdFizetesRoute
@@ -803,6 +824,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedKlauzulaJovahagyasokRoute:
     AuthenticatedKlauzulaJovahagyasokRoute,
+  AuthenticatedKlauzulaSzerkesztesRoute: AuthenticatedKlauzulaSzerkesztesRoute,
   AuthenticatedSzerzodesUjRoute: AuthenticatedSzerzodesUjRoute,
   AuthenticatedSzerzodesIdEllenorzesRoute:
     AuthenticatedSzerzodesIdEllenorzesRoute,
