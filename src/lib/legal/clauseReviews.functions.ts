@@ -163,14 +163,30 @@ export async function getUnapprovedClauseIds(
     .eq("clause_version", LEASE_CLAUSE_VERSION);
   if (error) throw new Error(error.message);
   const latestApproved = new Set<string>();
+  const latestReviewedAt = new Map<string, string>();
   const seen = new Map<string, string>(); // clause_id -> max reviewed_at
   for (const row of (data ?? []) as Array<{ clause_id: string; decision: string; reviewed_at: string }>) {
     const prev = seen.get(row.clause_id);
     if (!prev || row.reviewed_at > prev) {
       seen.set(row.clause_id, row.reviewed_at);
+      latestReviewedAt.set(row.clause_id, row.reviewed_at);
       if (row.decision === "approved") latestApproved.add(row.clause_id);
       else latestApproved.delete(row.clause_id);
     }
   }
-  return requiredClauseIds.filter((id) => !latestApproved.has(id));
+  const { data: overrides } = await supabaseClient
+    .from("clause_overrides")
+    .select("clause_id, updated_at")
+    .in("clause_id", requiredClauseIds);
+  const overrideUpdatedAt = new Map<string, string>();
+  for (const row of (overrides ?? []) as Array<{ clause_id: string; updated_at: string }>) {
+    overrideUpdatedAt.set(row.clause_id, row.updated_at);
+  }
+  return requiredClauseIds.filter((id) => {
+    if (!latestApproved.has(id)) return true;
+    const ovAt = overrideUpdatedAt.get(id);
+    const revAt = latestReviewedAt.get(id);
+    if (ovAt && revAt && revAt < ovAt) return true; // override frissebb, mint a jóváhagyás
+    return false;
+  });
 }
