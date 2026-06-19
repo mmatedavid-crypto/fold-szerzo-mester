@@ -56,7 +56,9 @@ export const listClauseEditorEntries = createServerFn({ method: "GET" })
       .select("clause_id, title, body_template, source_refs, updated_by_name, updated_at");
     if (error) throw new Error(error.message);
     const byId = new Map<string, ClauseOverrideRow>();
-    for (const row of (data ?? []) as ClauseOverrideRow[]) byId.set(row.clause_id, row);
+    for (const row of (data ?? []) as unknown as ClauseOverrideRow[]) {
+      byId.set(row.clause_id, row);
+    }
 
     const entries: ClauseEditorEntry[] = CLAUSE_LIBRARY.map((c) => {
       const ov = byId.get(c.id) ?? null;
