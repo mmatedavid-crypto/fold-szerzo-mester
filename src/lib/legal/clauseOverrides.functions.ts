@@ -148,7 +148,7 @@ export const upsertClauseOverride = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
-    return row as ClauseOverrideRow;
+    return row as unknown as ClauseOverrideRow;
   });
 
 const resetInput = z.object({ clauseId: z.string().min(1).max(100) });
