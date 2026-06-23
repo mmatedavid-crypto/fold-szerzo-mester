@@ -48,7 +48,12 @@ export const Route = createFileRoute("/_authenticated/klauzula-szerkesztes")({
   component: ClauseEditorPage,
 });
 
-type DraftRef = { sourceId: string; section?: string };
+type DraftRef = {
+  sourceId: string;
+  section?: string;
+  quotedText?: string;
+  effectiveDate?: string;
+};
 
 function EditDialog({
   entry,
@@ -68,8 +73,13 @@ function EditDialog({
   const [body, setBody] = useState(entry.effective.bodyTemplate);
   const [refs, setRefs] = useState<DraftRef[]>(
     entry.effective.sourceRefs.length > 0
-      ? entry.effective.sourceRefs.map((r) => ({ sourceId: r.sourceId, section: r.section ?? "" }))
-      : [{ sourceId: sources[0]?.id ?? "", section: "" }],
+      ? entry.effective.sourceRefs.map((r) => ({
+          sourceId: r.sourceId,
+          section: r.section ?? "",
+          quotedText: r.quotedText ?? "",
+          effectiveDate: r.effectiveDate ?? "",
+        }))
+      : [{ sourceId: sources[0]?.id ?? "", section: "", quotedText: "", effectiveDate: "" }],
   );
 
   useEffect(() => {
@@ -78,8 +88,13 @@ function EditDialog({
       setBody(entry.effective.bodyTemplate);
       setRefs(
         entry.effective.sourceRefs.length > 0
-          ? entry.effective.sourceRefs.map((r) => ({ sourceId: r.sourceId, section: r.section ?? "" }))
-          : [{ sourceId: sources[0]?.id ?? "", section: "" }],
+          ? entry.effective.sourceRefs.map((r) => ({
+              sourceId: r.sourceId,
+              section: r.section ?? "",
+              quotedText: r.quotedText ?? "",
+              effectiveDate: r.effectiveDate ?? "",
+            }))
+          : [{ sourceId: sources[0]?.id ?? "", section: "", quotedText: "", effectiveDate: "" }],
       );
     }
   }, [open, entry, sources]);
@@ -92,7 +107,12 @@ function EditDialog({
           title: title.trim(),
           bodyTemplate: body.trim(),
           sourceRefs: refs
-            .map((r) => ({ sourceId: r.sourceId, section: r.section?.trim() || undefined }))
+            .map((r) => ({
+              sourceId: r.sourceId,
+              section: r.section?.trim() || undefined,
+              quotedText: r.quotedText?.trim() || undefined,
+              effectiveDate: r.effectiveDate?.trim() || undefined,
+            }))
             .filter((r) => r.sourceId),
         },
       }),
@@ -123,7 +143,6 @@ function EditDialog({
               id="clause-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              maxLength={200}
             />
           </div>
           <div className="space-y-1.5">
@@ -135,7 +154,6 @@ function EditDialog({
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={6}
-              maxLength={5000}
             />
           </div>
           <div className="space-y-2">
@@ -145,51 +163,87 @@ function EditDialog({
                 type="button"
                 size="sm"
                 variant="outline"
-                onClick={() => setRefs((r) => [...r, { sourceId: sources[0]?.id ?? "", section: "" }])}
+                onClick={() =>
+                  setRefs((r) => [
+                    ...r,
+                    { sourceId: sources[0]?.id ?? "", section: "", quotedText: "", effectiveDate: "" },
+                  ])
+                }
               >
                 <Plus className="mr-1 h-3 w-3" /> Hozzáadás
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-4">
               {refs.map((ref, i) => (
-                <div key={i} className="flex flex-wrap items-center gap-2">
-                  <div className="min-w-[200px] flex-1">
-                    <Select
-                      value={ref.sourceId}
-                      onValueChange={(v) =>
-                        setRefs((arr) => arr.map((r, idx) => (idx === i ? { ...r, sourceId: v } : r)))
+                <div key={i} className="space-y-2 rounded-md border border-df-border bg-df-cream/30 p-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="min-w-[200px] flex-1">
+                      <Select
+                        value={ref.sourceId}
+                        onValueChange={(v) =>
+                          setRefs((arr) => arr.map((r, idx) => (idx === i ? { ...r, sourceId: v } : r)))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Jogszabály" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sources.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.shortName} ({s.actNumber})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Input
+                      className="min-w-[140px] flex-1"
+                      placeholder="§ pl. 44. § (2) b)"
+                      value={ref.section ?? ""}
+                      onChange={(e) =>
+                        setRefs((arr) => arr.map((r, idx) => (idx === i ? { ...r, section: e.target.value } : r)))
                       }
+                    />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setRefs((arr) => arr.filter((_, idx) => idx !== i))}
+                      disabled={refs.length === 1}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Jogszabály" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sources.map((s) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.shortName} ({s.actNumber})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Input
-                    className="min-w-[140px] flex-1"
-                    placeholder="§ pl. 44. § (2)"
-                    value={ref.section ?? ""}
-                    onChange={(e) =>
-                      setRefs((arr) => arr.map((r, idx) => (idx === i ? { ...r, section: e.target.value } : r)))
-                    }
-                    maxLength={120}
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setRefs((arr) => arr.filter((_, idx) => idx !== i))}
-                    disabled={refs.length === 1}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-df-gray">
+                      Hatályos törvényszöveg (szó szerinti másolat, nincs karakterkorlát)
+                    </Label>
+                    <Textarea
+                      placeholder="Pl. „A haszonbérleti szerződés időtartama legalább egy év..."
+                      value={ref.quotedText ?? ""}
+                      onChange={(e) =>
+                        setRefs((arr) =>
+                          arr.map((r, idx) => (idx === i ? { ...r, quotedText: e.target.value } : r)),
+                        )
+                      }
+                      rows={4}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-df-gray">
+                      Hatályos állapot dátuma (opcionális)
+                    </Label>
+                    <Input
+                      type="date"
+                      className="max-w-[200px]"
+                      value={ref.effectiveDate ?? ""}
+                      onChange={(e) =>
+                        setRefs((arr) =>
+                          arr.map((r, idx) => (idx === i ? { ...r, effectiveDate: e.target.value } : r)),
+                        )
+                      }
+                    />
+                  </div>
                 </div>
               ))}
             </div>
