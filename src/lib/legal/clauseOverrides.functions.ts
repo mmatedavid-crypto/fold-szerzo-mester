@@ -30,6 +30,8 @@ export interface ClauseOverrideRow {
 
 export interface ClauseEditorEntry {
   clauseId: string;
+  kind: "pdf" | "audit";
+  sortOrder: number;
   defaults: {
     title: string;
     bodyTemplate: string;
@@ -75,7 +77,35 @@ export const listClauseEditorEntries = createServerFn({ method: "GET" })
       byId.set(row.clause_id, row);
     }
 
-    const entries: ClauseEditorEntry[] = CLAUSE_LIBRARY.map((c) => {
+    // 1) PDF-be kerülő klauzulák (clauses tábla) — ezeket a generátor TÉNYLEGESEN használja.
+    const { data: pdfRows } = await supabase
+      .from("clauses")
+      .select("clause_key, title, text, sort_order")
+      .eq("active", true)
+      .order("sort_order", { ascending: true });
+
+    const pdfEntries: ClauseEditorEntry[] = (
+      (pdfRows ?? []) as Array<{ clause_key: string; title: string; text: string; sort_order: number }>
+    ).map((c) => {
+      const ov = byId.get(c.clause_key) ?? null;
+      return {
+        clauseId: c.clause_key,
+        kind: "pdf" as const,
+        sortOrder: c.sort_order,
+        defaults: { title: c.title, bodyTemplate: c.text, sourceRefs: [] },
+        override: ov,
+        effective: {
+          title: ov?.title ?? c.title,
+          bodyTemplate: ov?.body_template ?? c.text,
+          sourceRefs:
+            ov && Array.isArray(ov.source_refs) && ov.source_refs.length > 0 ? ov.source_refs : [],
+        },
+      };
+    });
+
+    // 2) Audit-hivatkozások (CLAUSE_LIBRARY) — a generátorhoz nem kerülnek a PDF-be,
+    //    de a jóváhagyási nézethez használjuk.
+    const auditEntries: ClauseEditorEntry[] = CLAUSE_LIBRARY.map((c, idx) => {
       const ov = byId.get(c.id) ?? null;
       const effective = {
         title: ov?.title ?? c.title,
@@ -87,6 +117,8 @@ export const listClauseEditorEntries = createServerFn({ method: "GET" })
       };
       return {
         clauseId: c.id,
+        kind: "audit" as const,
+        sortOrder: idx,
         defaults: {
           title: c.title,
           bodyTemplate: c.bodyTemplate,
@@ -96,6 +128,8 @@ export const listClauseEditorEntries = createServerFn({ method: "GET" })
         effective,
       };
     });
+
+    const entries: ClauseEditorEntry[] = [...pdfEntries, ...auditEntries];
 
     const sources: LegalSourceOption[] = LEGAL_SOURCES_V2.map((s) => ({
       id: s.id,
@@ -132,7 +166,9 @@ const upsertInput = z.object({
   clauseId: z.string().min(1).max(100),
   title: z.string().trim().min(1),
   bodyTemplate: z.string().trim().min(1),
-  sourceRefs: z.array(sourceRefSchema).min(1),
+  // PDF-klauzulánál nem kötelező jogforrás-hivatkozást felvenni — a szöveg
+  // önmagában is hasznosul. Audit-bejegyzésnél a UI továbbra is megköveteli.
+  sourceRefs: z.array(sourceRefSchema).min(0),
 });
 
 const checkLawyerOrAdmin = async (supabase: SupabaseClient, userId: string) => {
@@ -149,7 +185,19 @@ export const upsertClauseOverride = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => upsertInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    if (!CLAUSE_LIBRARY.some((c) => c.id === data.clauseId)) {
+    // Engedjük a CLAUSE_LIBRARY-t (audit) ÉS az aktív clauses tábla kulcsait (PDF).
+    const isAudit = CLAUSE_LIBRARY.some((c) => c.id === data.clauseId);
+    let isPdf = false;
+    if (!isAudit) {
+      const { data: pdfRow } = await supabase
+        .from("clauses")
+        .select("clause_key")
+        .eq("clause_key", data.clauseId)
+        .eq("active", true)
+        .maybeSingle();
+      isPdf = !!pdfRow;
+    }
+    if (!isAudit && !isPdf) {
       throw new Error("Ismeretlen klauzula azonosító.");
     }
     for (const ref of data.sourceRefs) {

@@ -79,7 +79,7 @@ function EditDialog({
           quotedText: r.quotedText ?? "",
           effectiveDate: r.effectiveDate ?? "",
         }))
-      : [{ sourceId: sources[0]?.id ?? "", section: "", quotedText: "", effectiveDate: "" }],
+      : [],
   );
 
   useEffect(() => {
@@ -94,7 +94,7 @@ function EditDialog({
               quotedText: r.quotedText ?? "",
               effectiveDate: r.effectiveDate ?? "",
             }))
-          : [{ sourceId: sources[0]?.id ?? "", section: "", quotedText: "", effectiveDate: "" }],
+          : [],
       );
     }
   }, [open, entry, sources]);
@@ -209,7 +209,6 @@ function EditDialog({
                       size="icon"
                       variant="ghost"
                       onClick={() => setRefs((arr) => arr.filter((_, idx) => idx !== i))}
-                      disabled={refs.length === 1}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -268,7 +267,7 @@ function EditDialog({
           <Button
             className="bg-df-green text-df-card hover:bg-primary"
             onClick={() => mutation.mutate()}
-            disabled={mutation.isPending || !title.trim() || !body.trim() || refs.length === 0}
+            disabled={mutation.isPending || !title.trim() || !body.trim()}
           >
             {mutation.isPending ? "Mentés…" : "Mentés"}
           </Button>
@@ -311,8 +310,10 @@ function ClauseEditorPage() {
             </Badge>
             <h1 className="mt-4 font-brand text-4xl font-bold text-df-green">Klauzula szerkesztő</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-df-gray">
-              Itt javíthatod a Klauzula Társ szövegeit és jogforrás-hivatkozásait. Minden mentés után
-              a klauzula automatikusan visszakerül „jóváhagyandó" állapotba, és újra le kell lektorálni.
+              A „Szerződésbe kerül" jelölésű klauzulák szövegét a generátor szó szerint a PDF-be
+              illeszti. Ha az ügyvéd új szöveget ad meg, a következő generált szerződés már azt
+              tartalmazza. A klauzula minden mentés után automatikusan visszakerül „jóváhagyandó"
+              állapotba, és újra le kell lektorálni.
             </p>
           </div>
           <Button asChild variant="outline" className="border-df-green text-df-green">
@@ -346,16 +347,50 @@ function ClauseEditorPage() {
           </Card>
         )}
 
-        <div className="mt-6 space-y-3">
-          {entries.map((entry) => {
-            const isOverridden = !!entry.override;
+        <div className="mt-8 space-y-6">
+          {(["pdf", "audit"] as const).map((kind) => {
+            const group = entries.filter((e) => e.kind === kind);
+            if (group.length === 0) return null;
             return (
-              <Card key={entry.clauseId} className="border-df-border bg-df-card p-4">
+              <section key={kind} className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-brand text-xl font-bold text-df-green">
+                    {kind === "pdf"
+                      ? "Szerződésbe kerülő klauzulák"
+                      : "Audit-hivatkozások (nem kerülnek a PDF-be)"}
+                  </h2>
+                  <Badge
+                    variant="outline"
+                    className={
+                      kind === "pdf"
+                        ? "border-df-green bg-df-green/10 text-df-green"
+                        : "border-df-border text-df-gray"
+                    }
+                  >
+                    {kind === "pdf" ? "Generátor használja" : "Csak ellenőrzéshez"}
+                  </Badge>
+                </div>
+                {kind === "pdf" && (
+                  <p className="text-xs text-df-gray">
+                    Az itt megadott teljes szöveg szó szerint a generált szerződésbe kerül
+                    (változó-helyettesítéssel, pl. {`{{lessor_name}}`}). Ha üresen hagyod, a kódbeli
+                    alapértelmezés marad.
+                  </p>
+                )}
+                {group.map((entry) => {
+                  const isOverridden = !!entry.override;
+                  return (
+                    <Card key={entry.clauseId} className="border-df-border bg-df-card p-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <ScrollText className="h-4 w-4 text-df-green" />
                       <h2 className="font-semibold text-df-ink">{entry.effective.title}</h2>
+                      {entry.kind === "pdf" && (
+                        <Badge className="bg-df-green text-df-card hover:bg-df-green">
+                          Szerződésbe kerül
+                        </Badge>
+                      )}
                       {isOverridden && (
                         <Badge variant="outline" className="border-df-green text-df-green">
                           Ügyvédi javítás
@@ -419,7 +454,10 @@ function ClauseEditorPage() {
                     )}
                   </div>
                 </div>
-              </Card>
+                    </Card>
+                  );
+                })}
+              </section>
             );
           })}
         </div>

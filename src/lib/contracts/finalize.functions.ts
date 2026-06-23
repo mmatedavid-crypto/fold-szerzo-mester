@@ -90,11 +90,33 @@ export const finalizeContract = createServerFn({ method: "POST" })
       .eq("active", true);
     if (clErr) throw new Error(clErr.message);
 
+    // Ügyvédi override-ok beolvasztása: ha az ügyvéd átírta a klauzula címét/szövegét,
+    // a generátor azt használja a hardcode-olt DB-szöveg helyett.
+    const clauseKeys = (clauses ?? []).map((c) => c.clause_key);
+    const { data: overrides } = await supabaseAdmin
+      .from("clause_overrides")
+      .select("clause_id, title, body_template")
+      .in("clause_id", clauseKeys);
+    const overrideByKey = new Map<string, { title: string | null; body_template: string | null }>();
+    for (const ov of (overrides ?? []) as Array<{
+      clause_id: string;
+      title: string | null;
+      body_template: string | null;
+    }>) {
+      overrideByKey.set(ov.clause_id, ov);
+    }
+    const mergedClauses = (clauses ?? []).map((c) => {
+      const ov = overrideByKey.get(c.clause_key);
+      return {
+        clause_key: c.clause_key,
+        title: ov?.title ?? c.title,
+        text: ov?.body_template ?? c.text,
+        sort_order: c.sort_order,
+      };
+    });
+
     // Compose contract text server-side
-    const composed = composeContract(
-      draft,
-      clauses as { clause_key: string; title: string; text: string; sort_order: number }[],
-    );
+    const composed = composeContract(draft, mergedClauses);
 
     // Pre-generate doc number from draft id; finalize_document RPC consumes credit atomically.
     const documentNumber = makeDocNumber(draft.id);
