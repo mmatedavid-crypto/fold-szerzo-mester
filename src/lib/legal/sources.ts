@@ -75,6 +75,25 @@ export const LEGAL_SOURCES_V2: LegalSource[] = [
     checkedAt: ADDED_AT,
   },
   {
+    id: "inytv",
+    title: "Az ingatlan-nyilvántartásról",
+    actNumber: "2021. évi C. törvény",
+    shortName: "Inytv.",
+    sourceUrl: "https://net.jogtar.hu/jogszabaly?docid=A2100100.TV",
+    ...meta("inytv"),
+    checkedAt: ADDED_AT,
+  },
+  {
+    id: "korm-179-2023",
+    title:
+      "Az ingatlan-nyilvántartásról szóló 2021. évi C. törvény végrehajtásáról",
+    actNumber: "179/2023. (V. 15.) Korm. rendelet",
+    shortName: "179/2023. Korm. r.",
+    sourceUrl: "https://net.jogtar.hu/jogszabaly?docid=A2300179.KOR",
+    ...meta("korm-179-2023"),
+    checkedAt: ADDED_AT,
+  },
+  {
     id: "korm-474-2013",
     title:
       "Az elővásárlási és előhaszonbérleti jog gyakorlása érdekében hirdetményi úton történő közlés eljárási szabályairól",
