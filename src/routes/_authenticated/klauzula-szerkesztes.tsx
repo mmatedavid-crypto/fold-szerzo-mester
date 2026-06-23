@@ -371,6 +371,24 @@ function ClauseEditorPage() {
                         .map((r) => (r.section ? `${r.sourceId} ${r.section}` : r.sourceId))
                         .join(", ") || "—"}
                     </div>
+                    {entry.effective.sourceRefs.some((r) => r.quotedText) && (
+                      <div className="mt-2 space-y-2">
+                        {entry.effective.sourceRefs
+                          .filter((r) => r.quotedText)
+                          .map((r, idx) => (
+                            <div
+                              key={idx}
+                              className="rounded-md border border-df-border bg-df-cream/40 p-2 text-xs text-df-ink"
+                            >
+                              <div className="mb-1 font-semibold text-df-green">
+                                {r.sourceId} {r.section ?? ""}
+                                {r.effectiveDate ? ` · hatályos: ${r.effectiveDate}` : ""}
+                              </div>
+                              <p className="whitespace-pre-wrap leading-5">{r.quotedText}</p>
+                            </div>
+                          ))}
+                      </div>
+                    )}
                     {isOverridden && entry.override && (
                       <div className="mt-1 text-xs text-df-gray">
                         Utolsó módosítás: {new Date(entry.override.updated_at).toLocaleString("hu-HU")} ·{" "}
