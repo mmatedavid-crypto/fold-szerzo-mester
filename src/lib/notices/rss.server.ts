@@ -134,6 +134,19 @@ type ApiRow = {
   hirdetmenyTipusNev: string | null;
 };
 
+type ApiDetail = {
+  hirdetmenyDTO?: {
+    forrasIntezmenyNeve?: string | null;
+    kifuggesztesNapja?: string | null;
+    lejaratNapja?: string | null;
+    targy?: string | null;
+    ugyiratszam?: string | null;
+    iktatasiszam?: string | null;
+  } | null;
+  tipus?: string | null;
+  altipus?: string | null;
+};
+
 function parseSubjectParts(rawTitle: string): { settlement: string | null; parcels: string[] } {
   const parts = rawTitle
     .split("|")
@@ -179,32 +192,63 @@ async function fetchPage(
   return (await res.json()) as { rows: ApiRow[]; total: number };
 }
 
-function mapRow(r: ApiRow) {
-  const { settlement, parcels } = parseSubjectParts(r.targy ?? "");
-  const pub = toBudapestDate(r.kifuggesztesNapja);
-  const deadline = toBudapestDate(r.lejaratNapja);
-  const normalizedCategory = classifyNoticeCategory(r.hirdetmenyTipusNev, r.targy);
+async function fetchDetail(sourceId: number): Promise<ApiDetail | null> {
+  const url = `https://hirdetmenyek.gov.hu/api/hirdetmenyek/reszletezo/${sourceId}`;
+  const res = await fetch(url, {
+    headers: { "User-Agent": "Foldberleti-Szerzodes-Generator/1.0", Accept: "application/json" },
+  });
+  if (!res.ok) return null;
+  return (await res.json()) as ApiDetail;
+}
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  mapper: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let next = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const index = next;
+      next++;
+      results[index] = await mapper(items[index]);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
+function mapRow(r: ApiRow, detail: ApiDetail | null = null) {
+  const dto = detail?.hirdetmenyDTO ?? null;
+  const subject = dto?.targy ?? r.targy ?? "";
+  const sourceType = detail?.altipus ?? detail?.tipus ?? r.hirdetmenyTipusNev;
+  const { settlement, parcels } = parseSubjectParts(subject);
+  const pub = toBudapestDate(dto?.kifuggesztesNapja ?? r.kifuggesztesNapja);
+  const deadline = toBudapestDate(dto?.lejaratNapja ?? r.lejaratNapja);
+  const normalizedCategory = classifyNoticeCategory(sourceType, subject);
   const typeLabel =
     (normalizedCategory && CATEGORY_LABEL[normalizedCategory]) ??
+    detail?.altipus ??
     r.hirdetmenyTipusNev ??
     "Egyéb";
   return {
     source: "hirdetmenyek.gov.hu",
     source_notice_id: String(r.id),
     original_detail_url: `https://hirdetmenyek.gov.hu/reszletezo/${r.id}`,
-    subject: (r.targy ?? "").slice(0, 1000),
+    subject: subject.slice(0, 1000),
     notice_type: typeLabel.slice(0, 64),
     settlement: settlement?.slice(0, 255) ?? null,
     parcel_numbers: parcels,
-    municipality: r.forrasIntezmenyNeve?.slice(0, 255) ?? null,
+    municipality: (dto?.forrasIntezmenyNeve ?? r.forrasIntezmenyNeve)?.slice(0, 255) ?? null,
     publication_date: pub,
     deadline_date: deadline,
     source_deadline_date: deadline,
-    source_case_number: r.ugyiratszam?.slice(0, 255) ?? null,
-    registry_number: r.iktatasiszam?.slice(0, 255) ?? null,
-    source_notice_type: r.hirdetmenyTipusNev?.slice(0, 64) ?? null,
+    source_case_number: (dto?.ugyiratszam ?? r.ugyiratszam)?.slice(0, 255) ?? null,
+    registry_number: (dto?.iktatasiszam ?? r.iktatasiszam)?.slice(0, 255) ?? null,
+    source_notice_type: (detail?.tipus ?? r.hirdetmenyTipusNev)?.slice(0, 64) ?? null,
     normalized_notice_category: normalizedCategory,
-    raw_json: r,
+    raw_json: detail ? { ...r, detail } : r,
     last_fetched_at: new Date().toISOString(),
   };
 }
@@ -227,9 +271,12 @@ export async function syncFromApi(
 
   async function flush(rows: ApiRow[]) {
     if (rows.length === 0) return;
-    const payload = rows
-      .map(mapRow)
-      .filter((row) => ALLOWED_CATEGORIES.has(row.normalized_notice_category ?? ""));
+    const candidates = rows.filter((row) =>
+      ALLOWED_CATEGORIES.has(classifyNoticeCategory(row.hirdetmenyTipusNev, row.targy) ?? ""),
+    );
+    const payload = (
+      await mapWithConcurrency(candidates, 8, async (row) => mapRow(row, await fetchDetail(row.id)))
+    ).filter((row) => ALLOWED_CATEGORIES.has(row.normalized_notice_category ?? ""));
     if (payload.length === 0) {
       fetched += rows.length;
       return;
