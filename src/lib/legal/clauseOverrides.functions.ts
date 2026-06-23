@@ -18,7 +18,12 @@ export interface ClauseOverrideRow {
   clause_id: string;
   title: string | null;
   body_template: string | null;
-  source_refs: Array<{ sourceId: string; section?: string }>;
+  source_refs: Array<{
+    sourceId: string;
+    section?: string;
+    quotedText?: string;
+    effectiveDate?: string;
+  }>;
   updated_by_name: string | null;
   updated_at: string;
 }
@@ -28,13 +33,23 @@ export interface ClauseEditorEntry {
   defaults: {
     title: string;
     bodyTemplate: string;
-    sourceRefs: Array<{ sourceId: string; section?: string }>;
+    sourceRefs: Array<{
+      sourceId: string;
+      section?: string;
+      quotedText?: string;
+      effectiveDate?: string;
+    }>;
   };
   override: ClauseOverrideRow | null;
   effective: {
     title: string;
     bodyTemplate: string;
-    sourceRefs: Array<{ sourceId: string; section?: string }>;
+    sourceRefs: Array<{
+      sourceId: string;
+      section?: string;
+      quotedText?: string;
+      effectiveDate?: string;
+    }>;
   };
 }
 
@@ -92,14 +107,32 @@ export const listClauseEditorEntries = createServerFn({ method: "GET" })
 
 const sourceRefSchema = z.object({
   sourceId: z.string().min(1).max(50),
-  section: z.string().trim().max(120).optional().nullable().transform((v) => (v && v.length > 0 ? v : undefined)),
+  section: z
+    .string()
+    .trim()
+    .optional()
+    .nullable()
+    .transform((v) => (v && v.length > 0 ? v : undefined)),
+  quotedText: z
+    .string()
+    .trim()
+    .optional()
+    .nullable()
+    .transform((v) => (v && v.length > 0 ? v : undefined)),
+  effectiveDate: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Dátum formátuma: ÉÉÉÉ-HH-NN")
+    .optional()
+    .nullable()
+    .transform((v) => (v && v.length > 0 ? v : undefined)),
 });
 
 const upsertInput = z.object({
   clauseId: z.string().min(1).max(100),
-  title: z.string().trim().min(1).max(200),
-  bodyTemplate: z.string().trim().min(1).max(5000),
-  sourceRefs: z.array(sourceRefSchema).min(1).max(10),
+  title: z.string().trim().min(1),
+  bodyTemplate: z.string().trim().min(1),
+  sourceRefs: z.array(sourceRefSchema).min(1),
 });
 
 const checkLawyerOrAdmin = async (supabase: SupabaseClient, userId: string) => {
