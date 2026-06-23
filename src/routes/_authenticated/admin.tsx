@@ -320,3 +320,63 @@ function EmptyRow({ colSpan, text }: { colSpan: number; text: string }) {
     </TableRow>
   );
 }
+
+function TestContractsCard() {
+  const send = useServerFn(sendTestContractsToLawyer);
+  const [busy, setBusy] = useState(false);
+  const [last, setLast] = useState<null | {
+    recipient: string;
+    contracts: Array<{ documentNumber: string; title: string }>;
+  }>(null);
+
+  async function handleSend() {
+    setBusy(true);
+    try {
+      const r = await send();
+      setLast({ recipient: r.recipient, contracts: r.contracts });
+      toast.success(`3 teszt szerződés kiküldve: ${r.recipient}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Hiba a kiküldés során.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card className="mt-6 border-df-border bg-df-card p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="font-semibold text-df-ink">
+            Teszt szerződések kiküldése dr. Szarkának
+          </div>
+          <p className="mt-1 text-sm text-df-gray">
+            3 fiktív, de valósághű mintát generálunk (különböző bérlet-modellek és bérlő-típusok),
+            feltöltjük a privát tárhelyre, és egyetlen e-mailben kiküldjük az aláírt
+            letöltési linkeket dr. Szarka Ádámnak ügyvédi átnézésre. Mellékletek nincsenek,
+            csak 7 napig élő letöltési URL-ek.
+          </p>
+          {last && (
+            <div className="mt-3 rounded-md border border-df-border bg-df-cream p-3 text-xs text-df-gray">
+              Utolsó kiküldés címzettje: <strong>{last.recipient}</strong>
+              <ul className="mt-1 list-disc pl-5">
+                {last.contracts.map((c) => (
+                  <li key={c.documentNumber}>
+                    {c.title} — <span className="font-mono">{c.documentNumber}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        <Button onClick={handleSend} disabled={busy}>
+          {busy ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="mr-2 h-4 w-4" />
+          )}
+          {busy ? "Generálás…" : "3 teszt szerződés kiküldése"}
+        </Button>
+      </div>
+    </Card>
+  );
+}
