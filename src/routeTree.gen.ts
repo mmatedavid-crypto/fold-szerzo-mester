@@ -43,6 +43,7 @@ import { Route as ApiPublicHooksSyncNoticesRouteImport } from './routes/api/publ
 import { Route as ApiPublicHooksSendWeeklyDigestRouteImport } from './routes/api/public/hooks/send-weekly-digest'
 import { Route as ApiPublicHooksExtractPricesRouteImport } from './routes/api/public/hooks/extract-prices'
 import { Route as ApiPublicCronSourceFreshnessRouteImport } from './routes/api/public/cron/source-freshness'
+import { Route as ApiPublicAdminSendTestContractsRouteImport } from './routes/api/public/admin/send-test-contracts'
 import { Route as AuthenticatedSzerzodesIdSzerkesztesRouteImport } from './routes/_authenticated/szerzodes.$id.szerkesztes'
 import { Route as AuthenticatedSzerzodesIdKeszRouteImport } from './routes/_authenticated/szerzodes.$id.kesz'
 import { Route as AuthenticatedSzerzodesIdFizetesRouteImport } from './routes/_authenticated/szerzodes.$id.fizetes'
@@ -229,6 +230,12 @@ const ApiPublicCronSourceFreshnessRoute =
     path: '/api/public/cron/source-freshness',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminSendTestContractsRoute =
+  ApiPublicAdminSendTestContractsRouteImport.update({
+    id: '/api/public/admin/send-test-contracts',
+    path: '/api/public/admin/send-test-contracts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedSzerzodesIdSzerkesztesRoute =
   AuthenticatedSzerzodesIdSzerkesztesRouteImport.update({
     id: '/szerzodes/$id/szerkesztes',
@@ -284,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/admin/send-test-contracts': typeof ApiPublicAdminSendTestContractsRoute
   '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
@@ -323,6 +331,7 @@ export interface FileRoutesByTo {
   '/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/admin/send-test-contracts': typeof ApiPublicAdminSendTestContractsRoute
   '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
@@ -364,6 +373,7 @@ export interface FileRoutesById {
   '/_authenticated/szerzodes/$id/fizetes': typeof AuthenticatedSzerzodesIdFizetesRoute
   '/_authenticated/szerzodes/$id/kesz': typeof AuthenticatedSzerzodesIdKeszRoute
   '/_authenticated/szerzodes/$id/szerkesztes': typeof AuthenticatedSzerzodesIdSzerkesztesRoute
+  '/api/public/admin/send-test-contracts': typeof ApiPublicAdminSendTestContractsRoute
   '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
+    | '/api/public/admin/send-test-contracts'
     | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
@@ -444,6 +455,7 @@ export interface FileRouteTypes {
     | '/szerzodes/$id/fizetes'
     | '/szerzodes/$id/kesz'
     | '/szerzodes/$id/szerkesztes'
+    | '/api/public/admin/send-test-contracts'
     | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
@@ -484,6 +496,7 @@ export interface FileRouteTypes {
     | '/_authenticated/szerzodes/$id/fizetes'
     | '/_authenticated/szerzodes/$id/kesz'
     | '/_authenticated/szerzodes/$id/szerkesztes'
+    | '/api/public/admin/send-test-contracts'
     | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
     | '/api/public/hooks/send-weekly-digest'
@@ -515,6 +528,7 @@ export interface RootRouteChildren {
   KifuggesztesekNoticeIdRoute: typeof KifuggesztesekNoticeIdRoute
   KifuggesztesekIndexRoute: typeof KifuggesztesekIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicAdminSendTestContractsRoute: typeof ApiPublicAdminSendTestContractsRoute
   ApiPublicCronSourceFreshnessRoute: typeof ApiPublicCronSourceFreshnessRoute
   ApiPublicHooksExtractPricesRoute: typeof ApiPublicHooksExtractPricesRoute
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
@@ -765,6 +779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronSourceFreshnessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/send-test-contracts': {
+      id: '/api/public/admin/send-test-contracts'
+      path: '/api/public/admin/send-test-contracts'
+      fullPath: '/api/public/admin/send-test-contracts'
+      preLoaderRoute: typeof ApiPublicAdminSendTestContractsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/szerzodes/$id/szerkesztes': {
       id: '/_authenticated/szerzodes/$id/szerkesztes'
       path: '/szerzodes/$id/szerkesztes'
@@ -858,6 +879,7 @@ const rootRouteChildren: RootRouteChildren = {
   KifuggesztesekNoticeIdRoute: KifuggesztesekNoticeIdRoute,
   KifuggesztesekIndexRoute: KifuggesztesekIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicAdminSendTestContractsRoute: ApiPublicAdminSendTestContractsRoute,
   ApiPublicCronSourceFreshnessRoute: ApiPublicCronSourceFreshnessRoute,
   ApiPublicHooksExtractPricesRoute: ApiPublicHooksExtractPricesRoute,
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
