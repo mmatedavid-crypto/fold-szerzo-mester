@@ -79,7 +79,7 @@ function EditDialog({
           quotedText: r.quotedText ?? "",
           effectiveDate: r.effectiveDate ?? "",
         }))
-      : [{ sourceId: sources[0]?.id ?? "", section: "", quotedText: "", effectiveDate: "" }],
+      : [],
   );
 
   useEffect(() => {
@@ -94,7 +94,7 @@ function EditDialog({
               quotedText: r.quotedText ?? "",
               effectiveDate: r.effectiveDate ?? "",
             }))
-          : [{ sourceId: sources[0]?.id ?? "", section: "", quotedText: "", effectiveDate: "" }],
+          : [],
       );
     }
   }, [open, entry, sources]);
@@ -209,7 +209,6 @@ function EditDialog({
                       size="icon"
                       variant="ghost"
                       onClick={() => setRefs((arr) => arr.filter((_, idx) => idx !== i))}
-                      disabled={refs.length === 1}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -268,7 +267,7 @@ function EditDialog({
           <Button
             className="bg-df-green text-df-card hover:bg-primary"
             onClick={() => mutation.mutate()}
-            disabled={mutation.isPending || !title.trim() || !body.trim() || refs.length === 0}
+            disabled={mutation.isPending || !title.trim() || !body.trim()}
           >
             {mutation.isPending ? "Mentés…" : "Mentés"}
           </Button>
