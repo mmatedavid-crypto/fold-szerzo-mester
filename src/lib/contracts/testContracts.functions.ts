@@ -19,7 +19,6 @@ export const sendTestContractsToLawyer = createServerFn({ method: "POST" })
     const r = await runTestContractsToLawyer();
     return {
       recipient: r.recipient,
-      enqueue: r.enqueue,
       contracts: r.contracts.map((c) => ({
         documentNumber: c.documentNumber,
         title: c.title,
