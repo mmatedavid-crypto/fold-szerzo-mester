@@ -3,10 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/api/public/hooks/send-weekly-digest")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
         try {
           const { sendWeeklyDigest } = await import("@/lib/subscriptions/digest.server");
-          const result = await sendWeeklyDigest();
+          const url = new URL(request.url);
+          const force = url.searchParams.get("force");
+          const result = await sendWeeklyDigest({ idempotencySuffix: force || undefined });
           return Response.json({ success: true, ...result });
         } catch (err) {
           const message = err instanceof Error ? err.message : "Unknown error";

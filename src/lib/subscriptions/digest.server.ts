@@ -29,7 +29,7 @@ function fmtDate(d: string | null): string {
   }
 }
 
-export async function sendWeeklyDigest(): Promise<{
+export async function sendWeeklyDigest(opts: { idempotencySuffix?: string } = {}): Promise<{
   sent: number;
   skipped: number;
   failed: number;
@@ -57,15 +57,16 @@ export async function sendWeeklyDigest(): Promise<{
 
   // Pull all notices once and bucket by clean settlement (smaller fanout per sub)
   const today = new Date();
-  const inThirtyDays = new Date(today);
-  inThirtyDays.setDate(today.getDate() + 30);
+  const fallbackPublishedSince = new Date(today);
+  fallbackPublishedSince.setDate(today.getDate() - 90);
+  const todayIso = today.toISOString().slice(0, 10);
+  const fallbackIso = fallbackPublishedSince.toISOString().slice(0, 10);
   const { data: allNotices, error: nerr } = await supabaseAdmin
     .from("notices")
     .select(
       "id, subject, settlement, parcel_numbers, notice_type, publication_date, deadline_date, original_detail_url",
     )
-    .gte("deadline_date", today.toISOString().slice(0, 10))
-    .lte("deadline_date", inThirtyDays.toISOString().slice(0, 10))
+    .or(`deadline_date.gte.${todayIso},and(deadline_date.is.null,publication_date.gte.${fallbackIso})`)
     .order("publication_date", { ascending: false, nullsFirst: false })
     .limit(10000);
   if (nerr) throw new Error(nerr.message);
@@ -90,7 +91,7 @@ export async function sendWeeklyDigest(): Promise<{
       const result = await enqueueTransactionalEmail({
         templateName: "weekly-digest",
         recipientEmail: sub.email,
-        idempotencyKey: `weekly-digest-${sub.id}-${new Date().toISOString().slice(0, 10)}`,
+        idempotencyKey: `weekly-digest-${sub.id}-${new Date().toISOString().slice(0, 10)}${opts.idempotencySuffix ? `-${opts.idempotencySuffix}` : ""}`,
         fromLabel: "Dr Föld értesítő",
         templateData: {
           settlement: sub.settlement_clean,
