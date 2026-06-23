@@ -68,6 +68,14 @@ export function SiteHeader() {
               Klauzula jóváhagyások
             </Link>
           )}
+          {isLawyer && (
+            <Link
+              to="/klauzula-szerkesztes"
+              className="rounded-md border border-df-green/40 bg-df-green/10 px-3 py-1 text-df-green hover:bg-df-green/15"
+            >
+              Jogforrás-javítás
+            </Link>
+          )}
         </nav>
         <div className="flex items-center gap-2">
           {isLawyer && (
@@ -136,6 +144,15 @@ export function SiteHeader() {
                 className="text-df-green"
               >
                 Klauzula jóváhagyások
+              </Link>
+            )}
+            {isLawyer && (
+              <Link
+                to="/klauzula-szerkesztes"
+                onClick={() => setMenuOpen(false)}
+                className="text-df-green"
+              >
+                Jogforrás-javítás
               </Link>
             )}
             <Link to={authed ? "/dashboard" : "/belepes"} onClick={() => setMenuOpen(false)}>
