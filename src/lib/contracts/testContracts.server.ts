@@ -10,6 +10,20 @@ import type { Draft } from "./types";
 import { LEGAL_RULESET_VERSION, LEASE_CLAUSE_VERSION } from "@/lib/legal/ruleset";
 import { company } from "@/lib/company";
 
+/**
+ * pdf-lib StandardFonts use the WinAnsi codepage, ami nem tartalmazza a
+ * magyar Ő/ő/Ű/ű karaktereket. A renderer ezek nélkül elhasal — a teszt
+ * generálás előtt visszahajtjuk őket O/U-ra, hogy egyik mintán se akadjon el.
+ */
+function foldUnicodeForPdf(input: string): string {
+  return input
+    .replace(/\u0150/g, "O") // Ő
+    .replace(/\u0151/g, "o") // ő
+    .replace(/\u0170/g, "U") // Ű
+    .replace(/\u0171/g, "u") // ű
+    .replace(/[\u2013\u2014]/g, "-"); // – —
+}
+
 function makeDraft(
   id: string,
   partial: Partial<Draft> &
@@ -295,6 +309,10 @@ export async function runTestContractsToLawyer(): Promise<{
   for (let i = 0; i < TEST_CONTRACT_SAMPLES.length; i++) {
     const s = TEST_CONTRACT_SAMPLES[i];
     const composed = composeContract(s.draft, mergedClauses);
+    const safeSections = composed.sections.map((sec) => ({
+      title: foldUnicodeForPdf(sec.title),
+      text: foldUnicodeForPdf(sec.text),
+    }));
     const documentNumber = `FBSZ-TEST-${stamp.slice(0, 19)}-${i + 1}`;
     const verificationUrl = `${company.websiteUrl}/dokumentum-ellenorzes?id=${documentNumber}`;
     const pdfBytes = await renderContractPdf({
@@ -303,10 +321,10 @@ export async function runTestContractsToLawyer(): Promise<{
       templateVersion: `${tpl.version} / ${LEGAL_RULESET_VERSION}`,
       clauseVersion: `${tpl.version} / ${LEASE_CLAUSE_VERSION}`,
       generatedAt: new Date(),
-      title: composed.title,
-      sections: composed.sections,
+      title: foldUnicodeForPdf(composed.title),
+      sections: safeSections,
       verificationUrl,
-      watermark: "TESZT — ÜGYVÉDI ÁTNÉZÉSRE",
+      watermark: "TESZT - UGYVEDI ATNEZESRE",
     });
     const path = `test-contracts/${stamp}/${i + 1}-${documentNumber}.pdf`;
     const { error: upErr } = await supabaseAdmin.storage
