@@ -1,6 +1,9 @@
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { toast } from "sonner";
+import { sendTestContractsToLawyer } from "@/lib/contracts/testContracts.functions";
 import type { ReactNode } from "react";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { PageShell } from "@/components/layout/page-shell";
@@ -17,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { NoticesImport } from "@/components/admin/notices-import";
-import { AlertTriangle, Database, FileCheck2, Library, Loader2 } from "lucide-react";
+import { AlertTriangle, Database, FileCheck2, Library, Loader2, Send } from "lucide-react";
 
 const checkAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -158,6 +161,8 @@ function AdminPage() {
             </Button>
           </div>
         </Card>
+
+        <TestContractsCard />
 
         <SectionTitle title="Sablonverziók" text="Aktív jogi sablonok és érvényességi állapotuk." />
         <Card className="mt-3 overflow-x-auto border-df-border bg-df-card">
