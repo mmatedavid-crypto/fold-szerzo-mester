@@ -68,6 +68,18 @@ export type Rent = {
   method?: "atutalas" | "keszpenz" | "vegyes";
   bank_account?: string;
   payer?: string;
+  /**
+   * Készpénzes fizetés csak akkor engedélyezett, ha valamely törvényi
+   * kivétel fennáll (Fftv. 50. § (4)). Egyébként 2022.01.01. óta banki
+   * átutalás vagy belföldi postautalvány kötelező (Fftv. 50. § (3)).
+   */
+  cash_exemption?:
+    | "under_1_ha"
+    | "close_relatives"
+    | "tanya"
+    | "producer_org_25pct"
+    | "family_farm_member";
+  cash_exemption_note?: string;
   indexation?: "none" | "ksh" | "fixed" | "custom";
   fixed_pct?: number;
   first_year_special?: string;
