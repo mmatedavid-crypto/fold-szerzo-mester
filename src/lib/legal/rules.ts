@@ -203,6 +203,30 @@ export const LEGAL_RULES: LegalRule[] = [
     reviewStatus: "lawyer_review_required",
   },
   {
+    id: "rent_payment_method_statutory",
+    title: "Fizetési mód: banki átutalás / postautalvány kötelező",
+    sourceRefs: [{ sourceId: "fftv", section: "50. § (3)–(4)" }],
+    appliesWhen: () => true,
+    requiredFacts: ["rent.method"],
+    requiredClauses: ["payment_deadline"],
+    riskLevel: "blocker",
+    blocksFinalizationWhen: (d) => {
+      const r = d.rent ?? {};
+      const method = r.method;
+      // Nincs megadva mód -> blokkol
+      if (!method) return true;
+      // Készpénz vagy vegyes csak Fftv. 50. § (4) szerinti kivétellel
+      if (method === "keszpenz" || method === "vegyes") {
+        return !r.cash_exemption;
+      }
+      return false;
+    },
+    auditQuestions: [
+      "A fizetési mód banki átutalás vagy belföldi postautalvány? Ha készpénz, fennáll-e az Fftv. 50. § (4) szerinti kivétel (1 ha alatt, hozzátartozók, tanya, 25%-os termelőszervezet, családi mezőgazdasági társaság)?",
+    ],
+    reviewStatus: "lawyer_review_required",
+  },
+  {
     id: "prelease_rank_proof",
     title: "Előhaszonbérleti ranghely + igazolás",
     sourceRefs: [{ sourceId: "fftv", section: "45–49. §" }, { sourceId: "korm-474-2013" }],
