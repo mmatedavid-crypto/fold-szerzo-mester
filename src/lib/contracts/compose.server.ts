@@ -13,6 +13,44 @@ import { STATUS_LABEL } from "@/lib/legal/status";
 
 type Clause = { clause_key: string; title: string; text: string; sort_order: number };
 
+const CASH_EXEMPTION_LABEL: Record<string, string> = {
+  under_1_ha:
+    "a haszonbérleti szerződés tárgyát képező föld területe nem éri el az 1 hektárt [Fftv. 50. § (4) bek. a) pont]",
+  close_relatives: "hozzátartozók közötti haszonbérlet [Fftv. 50. § (4) bek. b) pont]",
+  tanya: "tanya haszonbérletére irányuló jogügylet [Fftv. 50. § (4) bek. c) pont]",
+  producer_org_25pct:
+    "a haszonbérlő legalább 25%-ban a bérbeadó vagy közeli hozzátartozója tulajdonában álló mezőgazdasági termelőszervezet [Fftv. 50. § (4) bek. d) pont]",
+  family_farm_member:
+    "a haszonbérlő olyan családi mezőgazdasági társaság, amelyben a bérbeadó tag [Fftv. 50. § (4) bek. e) pont]",
+};
+
+function rentMethodText(r: { method?: string }): string {
+  switch (r.method) {
+    case "atutalas":
+      return "banki átutalás.";
+    case "keszpenz":
+      return "készpénzes teljesítés (törvényi kivétel alapján).";
+    case "vegyes":
+      return "vegyes (részben banki átutalás / postautalvány, részben – törvényi kivétel alapján – készpénz).";
+    default:
+      return "banki átutalás vagy belföldi postautalvány.";
+  }
+}
+
+function rentCashExemptionText(r: {
+  method?: string;
+  cash_exemption?: string;
+  cash_exemption_note?: string;
+}): string {
+  if (r.method !== "keszpenz" && r.method !== "vegyes") return "";
+  const label = r.cash_exemption ? CASH_EXEMPTION_LABEL[r.cash_exemption] : undefined;
+  if (!label) {
+    return " A készpénzes teljesítés jogszerűségét külön kell igazolni az Fftv. 50. § (4) bekezdése alapján.";
+  }
+  const note = r.cash_exemption_note ? ` Megjegyzés: ${r.cash_exemption_note}.` : "";
+  return ` A készpénzes teljesítés jogalapja: ${label}.${note}`;
+}
+
 function substitute(text: string, vars: Record<string, string>): string {
   return text.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] ?? "");
 }
@@ -134,6 +172,11 @@ export function composeContract(
     rent_description: rentDescription(r),
     rent_deadline: r.deadline ?? "",
     rent_method: r.method ?? "",
+    rent_method_text: rentMethodText(r),
+    rent_cash_exemption_text: rentCashExemptionText(r),
+    rent_bank_account_text: r.bank_account
+      ? ` A haszonbér a bérbeadó ${r.bank_account} számú bankszámlájára teljesítendő.`
+      : "",
     rent_indexation:
       r.indexation === "ksh"
         ? "A díj a KSH inflációs adatai szerint évente felülvizsgálható."

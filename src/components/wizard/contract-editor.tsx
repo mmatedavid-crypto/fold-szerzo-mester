@@ -464,6 +464,37 @@ export function ContractEditor({ draft }: { draft: Draft }) {
             </Select>
           </div>
           <div><Label>Bankszámlaszám</Label><Input value={state.rent.bank_account ?? ""} onChange={(e) => set("rent", { ...state.rent, bank_account: e.target.value })} /></div>
+          {(state.rent.method === "keszpenz" || state.rent.method === "vegyes") && (
+            <div className="md:col-span-2 rounded-lg border border-amber-300 bg-amber-50 p-3 space-y-2">
+              <p className="text-sm text-amber-900">
+                <strong>Figyelem:</strong> 2022. január 1-je óta a haszonbér kizárólag banki átutalással vagy belföldi postautalvány útján fizethető [Fftv. 50. § (3) bek.]. Készpénz csak az Fftv. 50. § (4) bek. szerinti kivételes esetekben lehetséges — kérjük, jelöld meg a kivétel jogalapját, különben a szerződés nem véglegesíthető.
+              </p>
+              <div>
+                <Label>Készpénzes fizetés jogalapja (Fftv. 50. § (4))</Label>
+                <Select
+                  value={state.rent.cash_exemption ?? ""}
+                  onValueChange={(v) => set("rent", { ...state.rent, cash_exemption: v as Rent["cash_exemption"] })}
+                >
+                  <SelectTrigger><SelectValue placeholder="Válassz kivételt" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="under_1_ha">A föld területe nem éri el az 1 hektárt</SelectItem>
+                    <SelectItem value="close_relatives">Hozzátartozók közötti haszonbérlet</SelectItem>
+                    <SelectItem value="tanya">Tanya haszonbérlete</SelectItem>
+                    <SelectItem value="producer_org_25pct">Legalább 25%-ban bérbeadó/hozzátartozó tulajdonú termelőszervezet</SelectItem>
+                    <SelectItem value="family_farm_member">Családi mezőgazdasági társaság, melyben a bérbeadó tag</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Megjegyzés / igazolás (opcionális)</Label>
+                <Input
+                  value={state.rent.cash_exemption_note ?? ""}
+                  onChange={(e) => set("rent", { ...state.rent, cash_exemption_note: e.target.value })}
+                  placeholder="pl. rokoni kapcsolat, cégjegyzékszám, tulajdoni hányad"
+                />
+              </div>
+            </div>
+          )}
           <div>
             <Label>Indexálás</Label>
             <Select value={state.rent.indexation ?? "none"} onValueChange={(v) => set("rent", { ...state.rent, indexation: v as Rent["indexation"] })}>

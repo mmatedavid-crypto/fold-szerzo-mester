@@ -152,11 +152,12 @@ export const CLAUSE_LIBRARY: ClauseModule[] = [
   {
     id: "payment_deadline",
     title: "Fizetési határidő és mód",
-    bodyTemplate: "Fizetési határidő: {{rent_deadline}}. Fizetési mód: {{rent_method}}.",
-    sourceRefs: [{ sourceId: "fetv" }],
+    bodyTemplate:
+      "Fizetési határidő: {{rent_deadline}}. Fizetési mód: {{rent_method_text}} A haszonbér 2022. január 1-jétől kizárólag banki átutalással vagy belföldi postautalvány útján teljesíthető [Fftv. 50. § (3) bek.]. Az ettől eltérő megállapodás semmis, kivéve az Fftv. 50. § (4) bekezdésében felsorolt eseteket. {{rent_cash_exemption_text}}{{rent_bank_account_text}}",
+    sourceRefs: [{ sourceId: "fftv", section: "50. § (3)–(4)" }, { sourceId: "fetv" }],
     requiredFacts: ["rent.deadline", "rent.method"],
     appliesWhen: always,
-    riskLevel: "normal",
+    riskLevel: "kritikus",
     reviewStatus: "lawyer_review_required",
   },
   {
