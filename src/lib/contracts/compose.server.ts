@@ -134,6 +134,11 @@ export function composeContract(
     rent_description: rentDescription(r),
     rent_deadline: r.deadline ?? "",
     rent_method: r.method ?? "",
+    rent_method_text: rentMethodText(r),
+    rent_cash_exemption_text: rentCashExemptionText(r),
+    rent_bank_account_text: r.bank_account
+      ? ` A haszonbér a bérbeadó ${r.bank_account} számú bankszámlájára teljesítendő.`
+      : "",
     rent_indexation:
       r.indexation === "ksh"
         ? "A díj a KSH inflációs adatai szerint évente felülvizsgálható."
