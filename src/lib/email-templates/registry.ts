@@ -3,6 +3,7 @@ import { template as weeklyDigest } from './weekly-digest'
 import { template as legalSourceFreshness } from './legal-source-freshness'
 import { template as landSaleIntake } from './land-sale-intake'
 import { template as testContractsForLawyer } from './test-contracts-for-lawyer'
+import { template as projectStatusUpdate } from './project-status-update'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -26,4 +27,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'legal-source-freshness': legalSourceFreshness,
   'land-sale-intake': landSaleIntake,
   'test-contracts-for-lawyer': testContractsForLawyer,
+  'project-status-update': projectStatusUpdate,
 }
