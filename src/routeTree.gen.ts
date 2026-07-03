@@ -41,6 +41,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as ApiPublicPaymentsMockConfirmRouteImport } from './routes/api/public/payments/mock-confirm'
 import { Route as ApiPublicHooksSyncNoticesRouteImport } from './routes/api/public/hooks/sync-notices'
 import { Route as ApiPublicHooksSendWeeklyDigestRouteImport } from './routes/api/public/hooks/send-weekly-digest'
+import { Route as ApiPublicHooksSendStatusUpdateRouteImport } from './routes/api/public/hooks/send-status-update'
 import { Route as ApiPublicHooksExtractPricesRouteImport } from './routes/api/public/hooks/extract-prices'
 import { Route as ApiPublicCronSourceFreshnessRouteImport } from './routes/api/public/cron/source-freshness'
 import { Route as ApiPublicAdminSendTestContractsRouteImport } from './routes/api/public/admin/send-test-contracts'
@@ -218,6 +219,12 @@ const ApiPublicHooksSendWeeklyDigestRoute =
     path: '/api/public/hooks/send-weekly-digest',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSendStatusUpdateRoute =
+  ApiPublicHooksSendStatusUpdateRouteImport.update({
+    id: '/api/public/hooks/send-status-update',
+    path: '/api/public/hooks/send-status-update',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksExtractPricesRoute =
   ApiPublicHooksExtractPricesRouteImport.update({
     id: '/api/public/hooks/extract-prices',
@@ -294,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/send-test-contracts': typeof ApiPublicAdminSendTestContractsRoute
   '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
+  '/api/public/hooks/send-status-update': typeof ApiPublicHooksSendStatusUpdateRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -334,6 +342,7 @@ export interface FileRoutesByTo {
   '/api/public/admin/send-test-contracts': typeof ApiPublicAdminSendTestContractsRoute
   '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
+  '/api/public/hooks/send-status-update': typeof ApiPublicHooksSendStatusUpdateRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -376,6 +385,7 @@ export interface FileRoutesById {
   '/api/public/admin/send-test-contracts': typeof ApiPublicAdminSendTestContractsRoute
   '/api/public/cron/source-freshness': typeof ApiPublicCronSourceFreshnessRoute
   '/api/public/hooks/extract-prices': typeof ApiPublicHooksExtractPricesRoute
+  '/api/public/hooks/send-status-update': typeof ApiPublicHooksSendStatusUpdateRoute
   '/api/public/hooks/send-weekly-digest': typeof ApiPublicHooksSendWeeklyDigestRoute
   '/api/public/hooks/sync-notices': typeof ApiPublicHooksSyncNoticesRoute
   '/api/public/payments/mock-confirm': typeof ApiPublicPaymentsMockConfirmRoute
@@ -418,6 +428,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/send-test-contracts'
     | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
+    | '/api/public/hooks/send-status-update'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
@@ -458,6 +469,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/send-test-contracts'
     | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
+    | '/api/public/hooks/send-status-update'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
@@ -499,6 +511,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/send-test-contracts'
     | '/api/public/cron/source-freshness'
     | '/api/public/hooks/extract-prices'
+    | '/api/public/hooks/send-status-update'
     | '/api/public/hooks/send-weekly-digest'
     | '/api/public/hooks/sync-notices'
     | '/api/public/payments/mock-confirm'
@@ -531,6 +544,7 @@ export interface RootRouteChildren {
   ApiPublicAdminSendTestContractsRoute: typeof ApiPublicAdminSendTestContractsRoute
   ApiPublicCronSourceFreshnessRoute: typeof ApiPublicCronSourceFreshnessRoute
   ApiPublicHooksExtractPricesRoute: typeof ApiPublicHooksExtractPricesRoute
+  ApiPublicHooksSendStatusUpdateRoute: typeof ApiPublicHooksSendStatusUpdateRoute
   ApiPublicHooksSendWeeklyDigestRoute: typeof ApiPublicHooksSendWeeklyDigestRoute
   ApiPublicHooksSyncNoticesRoute: typeof ApiPublicHooksSyncNoticesRoute
   ApiPublicPaymentsMockConfirmRoute: typeof ApiPublicPaymentsMockConfirmRoute
@@ -765,6 +779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSendWeeklyDigestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/send-status-update': {
+      id: '/api/public/hooks/send-status-update'
+      path: '/api/public/hooks/send-status-update'
+      fullPath: '/api/public/hooks/send-status-update'
+      preLoaderRoute: typeof ApiPublicHooksSendStatusUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/extract-prices': {
       id: '/api/public/hooks/extract-prices'
       path: '/api/public/hooks/extract-prices'
@@ -882,6 +903,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAdminSendTestContractsRoute: ApiPublicAdminSendTestContractsRoute,
   ApiPublicCronSourceFreshnessRoute: ApiPublicCronSourceFreshnessRoute,
   ApiPublicHooksExtractPricesRoute: ApiPublicHooksExtractPricesRoute,
+  ApiPublicHooksSendStatusUpdateRoute: ApiPublicHooksSendStatusUpdateRoute,
   ApiPublicHooksSendWeeklyDigestRoute: ApiPublicHooksSendWeeklyDigestRoute,
   ApiPublicHooksSyncNoticesRoute: ApiPublicHooksSyncNoticesRoute,
   ApiPublicPaymentsMockConfirmRoute: ApiPublicPaymentsMockConfirmRoute,
