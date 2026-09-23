@@ -32,11 +32,18 @@ import {
 import type { RankId } from "@/lib/rank/leaseRankDefinitions";
 
 export const Route = createFileRoute("/elfogado-nyilatkozat")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    noticeId: stringSearch(search.noticeId),
-    noticePublicationDate: stringSearch(search.noticePublicationDate),
-    deadlineDate: stringSearch(search.deadlineDate),
-    contractSubject: stringSearch(search.contractSubject),
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): {
+    noticeId?: string;
+    noticePublicationDate?: string;
+    deadlineDate?: string;
+    contractSubject?: string;
+  } => ({
+    noticeId: stringSearch(search.noticeId) ?? undefined,
+    noticePublicationDate: stringSearch(search.noticePublicationDate) ?? undefined,
+    deadlineDate: stringSearch(search.deadlineDate) ?? undefined,
+    contractSubject: stringSearch(search.contractSubject) ?? undefined,
   }),
   head: () => ({
     meta: [
